@@ -30,7 +30,7 @@ services:
     environment:
       NODE_ENV: ${NODE_ENV:-development}
       PORT: ${PORT:-3000}
-      DATABASE_URL: mysql://${MYSQL_USER:-expense_user}:${MYSQL_PASSWORD:-expense_password}@mysql:3306/${MYSQL_DATABASE:-expense_tracker}
+      DATABASE_URL: ${DATABASE_URL:?DATABASE_URL is required}
       JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET:-local-development-access-secret-change-me}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET:-local-development-refresh-secret-change-me}
       JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN:-1d}
