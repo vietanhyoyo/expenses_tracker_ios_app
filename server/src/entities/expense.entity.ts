@@ -1,15 +1,17 @@
-import type { Prisma } from '@prisma/client';
+import type { Prisma, TransactionType } from '@prisma/client';
 
 export interface ExpenseCategoryEntity {
   id: number;
   name: string;
   isDefault: boolean;
+  type: TransactionType;
 }
 
 export interface ExpenseEntity {
   id: number;
   userId: number;
   categoryId: number;
+  type: TransactionType;
   title: string;
   amount: Prisma.Decimal;
   expenseDate: Date;

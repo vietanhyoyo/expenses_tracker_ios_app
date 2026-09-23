@@ -14,6 +14,7 @@ interface Tokens {
 interface Category {
   id: number;
   name: string;
+  type: 'income' | 'expense';
 }
 
 interface Expense {
@@ -28,6 +29,28 @@ interface ErrorEnvelope {
 
 interface ExpenseList {
   items: Expense[];
+}
+
+interface Transaction extends Expense {
+  type: 'income' | 'expense';
+  amount: string;
+  transactionDate: string;
+}
+
+interface DashboardSummary {
+  month: string;
+  totalBalance: string;
+  monthlyIncome: string;
+  monthlyExpense: string;
+  monthlyBalance: string;
+}
+
+interface Account {
+  id: number;
+  name: string;
+  type: 'cash' | 'ewallet' | 'bank';
+  initialBalance: string;
+  isDefault: boolean;
 }
 
 const api = request(process.env.E2E_BASE_URL ?? 'http://localhost:3000');
@@ -49,6 +72,15 @@ describe('Expense Tracker API (e2e)', () => {
       .send({ email, password })
       .expect(200);
     const loginData = (login.body as ApiEnvelope<Tokens>).data;
+
+    const accounts = await api
+      .get('/api/v1/accounts')
+      .set('Authorization', `Bearer ${loginData.accessToken}`)
+      .expect(200);
+    const accountValues = (accounts.body as ApiEnvelope<Account[]>).data;
+    expect(accountValues.map((account) => account.type)).toEqual(
+      expect.arrayContaining(['cash', 'ewallet', 'bank']),
+    );
 
     const categories = await api
       .get('/api/v1/categories')
@@ -169,8 +201,9 @@ describe('Expense Tracker API (e2e)', () => {
       .get('/api/v1/categories')
       .set('Authorization', `Bearer ${first.accessToken}`)
       .expect(200);
-    const defaultCategory = (defaultCategories.body as ApiEnvelope<Category[]>)
-      .data[0];
+    const defaultCategory = (
+      defaultCategories.body as ApiEnvelope<Category[]>
+    ).data.find((category) => category.type === 'expense')!;
 
     await api
       .patch(`/api/v1/categories/${defaultCategory.id}`)
@@ -240,6 +273,95 @@ describe('Expense Tracker API (e2e)', () => {
     await api
       .delete(`/api/v1/categories/${custom.id}`)
       .set('Authorization', `Bearer ${first.accessToken}`)
+      .expect(200);
+  }, 30_000);
+
+  it('serves transactions and dashboard summary for the seeded user', async () => {
+    const login = await api
+      .post('/api/v1/auth/login')
+      .send({ email: 'user@gmail.com', password: 'user123456@' })
+      .expect(200);
+    const tokens = (login.body as ApiEnvelope<Tokens>).data;
+    const authorization = `Bearer ${tokens.accessToken}`;
+
+    const categoriesResponse = await api
+      .get('/api/v1/categories')
+      .set('Authorization', authorization)
+      .expect(200);
+    const categories = (categoriesResponse.body as ApiEnvelope<Category[]>)
+      .data;
+    const incomeCategory = categories.find(
+      (category) => category.type === 'income',
+    )!;
+    const expenseCategory = categories.find(
+      (category) => category.type === 'expense',
+    )!;
+
+    const beforeResponse = await api
+      .get('/api/v1/dashboard/summary?month=2026-09')
+      .set('Authorization', authorization)
+      .expect(200);
+    const before = (beforeResponse.body as ApiEnvelope<DashboardSummary>).data;
+
+    const incomeResponse = await api
+      .post('/api/v1/transactions')
+      .set('Authorization', authorization)
+      .send({
+        type: 'income',
+        title: 'Automated salary test',
+        amount: 5000000,
+        transactionDate: '2026-09-23',
+        categoryId: incomeCategory.id,
+      })
+      .expect(201);
+    const income = (incomeResponse.body as ApiEnvelope<Transaction>).data;
+
+    const expenseResponse = await api
+      .post('/api/v1/transactions')
+      .set('Authorization', authorization)
+      .send({
+        type: 'expense',
+        title: 'Automated expense test',
+        amount: 1250000,
+        transactionDate: '2026-09-23',
+        categoryId: expenseCategory.id,
+      })
+      .expect(201);
+    const expense = (expenseResponse.body as ApiEnvelope<Transaction>).data;
+
+    const afterResponse = await api
+      .get('/api/v1/dashboard/summary?month=2026-09')
+      .set('Authorization', authorization)
+      .expect(200);
+    const after = (afterResponse.body as ApiEnvelope<DashboardSummary>).data;
+    expect(Number(after.totalBalance) - Number(before.totalBalance)).toBe(
+      3750000,
+    );
+    expect(Number(after.monthlyIncome) - Number(before.monthlyIncome)).toBe(
+      5000000,
+    );
+    expect(Number(after.monthlyExpense) - Number(before.monthlyExpense)).toBe(
+      1250000,
+    );
+
+    await api
+      .get('/api/v1/transactions?type=income&from=2026-09-01&to=2026-09-30')
+      .set('Authorization', authorization)
+      .expect(200)
+      .expect((response) => {
+        const items = (response.body as ApiEnvelope<{ items: Transaction[] }>)
+          .data.items;
+        expect(items.some((item) => item.id === income.id)).toBe(true);
+        expect(items.every((item) => item.type === 'income')).toBe(true);
+      });
+
+    await api
+      .delete(`/api/v1/transactions/${income.id}`)
+      .set('Authorization', authorization)
+      .expect(200);
+    await api
+      .delete(`/api/v1/transactions/${expense.id}`)
+      .set('Authorization', authorization)
       .expect(200);
   }, 30_000);
 });

@@ -40,24 +40,36 @@ struct CategoriesView: View {
     }
 
     private func categoryRow(_ category: ExpenseCategory) -> some View {
-        Button { editingCategory = category } label: {
-            HStack(spacing: AppSpacing.small) {
-                AppIconBadge(
-                    icon: category.icon,
-                    color: category.color,
-                    size: 38
-                )
-                Text(category.name)
-                    .font(AppTypography.bodyEmphasis)
-                    .foregroundStyle(.primary)
-            }
-            .padding(.vertical, 2)
-        }
-        .swipeActions {
-            Button("Xoá", role: .destructive) {
-                Task { await viewModel.delete(category) }
+        Group {
+            if category.isEditable {
+                Button { editingCategory = category } label: {
+                    categoryLabel(category)
+                }
+                .swipeActions {
+                    Button("Xoá", role: .destructive) {
+                        Task { await viewModel.delete(category) }
+                    }
+                }
+            } else {
+                categoryLabel(category)
             }
         }
+    }
+
+    private func categoryLabel(_ category: ExpenseCategory) -> some View {
+        HStack(spacing: AppSpacing.small) {
+            AppIconBadge(icon: category.icon, color: category.color, size: 38)
+            Text(category.name)
+                .font(AppTypography.bodyEmphasis)
+                .foregroundStyle(.primary)
+            Spacer()
+            if !category.isEditable {
+                Text("Mặc định")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(.vertical, 2)
     }
 
     private func reload() {

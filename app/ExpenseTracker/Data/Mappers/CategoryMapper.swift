@@ -8,7 +8,8 @@ enum CategoryMapper {
             name: entity.name,
             icon: entity.icon,
             type: type,
-            colorHex: entity.colorHex
+            colorHex: entity.colorHex,
+            isEditable: true
         )
     }
 

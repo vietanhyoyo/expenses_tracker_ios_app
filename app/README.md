@@ -1,6 +1,6 @@
 # Sổ Thu Chi — Expense Tracker
 
-Ứng dụng quản lý thu chi cục bộ bằng SwiftUI, SwiftData và Swift Charts. Dự án tuân theo Clean Architecture (`Presentation → Domain ← Data`) với MVVM ở lớp Presentation.
+Ứng dụng quản lý thu chi bằng SwiftUI, SwiftData, Swift Charts và REST API. Dự án tuân theo Clean Architecture (`Presentation → Domain ← Data`) với MVVM ở lớp Presentation.
 
 ## Kiến trúc
 
@@ -15,6 +15,7 @@ ExpenseTracker/
 ├── Data/
 │   ├── Local/Models/       # SwiftData persistence models
 │   ├── Local/DataSources/  # Đọc/ghi ModelContext
+│   ├── Remote/             # API client, DTO, Keychain và ánh xạ ID server
 │   ├── Mappers/            # Chuyển đổi Domain ↔ persistence
 │   └── Repositories/       # Hiện thực repository contract
 ├── Presentation/           # View + ViewModel, nhóm theo feature
@@ -36,12 +37,13 @@ Tài liệu chi tiết:
 - CRUD giao dịch; tìm kiếm, lọc theo loại/danh mục/tài khoản và sắp xếp.
 - Quản lý tài khoản, danh mục và ngân sách tháng.
 - Thống kê chi tiêu theo ngày và danh mục bằng Swift Charts.
-- Lưu hoàn toàn trên thiết bị, không backend, tài khoản hay đồng bộ đám mây.
+- Đăng ký, đăng nhập, tự refresh token và đăng xuất; token lưu trong Keychain.
+- Khoản thu, khoản chi, danh mục, tài khoản và số liệu Tổng quan dùng REST API; ngân sách và metadata chưa có API tiếp tục lưu cục bộ.
 - Định dạng VND và giao diện tiếng Việt, hỗ trợ Dark Mode/Dynamic Type.
 
 ## Chạy dự án
 
-Mở `ExpenseTracker.xcodeproj`, chọn scheme `ExpenseTracker`, chọn iOS Simulator và Run.
+Khởi động backend trong `../server` bằng `docker compose up --build -d`. Sau đó mở `ExpenseTracker.xcodeproj`, chọn scheme `ExpenseTracker`, chọn iOS Simulator và Run. Simulator dùng API mặc định tại `http://localhost:3000/api/v1`.
 
 ```sh
 xcodebuild -project ExpenseTracker.xcodeproj -scheme ExpenseTracker \

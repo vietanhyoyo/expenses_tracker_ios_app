@@ -3,6 +3,18 @@ import XCTest
 
 @MainActor
 final class DomainUseCaseTests: XCTestCase {
+    func testServerIDCodecRoundTripsCategoryAndExpenseIDs() {
+        let category = ServerIDCodec.categoryUUID(id: 42, userID: 7)
+        let expense = ServerIDCodec.expenseUUID(id: 99, userID: 7)
+
+        XCTAssertEqual(ServerIDCodec.categoryID(from: category), 42)
+        XCTAssertEqual(ServerIDCodec.expenseID(from: expense), 99)
+        XCTAssertEqual(ServerIDCodec.userID(from: category), 7)
+        XCTAssertEqual(ServerIDCodec.userID(from: expense), 7)
+        XCTAssertNil(ServerIDCodec.expenseID(from: category))
+        XCTAssertNil(ServerIDCodec.categoryID(from: UUID()))
+    }
+
     func testAccountBalanceUsesInitialIncomeAndExpenses() {
         let account = Account(id: UUID(), name: "Ví", initialBalance: 1_000_000)
         let category = UUID()

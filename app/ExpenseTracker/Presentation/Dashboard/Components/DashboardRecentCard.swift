@@ -3,14 +3,16 @@ import SwiftUI
 struct DashboardRecentCard: View {
     let transactions: [ExpenseTransaction]
     let categories: [UUID: ExpenseCategory]
+    let onShowAll: () -> Void
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.small) {
-            AppSectionHeader(
-                title: "Giao dịch gần đây",
-                icon: "clock.fill",
-                detail: "Mới nhất"
-            )
+        DashboardSectionCard(
+            title: "Giao dịch gần đây",
+            icon: "clock.fill",
+            detail: "Mới nhất",
+            actionTitle: "Xem thêm",
+            action: onShowAll
+        ) {
             if transactions.isEmpty {
                 DashboardCompactEmptyState(
                     icon: "clock.arrow.circlepath",
@@ -20,17 +22,18 @@ struct DashboardRecentCard: View {
                 transactionRows
             }
         }
-        .appCard()
     }
 
     private var transactionRows: some View {
-        ForEach(Array(transactions.enumerated()), id: \.element.id) { index, transaction in
+        let visibleTransactions = Array(transactions.prefix(5))
+
+        return ForEach(Array(visibleTransactions.enumerated()), id: \.element.id) { index, transaction in
             TransactionRow(
                 transaction: transaction,
                 category: categories[transaction.categoryID],
                 account: nil
             )
-            if index < transactions.count - 1 {
+            if index < visibleTransactions.count - 1 {
                 Divider().padding(.leading, 54)
             }
         }

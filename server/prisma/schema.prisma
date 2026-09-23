@@ -7,11 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum TransactionType {
+  income
+  expense
+}
+
+enum AccountType {
+  cash
+  ewallet
+  bank
+}
+
 model User {
   id            Int            @id @default(autoincrement())
   email         String         @unique @db.VarChar(255)
   passwordHash  String         @map("password_hash") @db.VarChar(255)
   expenses      Expense[]
+  accounts      Account[]
   categories    Category[]
   refreshTokens RefreshToken[]
   createdAt     DateTime       @default(now()) @map("created_at")
@@ -20,18 +32,35 @@ model User {
   @@map("users")
 }
 
+model Account {
+  id             Int         @id @default(autoincrement())
+  userId         Int         @map("user_id")
+  name           String      @db.VarChar(100)
+  type           AccountType @default(cash)
+  initialBalance Decimal     @default(0) @map("initial_balance") @db.Decimal(15, 2)
+  isDefault      Boolean     @default(false) @map("is_default")
+  user           User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt      DateTime    @default(now()) @map("created_at")
+  updatedAt      DateTime    @updatedAt @map("updated_at")
+
+  @@unique([userId, name])
+  @@index([userId, type])
+  @@map("accounts")
+}
+
 model Category {
   id             Int       @id @default(autoincrement())
   name           String    @db.VarChar(100)
   normalizedName String    @map("normalized_name") @db.VarChar(100)
   userId         Int?      @map("user_id")
   isDefault      Boolean   @default(false) @map("is_default")
+  type           TransactionType @default(expense)
   user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expenses       Expense[]
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
-  @@unique([userId, normalizedName])
+  @@unique([userId, normalizedName, type])
   @@index([isDefault])
   @@map("categories")
 }
@@ -40,6 +69,7 @@ model Expense {
   id          Int      @id @default(autoincrement())
   userId      Int      @map("user_id")
   categoryId  Int      @map("category_id")
+  type        TransactionType @default(expense)
   title       String   @db.VarChar(150)
   amount      Decimal  @db.Decimal(15, 2)
   expenseDate DateTime @map("expense_date") @db.DateTime(3)

@@ -4,10 +4,19 @@ import Foundation
 final class DefaultDataSeeder {
     private let categories: CategoryUseCases
     private let accounts: AccountUseCases
+    private let includeCategories: Bool
+    private let includeAccounts: Bool
 
-    init(categories: CategoryUseCases, accounts: AccountUseCases) {
+    init(
+        categories: CategoryUseCases,
+        accounts: AccountUseCases,
+        includeCategories: Bool,
+        includeAccounts: Bool
+    ) {
         self.categories = categories
         self.accounts = accounts
+        self.includeCategories = includeCategories
+        self.includeAccounts = includeAccounts
     }
 
     func seedIfNeeded() async {
@@ -20,14 +29,15 @@ final class DefaultDataSeeder {
     }
 
     private func seedCategoriesIfNeeded() async throws {
-        guard try await categories.getAll().isEmpty else { return }
-
-        for category in Self.defaultCategories {
+        guard includeCategories else { return }
+        let existingNames = Set(try await categories.getAll().map(\.name))
+        for category in Self.defaultCategories where !existingNames.contains(category.name) {
             try await categories.save(category, isEditing: false)
         }
     }
 
     private func seedAccountIfNeeded() async throws {
+        guard includeAccounts else { return }
         guard try await accounts.getAll().isEmpty else { return }
 
         let cashAccount = Account(

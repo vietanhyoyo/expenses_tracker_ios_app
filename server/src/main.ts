@@ -55,7 +55,9 @@ export async function bootstrap(): Promise<void> {
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Expense Tracker API')
-    .setDescription('REST API for authentication, categories, and expenses')
+    .setDescription(
+      'REST API for authentication, accounts, categories, transactions, expenses, and dashboard summaries',
+    )
     .setVersion('1.0')
     .addBearerAuth()
     .build();

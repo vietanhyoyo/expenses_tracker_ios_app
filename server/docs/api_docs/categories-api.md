@@ -38,6 +38,7 @@ Error response:
 interface Category {
   id: number;
   name: string;
+  type: 'income' | 'expense';
   isDefault: boolean;
   userId: number | null;
   createdAt: string; // ISO 8601
@@ -69,6 +70,7 @@ Authorization: Bearer <access-token>
     {
       "id": 1,
       "name": "Food",
+      "type": "expense",
       "isDefault": true,
       "userId": null,
       "createdAt": "2026-09-22T10:00:00.000Z",
@@ -77,6 +79,7 @@ Authorization: Bearer <access-token>
     {
       "id": 9,
       "name": "Gym",
+      "type": "expense",
       "isDefault": false,
       "userId": 1,
       "createdAt": "2026-09-22T10:05:00.000Z",
@@ -95,6 +98,7 @@ Request body:
 | Field | Type | Required | Rules |
 | --- | --- | --- | --- |
 | `name` | string | Yes | Must not contain only whitespace; maximum 100 characters |
+| `type` | string | No | `income` or `expense`; defaults to `expense` |
 
 ```http
 POST /api/v1/categories
@@ -102,7 +106,8 @@ Authorization: Bearer <access-token>
 Content-Type: application/json
 
 {
-  "name": "Gym"
+  "name": "Gym",
+  "type": "expense"
 }
 ```
 
@@ -115,6 +120,7 @@ Content-Type: application/json
   "data": {
     "id": 9,
     "name": "Gym",
+    "type": "expense",
     "isDefault": false,
     "userId": 1,
     "createdAt": "2026-09-22T10:05:00.000Z",
@@ -123,7 +129,7 @@ Content-Type: application/json
 }
 ```
 
-The backend trims the name and collapses consecutive whitespace into a single space. Duplicate checks are case-insensitive and compare the name against both system categories and the current user's custom categories.
+The backend trims the name and collapses consecutive whitespace into a single space. Duplicate checks are case-insensitive within the same `type` and compare the name against both system categories and the current user's custom categories.
 
 ## Update a custom category
 
@@ -152,6 +158,7 @@ The `200 OK` response returns the updated `Category`:
   "data": {
     "id": 9,
     "name": "Fitness",
+    "type": "expense",
     "isDefault": false,
     "userId": 1,
     "createdAt": "2026-09-22T10:05:00.000Z",
@@ -166,7 +173,7 @@ The frontend should display the edit action only when `isDefault === false` and 
 
 `DELETE /categories/:id`
 
-Only a custom category owned by the current user and not referenced by any expense can be deleted.
+Only a custom category owned by the current user and not referenced by any transaction can be deleted.
 
 ```http
 DELETE /api/v1/categories/9
@@ -194,4 +201,3 @@ Authorization: Bearer <access-token>
 | 404 | `CATEGORY_NOT_FOUND` | The category does not exist or belongs to another user |
 | 409 | `CATEGORY_ALREADY_EXISTS` | The name duplicates a system category or an existing custom category |
 | 409 | `CATEGORY_IN_USE` | One or more expenses currently use the category |
-

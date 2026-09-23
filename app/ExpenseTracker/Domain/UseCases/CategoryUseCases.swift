@@ -20,7 +20,8 @@ struct CategoryUseCases {
             name: name,
             icon: category.icon,
             type: category.type,
-            colorHex: category.colorHex
+            colorHex: category.colorHex,
+            isEditable: category.isEditable
         )
         if isEditing {
             try await categories.updateCategory(normalized)

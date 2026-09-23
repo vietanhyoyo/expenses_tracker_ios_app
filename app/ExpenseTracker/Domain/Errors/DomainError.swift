@@ -11,4 +11,15 @@ enum DomainError: Error, Equatable {
     case duplicateBudget
     case itemInUse
     case persistenceError
+    case invalidEmail
+    case invalidPassword
+    case invalidCredentials
+    case emailAlreadyExists
+    case authenticationRequired
+    case sessionExpired
+    case categoryNotEditable
+    case duplicateCategory
+    case duplicateAccount
+    case networkUnavailable
+    case remoteError(String)
 }

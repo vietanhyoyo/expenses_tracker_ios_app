@@ -40,6 +40,7 @@ struct CategoryFormView: View {
                 }
             }
             .pickerStyle(.segmented)
+            .disabled(viewModel.isEditing)
             .onChange(of: viewModel.type) { _, _ in
                 viewModel.typeChanged()
             }

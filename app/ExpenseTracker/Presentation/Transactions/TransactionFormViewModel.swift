@@ -86,6 +86,22 @@ final class TransactionFormViewModel {
         }
     }
 
+    func delete() async -> Bool {
+        guard isEditing else { return false }
+
+        isSaving = true
+        errorMessage = nil
+        defer { isSaving = false }
+
+        do {
+            try await transactions.delete(id: id)
+            return true
+        } catch {
+            errorMessage = error.userMessage
+            return false
+        }
+    }
+
     private var parsedAmount: Decimal? {
         AppFormatters.decimal(from: amountText)
     }

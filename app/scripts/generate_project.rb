@@ -12,7 +12,10 @@ def add_tree(project_group, disk_path, target)
   Dir.children(disk_path).sort.each do |name|
     next if name.start_with?(".")
     full_path = File.join(disk_path, name)
-    if File.directory?(full_path)
+    if File.directory?(full_path) && name.end_with?(".xcassets")
+      reference = project_group.new_file(full_path)
+      target.resources_build_phase.add_file_reference(reference)
+    elsif File.directory?(full_path)
       add_tree(project_group.new_group(name), full_path, target)
     elsif name.end_with?(".swift")
       reference = project_group.new_file(full_path)
@@ -28,15 +31,13 @@ add_tree(test_group, File.join(root, "ExpenseTrackerTests"), tests)
 
 app.build_configurations.each do |config|
   config.build_settings["PRODUCT_BUNDLE_IDENTIFIER"] = "com.local.ExpenseTracker"
-  config.build_settings["GENERATE_INFOPLIST_FILE"] = "YES"
-  config.build_settings["INFOPLIST_KEY_CFBundleDisplayName"] = "Sổ Thu Chi"
-  config.build_settings["INFOPLIST_KEY_UIApplicationSceneManifest_Generation"] = "YES"
-  config.build_settings["INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents"] = "YES"
-  config.build_settings["INFOPLIST_KEY_UILaunchScreen_Generation"] = "YES"
+  config.build_settings["GENERATE_INFOPLIST_FILE"] = "NO"
+  config.build_settings["INFOPLIST_FILE"] = "ExpenseTracker/Info.plist"
   config.build_settings["TARGETED_DEVICE_FAMILY"] = "1"
   config.build_settings["SWIFT_VERSION"] = "5.0"
   config.build_settings["CURRENT_PROJECT_VERSION"] = "1"
   config.build_settings["MARKETING_VERSION"] = "1.0"
+  config.build_settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
 end
 
 tests.build_configurations.each do |config|

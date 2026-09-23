@@ -4,11 +4,10 @@ struct DashboardSpendingCard: View {
     let items: [CategorySpending]
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.medium) {
-            AppSectionHeader(
-                title: "Chi tiêu theo danh mục",
-                icon: "chart.pie.fill"
-            )
+        DashboardSectionCard(
+            title: "Chi tiêu theo danh mục",
+            icon: "chart.pie.fill"
+        ) {
             if items.isEmpty {
                 DashboardCompactEmptyState(
                     icon: "chart.pie",
@@ -18,7 +17,6 @@ struct DashboardSpendingCard: View {
                 spendingRows
             }
         }
-        .appCard()
     }
 
     private var spendingRows: some View {

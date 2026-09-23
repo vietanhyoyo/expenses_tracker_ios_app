@@ -1,15 +1,18 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TransactionType } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import type { ExpenseEntity } from '../entities/expense.entity';
 
 const expenseInclude = {
-  category: { select: { id: true, name: true, isDefault: true } },
+  category: {
+    select: { id: true, name: true, isDefault: true, type: true },
+  },
 } satisfies Prisma.ExpenseInclude;
 
 interface CreateExpenseRecord {
   userId: number;
   categoryId: number;
+  type: TransactionType;
   title: string;
   amount: number;
   expenseDate: Date;
@@ -20,6 +23,7 @@ interface CreateExpenseRecord {
 interface ExpenseFilters {
   userId: number;
   categoryId?: number;
+  type?: TransactionType;
   from?: Date;
   to?: Date;
   sortBy: 'expenseDate' | 'amount' | 'createdAt';
@@ -33,6 +37,7 @@ interface UpdateExpenseRecord {
   amount?: number;
   expenseDate?: Date;
   categoryId?: number;
+  type?: TransactionType;
   location?: string | null;
   notes?: string | null;
 }
@@ -53,6 +58,7 @@ export class ExpensesRepository {
   ): Promise<{ items: ExpenseEntity[]; total: number }> {
     const where: Prisma.ExpenseWhereInput = { userId: filters.userId };
     if (filters.categoryId !== undefined) where.categoryId = filters.categoryId;
+    if (filters.type !== undefined) where.type = filters.type;
     if (filters.from || filters.to) {
       where.expenseDate = {
         ...(filters.from ? { gte: filters.from } : {}),
@@ -75,9 +81,13 @@ export class ExpensesRepository {
     return { items, total };
   }
 
-  findOwned(userId: number, id: number): Promise<ExpenseEntity | null> {
+  findOwned(
+    userId: number,
+    id: number,
+    type?: TransactionType,
+  ): Promise<ExpenseEntity | null> {
     return this.prisma.expense.findFirst({
-      where: { id, userId },
+      where: { id, userId, ...(type === undefined ? {} : { type }) },
       include: expenseInclude,
     });
   }
@@ -102,11 +112,13 @@ export class ExpensesRepository {
   async isCategoryAccessible(
     userId: number,
     categoryId: number,
+    type?: TransactionType,
   ): Promise<boolean> {
     const category = await this.prisma.category.findFirst({
       where: {
         id: categoryId,
         OR: [{ isDefault: true, userId: null }, { userId }],
+        ...(type === undefined ? {} : { type }),
       },
       select: { id: true },
     });

@@ -24,6 +24,7 @@ export class ExpensesService {
     const expense = await this.expensesRepository.create({
       userId,
       categoryId: dto.categoryId,
+      type: 'expense',
       title: cleanText(dto.title),
       amount: dto.amount,
       expenseDate: new Date(dto.expenseDate),
@@ -48,6 +49,7 @@ export class ExpensesService {
 
     const { items, total } = await this.expensesRepository.findPaginated({
       userId,
+      type: 'expense',
       categoryId: query.categoryId,
       from: query.from ? new Date(query.from) : undefined,
       to: query.to ? this.endOfInputDate(query.to) : undefined,
@@ -114,7 +116,11 @@ export class ExpensesService {
     userId: number,
     id: number,
   ): Promise<ExpenseEntity> {
-    const expense = await this.expensesRepository.findOwned(userId, id);
+    const expense = await this.expensesRepository.findOwned(
+      userId,
+      id,
+      'expense',
+    );
     if (!expense) {
       throw new ApiException(
         ErrorCode.EXPENSE_NOT_FOUND,
@@ -130,7 +136,11 @@ export class ExpensesService {
     categoryId: number,
   ): Promise<void> {
     if (
-      !(await this.expensesRepository.isCategoryAccessible(userId, categoryId))
+      !(await this.expensesRepository.isCategoryAccessible(
+        userId,
+        categoryId,
+        'expense',
+      ))
     ) {
       throw new ApiException(
         ErrorCode.CATEGORY_NOT_FOUND,

@@ -2,11 +2,16 @@ import SwiftUI
 
 struct DashboardView: View {
     private let factory: any ViewModelFactory
+    private let onShowTransactions: () -> Void
     @State private var viewModel: DashboardViewModel
     @State private var isShowingTransactionForm = false
 
-    init(factory: any ViewModelFactory) {
+    init(
+        factory: any ViewModelFactory,
+        onShowTransactions: @escaping () -> Void = {}
+    ) {
         self.factory = factory
+        self.onShowTransactions = onShowTransactions
         _viewModel = State(initialValue: factory.makeDashboardViewModel())
     }
 
@@ -32,7 +37,8 @@ struct DashboardView: View {
                     }
                     DashboardRecentCard(
                         transactions: viewModel.recentTransactions,
-                        categories: viewModel.categories
+                        categories: viewModel.categories,
+                        onShowAll: onShowTransactions
                     )
                 }
                 .padding(.horizontal, AppSpacing.medium)

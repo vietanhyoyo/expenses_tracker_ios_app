@@ -6,13 +6,15 @@ struct ExpenseCategory: Identifiable, Equatable, Sendable {
     let icon: String
     let type: TransactionType
     let colorHex: String
+    let isEditable: Bool
 
     init(
         id: UUID,
         name: String,
         icon: String,
         type: TransactionType,
-        colorHex: String? = nil
+        colorHex: String? = nil,
+        isEditable: Bool = true
     ) {
         self.id = id
         self.name = name
@@ -21,6 +23,7 @@ struct ExpenseCategory: Identifiable, Equatable, Sendable {
         self.colorHex = colorHex
             ?? Self.defaultPalette[name]
             ?? Self.defaultColorHex(for: type)
+        self.isEditable = isEditable
     }
 
     static func defaultColorHex(for type: TransactionType) -> String {

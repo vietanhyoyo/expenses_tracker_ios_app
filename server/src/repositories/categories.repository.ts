@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, TransactionType } from '@prisma/client';
 import { PrismaService } from '../database/prisma.service';
 import type { CategoryEntity } from '../entities/category.entity';
 
@@ -7,6 +7,7 @@ const categorySelect = {
   id: true,
   name: true,
   isDefault: true,
+  type: true,
   userId: true,
   createdAt: true,
   updatedAt: true,
@@ -28,11 +29,17 @@ export class CategoriesRepository {
     return this.prisma.category.findUnique({ where: { id } });
   }
 
-  findDuplicate(userId: number, normalizedName: string, excludeId?: number) {
+  findDuplicate(
+    userId: number,
+    normalizedName: string,
+    type: TransactionType,
+    excludeId?: number,
+  ) {
     return this.prisma.category.findFirst({
       where: {
         ...(excludeId === undefined ? {} : { id: { not: excludeId } }),
         normalizedName,
+        type,
         OR: [{ userId }, { isDefault: true, userId: null }],
       },
     });
@@ -42,10 +49,11 @@ export class CategoriesRepository {
     userId: number,
     name: string,
     normalizedName: string,
+    type: TransactionType,
   ): Promise<CategoryEntity | null> {
     try {
       return await this.prisma.category.create({
-        data: { name, normalizedName, userId, isDefault: false },
+        data: { name, normalizedName, type, userId, isDefault: false },
         select: categorySelect,
       });
     } catch (error: unknown) {
@@ -56,7 +64,11 @@ export class CategoriesRepository {
 
   async update(
     id: number,
-    data: { name?: string; normalizedName?: string },
+    data: {
+      name?: string;
+      normalizedName?: string;
+      type?: TransactionType;
+    },
   ): Promise<CategoryEntity | null> {
     try {
       return await this.prisma.category.update({

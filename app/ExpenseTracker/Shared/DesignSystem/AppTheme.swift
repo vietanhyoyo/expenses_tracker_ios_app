@@ -2,8 +2,12 @@ import SwiftUI
 import UIKit
 
 enum AppTheme {
-    static let teal = Color(red: 0, green: 146 / 255, blue: 184 / 255)
-    static let tealDark = Color(red: 0, green: 78 / 255, blue: 102 / 255)
+    static let primary = Color(red: 76 / 255, green: 89 / 255, blue: 215 / 255)
+    static let primaryDark = Color(red: 48 / 255, green: 58 / 255, blue: 158 / 255)
+
+    // Compatibility aliases for existing views while the design token remains centralized.
+    static let teal = primary
+    static let tealDark = primaryDark
     static let navy = Color(red: 0.07, green: 0.14, blue: 0.22)
     static let coral = Color(red: 0.93, green: 0.31, blue: 0.29)
     static let gold = Color(red: 0.94, green: 0.62, blue: 0.12)

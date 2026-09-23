@@ -14,13 +14,13 @@ Checklist khi code: [CODING_CHECKLIST.md](CODING_CHECKLIST.md).
 | UI | SwiftUI, Swift Charts, một phần UIKit (`UITextField` nhập tiền) |
 | Kiến trúc | Clean Architecture, MVVM ở Presentation |
 | State | Observation (`@Observable`) |
-| Lưu trữ | SwiftData, chỉ trên thiết bị |
+| Lưu trữ | REST API cho giao dịch, danh mục và Tổng quan; SwiftData cho phần API chưa hỗ trợ |
 | Concurrency | `async/await`, toàn bộ pipeline chạy trên `@MainActor` |
 | DI | Constructor injection, composition root là `AppContainer` |
 | Test | XCTest (`ExpenseTrackerTests`) |
 | Ngôn ngữ build | `SWIFT_VERSION = 5.0` |
 
-App không có backend, không đăng nhập, không đồng bộ đám mây.
+App dùng backend NestJS tại `http://localhost:3000/api/v1`, có đăng ký/đăng nhập, refresh token rotation và đăng xuất. Khoản thu, khoản chi, danh mục và số liệu Tổng quan được đồng bộ với server. Tài khoản và ngân sách vẫn lưu trên thiết bị vì server chưa có API tương ứng.
 
 ---
 
@@ -42,6 +42,8 @@ flowchart TB
     end
     subgraph Data
         RI[RepositoryImpl] --> DS[SwiftDataLocalDataSource]
+        RI --> API[APIClient + REST API]
+        API --> Keychain[Keychain token store]
         RI --> Mapper
         DS --> Model["@Model Entity"]
     end
@@ -90,10 +92,11 @@ ExpenseTracker/
 ├── Data/
 │   ├── Local/Models/                      # @Model SwiftData
 │   ├── Local/DataSources/                 # SwiftDataLocalDataSource<Entity> + extension theo entity
+│   ├── Remote/                            # APIClient, DTO, Keychain, codec ID và metadata phụ trợ
 │   ├── Mappers/                           # Entity ↔ Domain
-│   └── Repositories/                      # RepositoryImpl + PersistenceErrorMapper
+│   └── Repositories/                      # Local và remote repository
 ├── Presentation/
-│   ├── Dashboard/  Transactions/  Statistics/  Accounts/  Budgets/  Categories/  Settings/
+│   ├── Auth/  Dashboard/  Transactions/  Statistics/  Accounts/  Budgets/  Categories/  Settings/
 │   │   ├── <Feature>View.swift / <Feature>ViewModel.swift          # Màn danh sách
 │   │   ├── <Feature>FormView.swift / <Feature>FormViewModel.swift  # Sheet thêm/sửa
 │   │   ├── Components/                    # View con chỉ dùng trong feature
@@ -201,6 +204,15 @@ extension SwiftDataLocalDataSource where Entity == AccountEntity {
 
 `XxxRepositoryImpl` ghép data source và mapper. Mọi thao tác được bọc trong `PersistenceErrorMapper.execute { … }`: `DomainError` giữ nguyên, lỗi khác (SwiftData) chuyển thành `.persistenceError`. Nhờ vậy tầng trên không bao giờ thấy lỗi của framework lưu trữ.
 
+### 5.5 Remote repository
+
+- `APIClient` giải mã response envelope, gắn access token, refresh một lần khi nhận `ACCESS_TOKEN_EXPIRED`, rồi thử lại request. Refresh thất bại sẽ xoá phiên và đưa người dùng về màn đăng nhập.
+- `KeychainTokenStore` lưu access/refresh token. `RemoteMetadataStore` chỉ lưu icon/màu danh mục và tài khoản được chọn cho khoản chi vì transaction API chưa có các field metadata này.
+- `RemoteCategoryRepository` dùng `/categories` cho cả danh mục thu và chi; danh mục mặc định có `isEditable = false`.
+- `RemoteTransactionRepository` dùng `/transactions` cho cả khoản thu và chi, tải đủ các trang (100 phần tử/trang), giữ amount bằng `Decimal` và ánh xạ ID số của server sang UUID ổn định.
+- `RemoteDashboardRepository` dùng `/dashboard/summary?month=YYYY-MM` cho tổng số dư và tổng thu/chi theo tháng.
+- `AppContainer(inMemory: true)` vẫn dùng repository local hoàn toàn để test độc lập với mạng.
+
 ---
 
 ## 6. Presentation
@@ -221,14 +233,14 @@ View ──(action)──▶ ViewModel ──▶ UseCase
 
 Protocol `ViewModelFactory` (Presentation/Shared) có một hàm `makeXxxViewModel(...)` cho mỗi ViewModel; `AppContainer` hiện thực nó.
 
-- `RootView` (App) truyền `container` vào `DashboardView(factory:)`, `TransactionListView(factory:)`, `SettingsView(factory:)`; `StatisticsView` nhận ViewModel tạo sẵn.
+- `RootView` (App) tạo một `SessionViewModel`, truyền `container` vào `DashboardView(factory:)`, `TransactionListView(factory:)`, `SettingsView(factory:session:)`; `StatisticsView` nhận ViewModel tạo sẵn.
 - View cần mở màn khác (Settings → Accounts/Categories/Budgets, danh sách → form) giữ `factory: any ViewModelFactory` và tạo ViewModel con từ đó.
 - View tự tạo ViewModel của mình trong `init` bằng `State(initialValue: factory.makeXxxViewModel())`.
 - Không View hay ViewModel nào khởi tạo use case, repository hay tham chiếu `AppContainer` (ngoại lệ duy nhất: `#Preview`).
 
 ### 6.3 Điều hướng
 
-`RootView` hiển thị màn chờ cho tới khi `container.bootstrap()` xong, sau đó `TabView` gồm 4 tab: Tổng quan, Giao dịch, Thống kê, Cài đặt. Mỗi tab có `NavigationStack` riêng. Tài khoản, Danh mục, Ngân sách được mở từ Cài đặt bằng `NavigationLink`. Thêm/sửa dùng `.sheet`; màn danh sách tải lại trong `onDismiss`.
+`RootView` khôi phục phiên từ Keychain và `/users/me`. Khi chưa có phiên, app hiển thị màn đăng nhập/đăng ký. Sau khi xác thực và `container.bootstrap()` xong, `TabView` gồm 4 tab: Tổng quan, Giao dịch, Thống kê, Cài đặt. Mỗi tab có `NavigationStack` riêng. Tài khoản, Danh mục, Ngân sách được mở từ Cài đặt bằng `NavigationLink`. Thêm/sửa dùng `.sheet`; màn danh sách tải lại trong `onDismiss`.
 
 ### 6.4 Trạng thái màn hình
 
@@ -273,26 +285,27 @@ TransactionFormView ─ Lưu
   → TransactionFormViewModel.save()          # parse tiền, trim ghi chú, dựng ExpenseTransaction
   → TransactionUseCases.save(_, isEditing:)  # validate nghiệp vụ
   → TransactionRepository.addTransaction     # protocol
-  → TransactionRepositoryImpl                # TransactionMapper.toEntity + PersistenceErrorMapper
-  → TransactionLocalDataSource.insert        # context.insert + save
-  → SwiftData
+  → RemoteTransactionRepository → POST /transactions
 ```
 
 ### Đọc (Dashboard)
 
 ```text
 DashboardView.task → DashboardViewModel.load()
-  → AccountUseCases.totalBalance / StatisticsUseCases.* / BudgetUseCases.progress / CategoryUseCases.getAll
-  → Repository.getXxx → DataSource.fetchAll → Mapper.toDomain
+  → DashboardUseCases.summary → GET /dashboard/summary?month=YYYY-MM
+  → StatisticsUseCases.* / BudgetUseCases.progress / CategoryUseCases.getAll
+  → Repository.getXxx → REST API hoặc DataSource.fetchAll → Domain model
   → ViewModel gán state → View render lại
 ```
 
 ### Khởi động
 
 ```text
-ExpenseTrackerApp.init → AppContainer()   # tạo ModelContainer, nối dependency
-RootView.task → container.bootstrap()     # DefaultDataSeeder: 12 danh mục + tài khoản "Tiền mặt" nếu DB trống
-             → isReady = true → TabView
+ExpenseTrackerApp.init → AppContainer()       # ModelContainer + APIClient + remote repository
+RootView.task → SessionViewModel.restore()    # Keychain → GET /users/me (tự refresh nếu cần)
+  ├─ chưa xác thực → AuthView
+  └─ đã xác thực → container.bootstrap()      # chỉ seed dữ liệu local khi chạy in-memory; tài khoản production lấy từ `/accounts`
+                 → isReady = true → TabView
 ```
 
 ---
@@ -331,6 +344,7 @@ xcodebuild -project ExpenseTracker.xcodeproj -scheme ExpenseTracker \
 |---|---|---|
 | Truy vấn | Use case lấy **toàn bộ** giao dịch rồi lọc trong bộ nhớ. Dashboard gọi nhiều use case nên fetch giao dịch nhiều lần mỗi lần tải. | Ổn với dữ liệu cá nhân (vài nghìn bản ghi). Khi lớn hơn: thêm method repository có tham số khoảng thời gian (`getTransactions(in: DateInterval)`) và đẩy lọc xuống `#Predicate`. |
 | Concurrency | Toàn bộ repository/data source chạy trên `@MainActor` với `mainContext`. | Chuyển data source sang `@ModelActor` khi thao tác nặng; protocol đã `async` nên Domain không đổi. |
+| API chưa đủ aggregate | Server đã có tài khoản và giao dịch vẫn lưu account metadata ở app; ngân sách chưa có API. | Tài khoản dùng `/accounts`; ngân sách và metadata tiếp tục local cho đến khi backend có endpoint/field tương ứng. |
 | Ràng buộc tham chiếu | Liên kết bằng UUID, không có relationship SwiftData; kiểm tra "đang được dùng" nằm ở use case. | Giữ nguyên để Domain độc lập với SwiftData. |
 | Chuỗi giao diện | Chuỗi tiếng Việt viết trực tiếp trong code. | Chuyển sang String Catalog nếu cần đa ngôn ngữ. |
 | Bảng màu danh mục mặc định | `ExpenseCategory.defaultPalette` gắn theo tên tiếng Việt, dùng cho cả seed và dữ liệu cũ thiếu màu. | Chấp nhận được vì là dữ liệu mặc định của app. |

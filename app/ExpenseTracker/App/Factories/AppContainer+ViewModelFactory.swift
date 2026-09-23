@@ -1,10 +1,18 @@
 import Foundation
 
 extension AppContainer: ViewModelFactory {
+    func makeSessionViewModel() -> SessionViewModel {
+        let viewModel = SessionViewModel(auth: authUseCases)
+        apiClient.onSessionInvalidated = { [weak viewModel] in
+            viewModel?.sessionDidExpire()
+        }
+        return viewModel
+    }
+
     func makeDashboardViewModel() -> DashboardViewModel {
         DashboardViewModel(
+            dashboard: dashboardUseCases,
             statistics: statisticsUseCases,
-            accounts: accountUseCases,
             categories: categoryUseCases,
             budgets: budgetUseCases
         )

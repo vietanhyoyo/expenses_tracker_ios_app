@@ -7,8 +7,11 @@ import { validateEnvironment } from './config/env.validation';
 import { AuthModule } from './modules/auth.module';
 import { CategoriesModule } from './modules/categories.module';
 import { ExpensesModule } from './modules/expenses.module';
+import { DashboardModule } from './modules/dashboard.module';
 import { PrismaModule } from './modules/prisma.module';
 import { UsersModule } from './modules/users.module';
+import { TransactionsModule } from './modules/transactions.module';
+import { AccountsModule } from './modules/accounts.module';
 
 @Module({
   imports: [
@@ -19,6 +22,9 @@ import { UsersModule } from './modules/users.module';
     UsersModule,
     CategoriesModule,
     ExpensesModule,
+    TransactionsModule,
+    DashboardModule,
+    AccountsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

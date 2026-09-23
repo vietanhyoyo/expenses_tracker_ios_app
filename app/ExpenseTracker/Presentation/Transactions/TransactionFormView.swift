@@ -3,6 +3,7 @@ import SwiftUI
 struct TransactionFormView: View {
     @State var viewModel: TransactionFormViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var isShowingDeleteConfirmation = false
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -10,10 +11,10 @@ struct TransactionFormView: View {
             Form {
                 Section {
                     TransactionTypePicker(selection: $viewModel.type)
+                        .disabled(viewModel.isEditing)
                         .onChange(of: viewModel.type) { _, _ in
                             viewModel.typeChanged()
                         }
-                        .padding(.horizontal, AppSpacing.xxxSmall)
 
                     AmountTextField(
                         text: $viewModel.amountText,
@@ -22,9 +23,9 @@ struct TransactionFormView: View {
                 }
                 .listRowInsets(EdgeInsets(
                     top: AppSpacing.xSmall,
-                    leading: AppSpacing.medium,
+                    leading: 0,
                     bottom: AppSpacing.xSmall,
-                    trailing: AppSpacing.medium
+                    trailing: 0
                 ))
                 .listRowBackground(Color.clear)
                 .listRowSeparator(.hidden)
@@ -51,10 +52,61 @@ struct TransactionFormView: View {
                 }
             }
             .appFormStyle()
+            .safeAreaInset(edge: .bottom, spacing: 0) {
+                bottomActions
+            }
             .navigationTitle(viewModel.isEditing ? "Sửa giao dịch" : "Thêm giao dịch")
             .navigationBarTitleDisplayMode(.inline)
-            .formToolbar(isSaveDisabled: !viewModel.canSave, onSave: save)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button {
+                        dismiss()
+                    } label: {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .semibold))
+                            .frame(width: 34, height: 34)
+                            .background(
+                                AppTheme.surface,
+                                in: Circle()
+                            )
+                    }
+                    .accessibilityLabel("Quay lại")
+                }
+
+                if viewModel.isEditing {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button(role: .destructive) {
+                            isShowingDeleteConfirmation = true
+                        } label: {
+                            Image(systemName: "trash.fill")
+                                .font(.system(size: 15, weight: .semibold))
+                                .foregroundStyle(AppTheme.coral)
+                                .frame(width: 34, height: 34)
+                                .background(
+                                    AppTheme.coral.opacity(0.1),
+                                    in: Circle()
+                                )
+                        }
+                        .disabled(viewModel.isSaving)
+                        .opacity(viewModel.isSaving ? 0.5 : 1)
+                        .accessibilityLabel("Xoá giao dịch")
+                        .accessibilityHint("Mở hộp thoại xác nhận xoá")
+                    }
+                }
+            }
             .task { await viewModel.load() }
+            .alert("Xoá giao dịch?", isPresented: $isShowingDeleteConfirmation) {
+                Button("Huỷ", role: .cancel) {}
+                Button("Xoá", role: .destructive) {
+                    Task {
+                        if await viewModel.delete() {
+                            dismiss()
+                        }
+                    }
+                }
+            } message: {
+                Text("Giao dịch này sẽ bị xoá vĩnh viễn và không thể hoàn tác.")
+            }
         }
         .tint(AppTheme.teal)
     }
@@ -63,6 +115,66 @@ struct TransactionFormView: View {
         Task {
             if await viewModel.save() { dismiss() }
         }
+    }
+
+    private var bottomActions: some View {
+        HStack(spacing: AppSpacing.small) {
+            Button {
+                dismiss()
+            } label: {
+                Label("Huỷ", systemImage: "xmark")
+                    .font(AppTypography.bodyEmphasis)
+                    .frame(width: 108, height: 50)
+                    .foregroundStyle(.secondary)
+                    .background(
+                        AppTheme.surface,
+                        in: RoundedRectangle(
+                            cornerRadius: AppRadius.medium,
+                            style: .continuous
+                        )
+                    )
+                    .overlay {
+                        RoundedRectangle(
+                            cornerRadius: AppRadius.medium,
+                            style: .continuous
+                        )
+                        .stroke(AppTheme.separator, lineWidth: 1)
+                    }
+            }
+            .buttonStyle(.plain)
+
+            Button(action: save) {
+                Label("Lưu giao dịch", systemImage: "checkmark")
+                    .font(AppTypography.bodyEmphasis)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .foregroundStyle(.white)
+                    .background(
+                        AppTheme.teal,
+                        in: RoundedRectangle(
+                            cornerRadius: AppRadius.medium,
+                            style: .continuous
+                        )
+                    )
+                    .shadow(
+                        color: AppTheme.teal.opacity(viewModel.canSave ? 0.24 : 0),
+                        radius: 8,
+                        y: 4
+                    )
+            }
+                .buttonStyle(.plain)
+                .disabled(!viewModel.canSave)
+                .opacity(viewModel.canSave ? 1 : 0.42)
+        }
+        .padding(.horizontal, AppSpacing.medium)
+        .padding(.vertical, AppSpacing.small)
+        .background(.ultraThinMaterial)
+        .overlay(alignment: .top) {
+            Rectangle()
+                .fill(AppTheme.separator)
+                .frame(height: 0.5)
+        }
+        .animation(.easeInOut(duration: 0.2), value: viewModel.canSave)
     }
 }
 

@@ -2,17 +2,32 @@ import SwiftUI
 
 struct SettingsView: View {
     let factory: any ViewModelFactory
+    @Bindable var session: SessionViewModel
 
     var body: some View {
         NavigationStack {
             List {
                 managementSection
+                accountSection
                 dataSection
                 privacySection
             }
             .appFormStyle()
             .navigationTitle("Cài đặt")
             .navigationBarTitleDisplayMode(.inline)
+        }
+    }
+
+    private var accountSection: some View {
+        Section("Tài khoản đăng nhập") {
+            if let user = session.user {
+                LabeledContent("Email", value: user.email)
+                LabeledContent("Mã người dùng", value: String(user.id))
+            }
+            Button("Đăng xuất", role: .destructive) {
+                Task { await session.logout() }
+            }
+            .disabled(session.isSubmitting)
         }
     }
 
@@ -39,7 +54,7 @@ struct SettingsView: View {
     private var dataSection: some View {
         Section("Dữ liệu") {
             LabeledContent {
-                Text("Chỉ trên thiết bị").foregroundStyle(.secondary)
+                Text("Máy chủ + thiết bị").foregroundStyle(.secondary)
             } label: {
                 Label("Lưu trữ", systemImage: "internaldrive.fill")
             }
@@ -56,9 +71,9 @@ struct SettingsView: View {
             HStack(alignment: .top, spacing: AppSpacing.small) {
                 AppIconBadge(icon: "lock.shield.fill", color: AppTheme.teal)
                 VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
-                    Text("Riêng tư từ thiết kế")
+                    Text("Phiên đăng nhập an toàn")
                         .font(AppTypography.cardTitle)
-                    Text("Dữ liệu được lưu cục bộ bằng SwiftData và không được gửi lên máy chủ.")
+                    Text("Token được lưu trong Keychain. Giao dịch, danh mục và Tổng quan được đồng bộ qua API; tài khoản và ngân sách vẫn lưu trên thiết bị.")
                         .font(AppTypography.caption)
                         .foregroundStyle(.secondary)
                 }

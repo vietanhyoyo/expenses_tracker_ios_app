@@ -5,6 +5,7 @@ import Foundation
 /// so views never depend on the App layer.
 @MainActor
 protocol ViewModelFactory {
+    func makeSessionViewModel() -> SessionViewModel
     func makeDashboardViewModel() -> DashboardViewModel
     func makeTransactionListViewModel() -> TransactionListViewModel
     func makeTransactionFormViewModel(transaction: ExpenseTransaction?) -> TransactionFormViewModel

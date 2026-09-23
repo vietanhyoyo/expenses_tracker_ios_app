@@ -27,9 +27,11 @@ export class CategoriesService {
   ): Promise<ServiceResponse<CategoryEntity>> {
     const name = cleanText(dto.name).replace(/\s+/g, ' ');
     const normalizedName = normalizeCategoryName(name);
+    const type = dto.type ?? 'expense';
     const duplicate = await this.categoriesRepository.findDuplicate(
       userId,
       normalizedName,
+      type,
     );
     if (duplicate) this.throwDuplicate();
 
@@ -37,6 +39,7 @@ export class CategoriesService {
       userId,
       name,
       normalizedName,
+      type,
     );
     if (!category) this.throwDuplicate();
     return { message: 'Category created successfully', data: category };
@@ -47,19 +50,31 @@ export class CategoriesService {
     id: number,
     dto: UpdateCategoryDto,
   ): Promise<ServiceResponse<CategoryEntity>> {
-    await this.assertEditable(userId, id);
-    const data: { name?: string; normalizedName?: string } = {};
+    const current = await this.assertEditable(userId, id);
+    const targetType = dto.type ?? current.type;
+    const data: {
+      name?: string;
+      normalizedName?: string;
+      type?: 'income' | 'expense';
+    } = {};
     if (dto.name !== undefined) {
       const name = cleanText(dto.name).replace(/\s+/g, ' ');
       const normalizedName = normalizeCategoryName(name);
       const duplicate = await this.categoriesRepository.findDuplicate(
         userId,
         normalizedName,
+        targetType,
         id,
       );
       if (duplicate) this.throwDuplicate();
       data.name = name;
       data.normalizedName = normalizedName;
+    }
+    if (dto.type !== undefined && dto.type !== current.type) {
+      if ((await this.categoriesRepository.countExpenses(id)) > 0) {
+        this.throwInUse();
+      }
+      data.type = dto.type;
     }
 
     const category = await this.categoriesRepository.update(id, data);
@@ -76,7 +91,7 @@ export class CategoriesService {
     return { message: 'Category deleted successfully', data: null };
   }
 
-  private async assertEditable(userId: number, id: number): Promise<void> {
+  private async assertEditable(userId: number, id: number) {
     const category = await this.categoriesRepository.findById(id);
     if (!category || (category.userId !== null && category.userId !== userId)) {
       throw new ApiException(
@@ -92,6 +107,7 @@ export class CategoriesService {
         HttpStatus.FORBIDDEN,
       );
     }
+    return category;
   }
 
   private throwDuplicate(): never {

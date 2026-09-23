@@ -14,18 +14,18 @@ final class DashboardViewModel {
     var selectedMonth = Date()
 
     private let statistics: StatisticsUseCases
-    private let accounts: AccountUseCases
+    private let dashboard: DashboardUseCases
     private let categoryUseCases: CategoryUseCases
     private let budgets: BudgetUseCases
 
     init(
+        dashboard: DashboardUseCases,
         statistics: StatisticsUseCases,
-        accounts: AccountUseCases,
         categories: CategoryUseCases,
         budgets: BudgetUseCases
     ) {
+        self.dashboard = dashboard
         self.statistics = statistics
-        self.accounts = accounts
         categoryUseCases = categories
         self.budgets = budgets
     }
@@ -34,8 +34,12 @@ final class DashboardViewModel {
         errorMessage = nil
 
         do {
-            balance = try await accounts.totalBalance()
-            summary = try await statistics.monthlySummary(for: selectedMonth)
+            let dashboardSummary = try await dashboard.summary(for: selectedMonth)
+            balance = dashboardSummary.totalBalance
+            summary = MonthlySummary(
+                income: dashboardSummary.monthlyIncome,
+                expense: dashboardSummary.monthlyExpense
+            )
             categorySpending = try await statistics.expenseByCategory(for: selectedMonth)
             budgetProgress = try await budgets.progress(for: selectedMonth)
             recentTransactions = try await statistics.recent(limit: 5)
