@@ -5,7 +5,7 @@ struct DashboardBalanceCard: View {
     let summary: MonthlySummary
 
     var body: some View {
-        VStack(alignment: .leading, spacing: AppSpacing.xLarge) {
+        VStack(alignment: .leading, spacing: AppSpacing.large) {
             balanceHeader
             HStack(spacing: AppSpacing.medium) {
                 SummaryMetric(
@@ -25,44 +25,20 @@ struct DashboardBalanceCard: View {
                 )
             }
         }
-        .padding(AppSpacing.xLarge)
         .frame(maxWidth: .infinity, alignment: .leading)
-        .background(
-            AppTheme.heroGradient,
-            in: RoundedRectangle(cornerRadius: AppRadius.xLarge, style: .continuous)
-        )
-        .overlay(alignment: .topTrailing) {
-            Circle()
-                .fill(.white.opacity(0.06))
-                .frame(width: 150, height: 150)
-                .offset(x: 45, y: -75)
-                .allowsHitTesting(false)
-        }
-        .clipShape(RoundedRectangle(cornerRadius: AppRadius.xLarge, style: .continuous))
-        .shadow(color: AppTheme.navy.opacity(0.2), radius: 18, y: 10)
         .accessibilityElement(children: .combine)
     }
 
     private var balanceHeader: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
-                Label("Tổng số dư", systemImage: "wallet.bifold.fill")
-                    .font(AppTypography.captionEmphasis)
-                    .foregroundStyle(.white.opacity(0.75))
-                Text(AppFormatters.money(balance))
-                    .font(AppTypography.heroAmount)
-                    .foregroundStyle(.white)
-                    .minimumScaleFactor(0.62)
-                    .lineLimit(1)
-            }
-            Spacer(minLength: AppSpacing.small)
-            AppIconBadge(
-                icon: "waveform.path.ecg",
-                color: .white.opacity(0.72),
-                size: 44,
-                backgroundColor: .white.opacity(0.11),
-                iconScale: 0.5
-            )
+        VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
+            Label("Tổng số dư", systemImage: "wallet.bifold.fill")
+                .font(AppTypography.captionEmphasis)
+                .foregroundStyle(.white.opacity(0.75))
+            Text(AppFormatters.money(balance))
+                .font(AppTypography.heroAmount)
+                .foregroundStyle(.white)
+                .minimumScaleFactor(0.62)
+                .lineLimit(1)
         }
     }
 }

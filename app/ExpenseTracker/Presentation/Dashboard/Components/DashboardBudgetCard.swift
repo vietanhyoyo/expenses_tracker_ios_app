@@ -9,11 +9,11 @@ struct DashboardBudgetCard: View {
                 title: "Ngân sách tháng",
                 icon: "gauge.with.dots.needle.50percent"
             )
+            Divider()
             ForEach(items.prefix(3)) { progress in
                 BudgetProgressRow(progress: progress)
             }
         }
-        .appCard()
     }
 }
 

@@ -21,15 +21,7 @@ struct MonthSelector: View {
             Spacer()
             monthButton(icon: "chevron.right", label: "Tháng sau", action: next)
         }
-        .padding(AppSpacing.xSmall)
-        .background(
-            AppTheme.elevatedSurface,
-            in: RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-        )
-        .overlay {
-            RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                .stroke(AppTheme.separator, lineWidth: 0.5)
-        }
+        .padding(.vertical, AppSpacing.xxxSmall)
     }
 
     private func monthButton(
@@ -38,7 +30,11 @@ struct MonthSelector: View {
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            AppIconBadge(icon: icon, color: AppTheme.teal, size: 38)
+            Image(systemName: icon)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundStyle(AppTheme.primary)
+                .frame(width: 38, height: 38)
+                .background(AppTheme.primary.opacity(0.09), in: Circle())
         }
         .accessibilityLabel(label)
     }

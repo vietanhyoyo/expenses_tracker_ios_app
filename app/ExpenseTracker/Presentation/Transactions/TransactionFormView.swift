@@ -42,6 +42,7 @@ struct TransactionFormView: View {
                         }
                     }
                     DatePicker("Ngày", selection: $viewModel.date, displayedComponents: [.date])
+                        .environment(\.locale, Locale(identifier: "vi_VN"))
                     TextField("Ghi chú (không bắt buộc)", text: $viewModel.note, axis: .vertical)
                 }
                 if let error = viewModel.errorMessage {
@@ -186,14 +187,14 @@ private struct TransactionTypePicker: View {
             typeButton(for: .income, icon: "arrow.down.left")
             typeButton(for: .expense, icon: "arrow.up.right")
         }
-        .padding(AppSpacing.xxxSmall)
+        .padding(AppSpacing.xxSmall)
         .background(
-            AppTheme.navy.opacity(0.055),
-            in: RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+            AppTheme.surface,
+            in: Capsule(style: .continuous)
         )
         .overlay {
-            RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
-                .stroke(AppTheme.separator, lineWidth: 0.5)
+            Capsule(style: .continuous)
+                .stroke(AppTheme.separator, lineWidth: 1)
         }
         .accessibilityElement(children: .contain)
     }
@@ -210,12 +211,19 @@ private struct TransactionTypePicker: View {
             Label(type.title, systemImage: icon)
                 .font(AppTypography.bodyEmphasis)
                 .frame(maxWidth: .infinity)
-                .frame(height: 42)
-                .foregroundStyle(isSelected ? Color.white : Color.secondary)
+                .frame(height: 52)
+                .foregroundStyle(isSelected ? Color.white : color)
                 .background(
-                    isSelected ? color : Color.clear,
-                    in: RoundedRectangle(cornerRadius: AppRadius.small, style: .continuous)
+                    isSelected ? color : color.opacity(0.09),
+                    in: Capsule(style: .continuous)
                 )
+                .overlay {
+                    Capsule(style: .continuous)
+                        .stroke(
+                            isSelected ? color : color.opacity(0.18),
+                            lineWidth: isSelected ? 0 : 0.8
+                        )
+                }
                 .shadow(
                     color: isSelected ? color.opacity(0.2) : .clear,
                     radius: 6,

@@ -28,8 +28,10 @@ struct DashboardSectionCard<Content: View>: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             AppSectionHeader(title: title, icon: icon, detail: detail)
+            Divider()
+                .padding(.top, AppSpacing.small)
             content
-                .padding(.top, AppSpacing.large)
+                .padding(.top, AppSpacing.medium)
             if let actionTitle, let action {
                 Button(action: action) {
                     HStack(spacing: AppSpacing.xxxSmall) {
@@ -46,6 +48,5 @@ struct DashboardSectionCard<Content: View>: View {
                 .padding(.top, AppSpacing.medium)
             }
         }
-        .appCard()
     }
 }

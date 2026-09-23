@@ -21,6 +21,7 @@ struct RootView: View {
                 TabView(selection: $selectedTab) {
                     DashboardView(
                         factory: container,
+                        userEmail: session.user?.email,
                         onShowTransactions: { selectedTab = 1 }
                     )
                         .tabItem { Label("Tổng quan", systemImage: "square.grid.2x2.fill") }

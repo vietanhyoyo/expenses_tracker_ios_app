@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "E94BDAD92356EF89ECEE63DE"
+               BlueprintIdentifier = "4093EB0DB06E7066D6129F8B"
                BuildableName = "ExpenseTracker.app"
                BlueprintName = "ExpenseTracker"
                ReferencedContainer = "container:ExpenseTracker.xcodeproj">
@@ -30,7 +30,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E94BDAD92356EF89ECEE63DE"
+            BlueprintIdentifier = "4093EB0DB06E7066D6129F8B"
             BuildableName = "ExpenseTracker.app"
             BlueprintName = "ExpenseTracker"
             ReferencedContainer = "container:ExpenseTracker.xcodeproj">
@@ -41,7 +41,7 @@
             skipped = "NO">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "B7A785D63CDD3C134FF33A58"
+               BlueprintIdentifier = "E9749A1EB748A04DB09383BB"
                BuildableName = "ExpenseTrackerTests.xctest"
                BlueprintName = "ExpenseTrackerTests"
                ReferencedContainer = "container:ExpenseTracker.xcodeproj">
@@ -63,7 +63,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E94BDAD92356EF89ECEE63DE"
+            BlueprintIdentifier = "4093EB0DB06E7066D6129F8B"
             BuildableName = "ExpenseTracker.app"
             BlueprintName = "ExpenseTracker"
             ReferencedContainer = "container:ExpenseTracker.xcodeproj">
@@ -80,7 +80,7 @@
          runnableDebuggingMode = "0">
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "E94BDAD92356EF89ECEE63DE"
+            BlueprintIdentifier = "4093EB0DB06E7066D6129F8B"
             BuildableName = "ExpenseTracker.app"
             BlueprintName = "ExpenseTracker"
             ReferencedContainer = "container:ExpenseTracker.xcodeproj">
