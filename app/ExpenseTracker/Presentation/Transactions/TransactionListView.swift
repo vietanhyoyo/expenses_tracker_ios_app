@@ -6,6 +6,7 @@ struct TransactionListView: View {
     @State private var editingTransaction: ExpenseTransaction?
     @State private var showingAdd = false
     @State private var showingFilters = false
+    @State private var successMessage: String?
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -47,18 +48,21 @@ struct TransactionListView: View {
             .refreshable { await viewModel.load() }
             .sheet(isPresented: $showingAdd, onDismiss: reload) {
                 TransactionFormView(
-                    viewModel: factory.makeTransactionFormViewModel(transaction: nil)
+                    viewModel: factory.makeTransactionFormViewModel(transaction: nil),
+                    onSuccess: { successMessage = $0 }
                 )
             }
             .sheet(item: $editingTransaction, onDismiss: reload) { item in
                 TransactionFormView(
-                    viewModel: factory.makeTransactionFormViewModel(transaction: item)
+                    viewModel: factory.makeTransactionFormViewModel(transaction: item),
+                    onSuccess: { successMessage = $0 }
                 )
             }
             .sheet(isPresented: $showingFilters) {
                 TransactionFilterView(viewModel: viewModel)
             }
             .errorAlert(message: $viewModel.errorMessage)
+            .successToast(message: $successMessage)
         }
     }
 

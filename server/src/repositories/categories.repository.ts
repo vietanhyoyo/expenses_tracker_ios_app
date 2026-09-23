@@ -6,6 +6,7 @@ import type { CategoryEntity } from '../entities/category.entity';
 const categorySelect = {
   id: true,
   name: true,
+  colorHex: true,
   isDefault: true,
   type: true,
   userId: true,
@@ -50,10 +51,18 @@ export class CategoriesRepository {
     name: string,
     normalizedName: string,
     type: TransactionType,
+    colorHex: string,
   ): Promise<CategoryEntity | null> {
     try {
       return await this.prisma.category.create({
-        data: { name, normalizedName, type, userId, isDefault: false },
+        data: {
+          name,
+          normalizedName,
+          type,
+          colorHex,
+          userId,
+          isDefault: false,
+        },
         select: categorySelect,
       });
     } catch (error: unknown) {
@@ -68,6 +77,7 @@ export class CategoriesRepository {
       name?: string;
       normalizedName?: string;
       type?: TransactionType;
+      colorHex?: string;
     },
   ): Promise<CategoryEntity | null> {
     try {

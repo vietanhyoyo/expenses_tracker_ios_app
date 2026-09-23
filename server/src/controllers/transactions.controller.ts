@@ -20,6 +20,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import type { AuthUser } from '../common/interfaces/auth-user.interface';
 import { CreateTransactionDto } from '../dto/create-transaction.dto';
+import { QueryTransactionTrendDto } from '../dto/query-transaction-trend.dto';
 import { QueryTransactionsDto } from '../dto/query-transactions.dto';
 import { UpdateTransactionDto } from '../dto/update-transaction.dto';
 import { TransactionsService } from '../services/transactions.service';
@@ -41,6 +42,15 @@ export class TransactionsController {
   @ApiOperation({ summary: 'List, filter, paginate, and sort transactions' })
   findAll(@CurrentUser() user: AuthUser, @Query() query: QueryTransactionsDto) {
     return this.service.findAll(user.id, query);
+  }
+
+  @Get('trend')
+  @ApiOperation({ summary: 'Get income or expense trend grouped by day or month' })
+  trend(
+    @CurrentUser() user: AuthUser,
+    @Query() query: QueryTransactionTrendDto,
+  ) {
+    return this.service.trend(user.id, query);
   }
 
   @Get(':id')

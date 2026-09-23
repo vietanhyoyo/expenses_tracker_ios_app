@@ -52,6 +52,7 @@ model Category {
   id             Int       @id @default(autoincrement())
   name           String    @db.VarChar(100)
   normalizedName String    @map("normalized_name") @db.VarChar(100)
+  colorHex       String    @default("#64748B") @map("color_hex") @db.Char(7)
   userId         Int?      @map("user_id")
   isDefault      Boolean   @default(false) @map("is_default")
   type           TransactionType @default(expense)

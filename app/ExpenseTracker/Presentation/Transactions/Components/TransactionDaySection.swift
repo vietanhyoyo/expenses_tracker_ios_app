@@ -54,13 +54,6 @@ struct TransactionDaySection: View {
     }
 
     private var formattedDay: String {
-        day.formatted(
-            .dateTime
-                .locale(Locale(identifier: "vi_VN"))
-                .weekday(.wide)
-                .day()
-                .month()
-                .year()
-        )
+        AppFormatters.dateString(day)
     }
 }

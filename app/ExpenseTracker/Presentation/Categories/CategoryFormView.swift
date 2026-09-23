@@ -5,9 +5,22 @@ struct CategoryFormView: View {
     @Environment(\.dismiss) private var dismiss
 
     private let icons = [
-        "fork.knife", "car.fill", "bag.fill", "gamecontroller.fill",
-        "doc.text.fill", "cross.case.fill", "book.fill", "banknote.fill",
-        "gift.fill", "star.fill", "square.grid.2x2.fill"
+        // Food and transport
+        "fork.knife", "mug.fill", "takeoutbag.and.cup.and.straw.fill",
+        "car.fill", "car.side.fill", "bus.fill", "tram.fill", "bicycle",
+        "airplane", "fuelpump.fill",
+        // Shopping and entertainment
+        "bag.fill", "cart.fill", "basket.fill", "tshirt.fill",
+        "gamecontroller.fill", "film.fill", "music.note", "tv.fill",
+        "ticket.fill", "sparkles",
+        // Home and bills
+        "house.fill", "building.2.fill", "bolt.fill", "wifi",
+        "phone.fill", "doc.text.fill", "wrench.and.screwdriver.fill",
+        "briefcase.fill", "creditcard.fill", "banknote.fill",
+        // Health, education, and other
+        "cross.case.fill", "heart.fill", "figure.run", "dumbbell.fill",
+        "book.fill", "graduationcap.fill", "gift.fill", "star.fill",
+        "pawprint.fill", "leaf.fill", "person.2.fill", "square.grid.2x2.fill"
     ]
 
     var body: some View {
@@ -59,13 +72,14 @@ struct CategoryFormView: View {
     }
 
     private var iconSection: some View {
-        Section("Biểu tượng") {
+        @Bindable var viewModel = viewModel
+        return Section("Biểu tượng") {
             LazyVGrid(
                 columns: Array(repeating: GridItem(.flexible()), count: 5),
                 spacing: AppSpacing.small
             ) {
                 ForEach(icons, id: \.self) { value in
-                    iconButton(value)
+                    iconButton(value, viewModel: viewModel)
                 }
             }
             .padding(.vertical, AppSpacing.xxSmall)
@@ -84,7 +98,10 @@ struct CategoryFormView: View {
         )
     }
 
-    private func iconButton(_ value: String) -> some View {
+    private func iconButton(
+        _ value: String,
+        viewModel: CategoryFormViewModel
+    ) -> some View {
         let isSelected = viewModel.icon == value
 
         return Button { viewModel.icon = value } label: {
@@ -98,7 +115,11 @@ struct CategoryFormView: View {
                 iconScale: 0.46
             )
         }
+        .buttonStyle(.plain)
+        .frame(maxWidth: .infinity, minHeight: 52)
+        .contentShape(Rectangle())
         .accessibilityLabel(value)
+        .accessibilityValue(isSelected ? "Đang chọn" : "Chưa chọn")
         .accessibilityAddTraits(isSelected ? .isSelected : [])
     }
 

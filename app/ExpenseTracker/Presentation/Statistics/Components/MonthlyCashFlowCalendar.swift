@@ -130,7 +130,7 @@ struct MonthlyCashFlowCalendar: View {
     }
 
     private func accessibilityLabel(for date: Date, item: DailyCashFlow?) -> String {
-        let dateText = date.formatted(.dateTime.day().month().year())
+        let dateText = AppFormatters.dateString(date)
         guard let item else { return "\(dateText), không có giao dịch" }
         return "\(dateText), thu \(AppFormatters.money(item.income)), chi \(AppFormatters.money(item.expense))"
     }

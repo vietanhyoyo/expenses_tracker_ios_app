@@ -25,7 +25,8 @@ final class RemoteCategoryRepository: CategoryRepository {
                 "/categories",
                 body: CreateCategoryRequest(
                     name: category.name,
-                    type: category.type.rawValue
+                    type: category.type.rawValue,
+                    colorHex: category.colorHex
                 )
             )
             saveAppearance(of: category, for: created)
@@ -42,7 +43,10 @@ final class RemoteCategoryRepository: CategoryRepository {
         do {
             let updated: RemoteCategoryDTO = try await api.patch(
                 "/categories/\(id)",
-                body: UpdateCategoryRequest(name: category.name)
+                body: UpdateCategoryRequest(
+                    name: category.name,
+                    colorHex: category.colorHex
+                )
             )
             saveAppearance(of: category, for: updated)
         } catch {
@@ -71,7 +75,9 @@ final class RemoteCategoryRepository: CategoryRepository {
             name: dto.name,
             icon: appearance?.icon ?? defaultIcon(for: dto.name),
             type: type,
-            colorHex: appearance?.colorHex ?? defaultColor(for: dto.id, type: type),
+            colorHex: dto.colorHex
+                ?? appearance?.colorHex
+                ?? defaultColor(for: dto.id, type: type),
             isEditable: !dto.isDefault
         )
     }

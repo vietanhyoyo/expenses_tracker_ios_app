@@ -17,20 +17,54 @@ final class RemoteTransactionRepository: TransactionRepository {
     }
 
     func getTransactions() async throws -> [ExpenseTransaction] {
+        try await getTransactions(from: nil, to: nil, type: nil, categoryID: nil)
+    }
+
+    func getTransactions(
+        from startDate: Date?,
+        to endDate: Date?,
+        type: TransactionType?,
+        categoryID: UUID?
+    ) async throws -> [ExpenseTransaction] {
         do {
             var page = 1
             var values: [RemoteExpenseDTO] = []
             var totalPages = 1
 
+            var queryItems = [
+                URLQueryItem(name: "page", value: "1"),
+                URLQueryItem(name: "limit", value: "100"),
+                URLQueryItem(name: "sortBy", value: "transactionDate"),
+                URLQueryItem(name: "sortOrder", value: "desc")
+            ]
+            if let startDate {
+                queryItems.append(URLQueryItem(
+                    name: "from",
+                    value: RemoteDateParser.calendarDate(from: startDate)
+                ))
+            }
+            if let endDate {
+                queryItems.append(URLQueryItem(
+                    name: "to",
+                    value: RemoteDateParser.calendarDate(from: endDate)
+                ))
+            }
+            if let type {
+                queryItems.append(URLQueryItem(name: "type", value: type.rawValue))
+            }
+            if let categoryID,
+               let serverCategoryID = ServerIDCodec.categoryID(from: categoryID) {
+                queryItems.append(URLQueryItem(
+                    name: "categoryId",
+                    value: String(serverCategoryID)
+                ))
+            }
+
             repeat {
+                queryItems[0] = URLQueryItem(name: "page", value: String(page))
                 let result: ExpensePageDTO = try await api.get(
                     "/transactions",
-                    queryItems: [
-                        URLQueryItem(name: "page", value: String(page)),
-                        URLQueryItem(name: "limit", value: "100"),
-                        URLQueryItem(name: "sortBy", value: "transactionDate"),
-                        URLQueryItem(name: "sortOrder", value: "desc")
-                    ]
+                    queryItems: queryItems
                 )
                 values.append(contentsOf: result.items)
                 totalPages = result.pagination.totalPages
@@ -39,6 +73,38 @@ final class RemoteTransactionRepository: TransactionRepository {
 
             let fallbackAccountID = try await defaultAccountID()
             return try values.map { try map($0, fallbackAccountID: fallbackAccountID) }
+        } catch {
+            throw RemoteErrorMapper.map(error)
+        }
+    }
+
+    func getSpendingTrend(
+        period: String,
+        type: TransactionType,
+        date: Date,
+        calendar: Calendar
+    ) async throws -> [DailySpending] {
+        do {
+            let result: ExpenseTrendDTO = try await api.get(
+                "/transactions/trend",
+                queryItems: [
+                    URLQueryItem(name: "period", value: period),
+                    URLQueryItem(name: "type", value: type.rawValue),
+                    URLQueryItem(
+                        name: "date",
+                        value: RemoteDateParser.calendarDate(from: date)
+                    )
+                ]
+            )
+            return try result.items.map { item in
+                guard let amount = Decimal(
+                    string: item.amount,
+                    locale: Locale(identifier: "en_US_POSIX")
+                ), let date = RemoteDateParser.calendarDateValue(from: item.date) else {
+                    throw DomainError.remoteError("Dữ liệu xu hướng giao dịch không hợp lệ.")
+                }
+                return DailySpending(date: date, amount: amount)
+            }
         } catch {
             throw RemoteErrorMapper.map(error)
         }

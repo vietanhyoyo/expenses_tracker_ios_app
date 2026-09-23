@@ -81,6 +81,23 @@ export class ExpensesRepository {
     return { items, total };
   }
 
+  findTransactionAmounts(
+    userId: number,
+    type: TransactionType,
+    from: Date,
+    to: Date,
+  ): Promise<Array<{ expenseDate: Date; amount: Prisma.Decimal }>> {
+    return this.prisma.expense.findMany({
+      where: {
+        userId,
+        type,
+        expenseDate: { gte: from, lt: to },
+      },
+      select: { expenseDate: true, amount: true },
+      orderBy: { expenseDate: 'asc' },
+    });
+  }
+
   findOwned(
     userId: number,
     id: number,

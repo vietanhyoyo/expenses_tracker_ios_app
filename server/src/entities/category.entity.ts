@@ -3,6 +3,7 @@ import type { TransactionType } from '@prisma/client';
 export interface CategoryEntity {
   id: number;
   name: string;
+  colorHex: string;
   isDefault: boolean;
   type: TransactionType;
   userId: number | null;

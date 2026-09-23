@@ -20,10 +20,8 @@ struct DashboardSpendingCard: View {
     }
 
     private var spendingRows: some View {
-        let visibleItems = Array(items.prefix(4))
-
         return VStack(spacing: AppSpacing.small) {
-            ForEach(Array(visibleItems.enumerated()), id: \.element.id) { index, item in
+            ForEach(Array(items.enumerated()), id: \.element.id) { index, item in
                 HStack(spacing: AppSpacing.small) {
                     AppIconBadge(icon: item.category.icon, color: item.category.color, size: 38)
                     Text(item.category.name)
@@ -32,7 +30,7 @@ struct DashboardSpendingCard: View {
                     Text(AppFormatters.money(item.amount))
                         .font(AppTypography.cardTitle)
                 }
-                if index < visibleItems.count - 1 {
+                if index < items.count - 1 {
                     Divider().padding(.leading, 50)
                 }
             }

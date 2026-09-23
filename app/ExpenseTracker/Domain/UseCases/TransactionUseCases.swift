@@ -10,6 +10,20 @@ struct TransactionUseCases {
         try await transactions.getTransactions()
     }
 
+    func getAll(
+        from startDate: Date?,
+        to endDate: Date?,
+        type: TransactionType?,
+        categoryID: UUID?
+    ) async throws -> [ExpenseTransaction] {
+        try await transactions.getTransactions(
+            from: startDate,
+            to: endDate,
+            type: type,
+            categoryID: categoryID
+        )
+    }
+
     func get(id: UUID) async throws -> ExpenseTransaction? {
         try await transactions.getTransaction(id: id)
     }

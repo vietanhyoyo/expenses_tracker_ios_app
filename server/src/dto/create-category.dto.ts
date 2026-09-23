@@ -14,6 +14,18 @@ export class CreateCategoryDto {
   @MaxLength(100)
   name!: string;
 
+  @ApiProperty({
+    example: '#7C3AED',
+    required: false,
+    description: 'Category color in #RRGGBB format',
+  })
+  @IsOptional()
+  @IsString()
+  @Matches(/^#[0-9A-Fa-f]{6}$/, {
+    message: 'colorHex must use the #RRGGBB format',
+  })
+  colorHex?: string;
+
   @ApiProperty({ enum: ['income', 'expense'], default: 'expense' })
   @IsOptional()
   @IsIn(['income', 'expense'])

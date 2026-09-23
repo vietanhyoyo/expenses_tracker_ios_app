@@ -53,4 +53,9 @@ final class DashboardViewModel {
         selectedMonth = selectedMonth.addingMonths(offset)
         await load()
     }
+
+    func selectMonth(_ month: Date) async {
+        selectedMonth = month
+        await load()
+    }
 }

@@ -1,10 +1,11 @@
 import { HttpStatus, Injectable } from '@nestjs/common';
-import type { TransactionType } from '@prisma/client';
+import { Prisma, type TransactionType } from '@prisma/client';
 import { ErrorCode } from '../common/constants/error-codes.constant';
 import { ApiException } from '../common/exceptions/api.exception';
 import type { ServiceResponse } from '../common/interfaces/api-response.interface';
 import { cleanText } from '../common/utils/normalize.util';
 import type { CreateTransactionDto } from '../dto/create-transaction.dto';
+import type { QueryTransactionTrendDto } from '../dto/query-transaction-trend.dto';
 import type { QueryTransactionsDto } from '../dto/query-transactions.dto';
 import type { UpdateTransactionDto } from '../dto/update-transaction.dto';
 import type { ExpenseEntity } from '../entities/expense.entity';
@@ -12,6 +13,7 @@ import type {
   PaginatedTransactionsEntity,
   TransactionEntity,
 } from '../entities/transaction.entity';
+import type { TransactionTrendEntity } from '../entities/transaction-trend.entity';
 import { ExpensesRepository } from '../repositories/expenses.repository';
 
 @Injectable()
@@ -72,6 +74,48 @@ export class TransactionsService {
           total,
           totalPages: Math.ceil(total / query.limit),
         },
+      },
+    };
+  }
+
+  async trend(
+    userId: number,
+    query: QueryTransactionTrendDto,
+  ): Promise<ServiceResponse<TransactionTrendEntity>> {
+    const anchor = this.parseCalendarDate(query.date);
+    const range = this.rangeFor(query.period, anchor);
+    const rows = await this.repository.findTransactionAmounts(
+      userId,
+      query.type,
+      range.from,
+      range.to,
+    );
+    const amounts = new Map<string, Prisma.Decimal>();
+    for (const row of rows) {
+      const key = this.bucketKey(row.expenseDate, range.granularity);
+      amounts.set(key, (amounts.get(key) ?? new Prisma.Decimal(0)).plus(row.amount));
+    }
+
+    const items: TransactionTrendEntity['items'] = [];
+    for (
+      let cursor = range.from;
+      cursor < range.to;
+      cursor = this.nextBucket(cursor, range.granularity)
+    ) {
+      const date = this.formatCalendarDate(cursor);
+      const key = range.granularity === 'month' ? `${date.slice(0, 7)}-01` : date;
+      items.push({ date: key, amount: amounts.get(key) ?? new Prisma.Decimal(0) });
+    }
+
+    return {
+      message: 'Transaction trend retrieved successfully',
+      data: {
+        type: query.type,
+        period: query.period,
+        granularity: range.granularity,
+        from: this.formatCalendarDate(range.from),
+        to: this.formatCalendarDate(range.to),
+        items,
       },
     };
   }
@@ -176,5 +220,57 @@ export class TransactionsService {
     return /^\d{4}-\d{2}-\d{2}$/.test(value)
       ? new Date(`${value}T23:59:59.999Z`)
       : new Date(value);
+  }
+
+  private parseCalendarDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  private rangeFor(
+    period: QueryTransactionTrendDto['period'],
+    anchor: Date,
+  ): { from: Date; to: Date; granularity: 'day' | 'month' } {
+    if (period === 'year') {
+      const from = new Date(Date.UTC(anchor.getUTCFullYear(), 0, 1));
+      return {
+        from,
+        to: new Date(Date.UTC(anchor.getUTCFullYear() + 1, 0, 1)),
+        granularity: 'month',
+      };
+    }
+    if (period === 'month') {
+      const from = new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1));
+      return {
+        from,
+        to: new Date(Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + 1, 1)),
+        granularity: 'day',
+      };
+    }
+
+    const dayOffset = (anchor.getUTCDay() + 6) % 7;
+    const from = new Date(
+      Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), anchor.getUTCDate() - dayOffset),
+    );
+    return {
+      from,
+      to: new Date(Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate() + 7)),
+      granularity: 'day',
+    };
+  }
+
+  private nextBucket(date: Date, granularity: 'day' | 'month'): Date {
+    return granularity === 'month'
+      ? new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth() + 1, 1))
+      : new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate() + 1));
+  }
+
+  private bucketKey(date: Date, granularity: 'day' | 'month'): string {
+    const value = this.formatCalendarDate(date);
+    return granularity === 'month' ? `${value.slice(0, 7)}-01` : value;
+  }
+
+  private formatCalendarDate(date: Date): string {
+    return date.toISOString().slice(0, 10);
   }
 }

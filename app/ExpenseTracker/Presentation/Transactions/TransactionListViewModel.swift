@@ -13,6 +13,9 @@ final class TransactionListViewModel {
     var selectedType: TransactionType?
     var selectedCategoryID: UUID?
     var selectedAccountID: UUID?
+    var isDateRangeEnabled = false
+    var fromDate: Date?
+    var toDate: Date?
     var sort: TransactionSort = .newest
 
     private let useCases: TransactionUseCases
@@ -35,6 +38,7 @@ final class TransactionListViewModel {
                 && (selectedType == nil || transaction.type == selectedType)
                 && (selectedCategoryID == nil || transaction.categoryID == selectedCategoryID)
                 && (selectedAccountID == nil || transaction.accountID == selectedAccountID)
+                && matchesDateRange(transaction)
         }
 
         switch sort {
@@ -65,7 +69,15 @@ final class TransactionListViewModel {
         selectedType != nil
             || selectedCategoryID != nil
             || selectedAccountID != nil
+            || isDateRangeEnabled
             || sort != .newest
+    }
+
+    var isDateRangeValid: Bool {
+        guard isDateRangeEnabled else { return true }
+        guard let fromDate, let toDate else { return false }
+        let calendar = Calendar.current
+        return calendar.startOfDay(for: fromDate) <= calendar.startOfDay(for: toDate)
     }
 
     var hasSearchOrFilters: Bool {
@@ -91,7 +103,12 @@ final class TransactionListViewModel {
         defer { isLoading = false }
 
         do {
-            transactions = try await useCases.getAll()
+            transactions = try await useCases.getAll(
+                from: isDateRangeEnabled ? fromDate : nil,
+                to: isDateRangeEnabled ? toDate : nil,
+                type: selectedType,
+                categoryID: selectedCategoryID
+            )
             categories = try await categoryUseCases.getAll().keyedByID()
             accounts = try await accountUseCases.getAll().keyedByID()
         } catch {
@@ -112,7 +129,23 @@ final class TransactionListViewModel {
         selectedType = nil
         selectedCategoryID = nil
         selectedAccountID = nil
+        isDateRangeEnabled = false
+        fromDate = nil
+        toDate = nil
         sort = .newest
+    }
+
+    func setDateRangeEnabled(_ enabled: Bool) {
+        isDateRangeEnabled = enabled
+        guard enabled else {
+            fromDate = nil
+            toDate = nil
+            return
+        }
+
+        let today = Calendar.current.startOfDay(for: Date())
+        fromDate = fromDate ?? Calendar.current.date(byAdding: .month, value: -1, to: today)
+        toDate = toDate ?? today
     }
 
     private func matchesQuery(_ transaction: ExpenseTransaction) -> Bool {
@@ -123,5 +156,22 @@ final class TransactionListViewModel {
             .name
             .localizedCaseInsensitiveContains(query) == true
         return noteMatches || categoryMatches
+    }
+
+    private func matchesDateRange(_ transaction: ExpenseTransaction) -> Bool {
+        guard isDateRangeEnabled else { return true }
+        let calendar = Calendar.current
+        let day = calendar.startOfDay(for: transaction.date)
+        if let fromDate, day < calendar.startOfDay(for: fromDate) { return false }
+        if let toDate,
+           let dayAfterToDate = calendar.date(
+               byAdding: .day,
+               value: 1,
+               to: calendar.startOfDay(for: toDate)
+           ),
+           day >= dayAfterToDate {
+            return false
+        }
+        return true
     }
 }

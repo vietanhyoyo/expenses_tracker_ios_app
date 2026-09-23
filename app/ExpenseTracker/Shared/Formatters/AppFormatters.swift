@@ -1,9 +1,18 @@
 import Foundation
 
 enum AppFormatters {
+    /// Shared presentation locale and Gregorian calendar for all user-facing dates.
+    static let locale = Locale(identifier: "vi_VN")
+    static let calendar: Calendar = {
+        var calendar = Calendar(identifier: .gregorian)
+        calendar.locale = locale
+        calendar.timeZone = .current
+        return calendar
+    }()
+
     static let currency: NumberFormatter = {
         let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
+        formatter.locale = locale
         formatter.numberStyle = .currency
         formatter.currencyCode = "VND"
         formatter.currencySymbol = "₫"
@@ -13,7 +22,7 @@ enum AppFormatters {
 
     private static let compactDecimal: NumberFormatter = {
         let formatter = NumberFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
+        formatter.locale = locale
         formatter.numberStyle = .decimal
         formatter.minimumFractionDigits = 0
         formatter.maximumFractionDigits = 1
@@ -21,18 +30,18 @@ enum AppFormatters {
     }()
 
     static let monthYear: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
-        formatter.dateFormat = "'Tháng' M, yyyy"
-        return formatter
+        makeDateFormatter("'Tháng' M, yyyy")
     }()
 
-    static let shortDate: DateFormatter = {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
-        formatter.dateFormat = "dd/MM/yyyy"
-        return formatter
-    }()
+    /// The single date format used throughout the app: `dd/MM/yyyy`.
+    static let dateOnly: DateFormatter = makeDateFormatter("dd/MM/yyyy")
+
+    /// Backwards-compatible alias for existing date-only presentation code.
+    static let shortDate = dateOnly
+
+    static func dateString(_ date: Date) -> String {
+        dateOnly.string(from: date)
+    }
 
     static func money(_ value: Decimal) -> String {
         currency.string(from: value as NSDecimalNumber) ?? "\(value) ₫"
@@ -77,5 +86,14 @@ enum AppFormatters {
             return "\(Int((value / 1_000).rounded()))k"
         }
         return String(format: "%.0f", value)
+    }
+
+    private static func makeDateFormatter(_ format: String) -> DateFormatter {
+        let formatter = DateFormatter()
+        formatter.calendar = calendar
+        formatter.locale = locale
+        formatter.timeZone = calendar.timeZone
+        formatter.dateFormat = format
+        return formatter
     }
 }

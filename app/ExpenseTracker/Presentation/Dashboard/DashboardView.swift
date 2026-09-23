@@ -6,6 +6,7 @@ struct DashboardView: View {
     private let onShowTransactions: () -> Void
     @State private var viewModel: DashboardViewModel
     @State private var isShowingTransactionForm = false
+    @State private var successMessage: String?
 
     init(
         factory: any ViewModelFactory,
@@ -36,7 +37,10 @@ struct DashboardView: View {
                             MonthSelector(
                                 month: viewModel.selectedMonth,
                                 previous: { Task { await viewModel.moveMonth(-1) } },
-                                next: { Task { await viewModel.moveMonth(1) } }
+                                next: { Task { await viewModel.moveMonth(1) } },
+                                selectMonth: { month in
+                                    Task { await viewModel.selectMonth(month) }
+                                }
                             )
                             DashboardPillDivider()
                             if let errorMessage = viewModel.errorMessage {
@@ -83,9 +87,11 @@ struct DashboardView: View {
                 onDismiss: { Task { await viewModel.load() } }
             ) {
                 TransactionFormView(
-                    viewModel: factory.makeTransactionFormViewModel(transaction: nil)
+                    viewModel: factory.makeTransactionFormViewModel(transaction: nil),
+                    onSuccess: { successMessage = $0 }
                 )
             }
+            .successToast(message: $successMessage)
         }
     }
 

@@ -28,6 +28,9 @@ export class CategoriesService {
     const name = cleanText(dto.name).replace(/\s+/g, ' ');
     const normalizedName = normalizeCategoryName(name);
     const type = dto.type ?? 'expense';
+    const colorHex = (
+      dto.colorHex ?? (type === 'income' ? '#0092B8' : '#ED4F4A')
+    ).toUpperCase();
     const duplicate = await this.categoriesRepository.findDuplicate(
       userId,
       normalizedName,
@@ -40,6 +43,7 @@ export class CategoriesService {
       name,
       normalizedName,
       type,
+      colorHex,
     );
     if (!category) this.throwDuplicate();
     return { message: 'Category created successfully', data: category };
@@ -56,6 +60,7 @@ export class CategoriesService {
       name?: string;
       normalizedName?: string;
       type?: 'income' | 'expense';
+      colorHex?: string;
     } = {};
     if (dto.name !== undefined) {
       const name = cleanText(dto.name).replace(/\s+/g, ' ');
@@ -75,6 +80,9 @@ export class CategoriesService {
         this.throwInUse();
       }
       data.type = dto.type;
+    }
+    if (dto.colorHex !== undefined) {
+      data.colorHex = dto.colorHex.toUpperCase();
     }
 
     const category = await this.categoriesRepository.update(id, data);

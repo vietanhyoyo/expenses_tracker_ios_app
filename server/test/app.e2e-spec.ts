@@ -15,6 +15,7 @@ interface Category {
   id: number;
   name: string;
   type: 'income' | 'expense';
+  colorHex: string;
 }
 
 interface Expense {
@@ -93,9 +94,10 @@ describe('Expense Tracker API (e2e)', () => {
     const customCategory = await api
       .post('/api/v1/categories')
       .set('Authorization', `Bearer ${loginData.accessToken}`)
-      .send({ name: `Gym ${unique}` })
+      .send({ name: `Gym ${unique}`, colorHex: '#7C3AED' })
       .expect(201);
     const category = (customCategory.body as ApiEnvelope<Category>).data;
+    expect(category.colorHex).toBe('#7C3AED');
 
     const createdExpense = await api
       .post('/api/v1/expenses')
@@ -219,9 +221,10 @@ describe('Expense Tracker API (e2e)', () => {
     const customResponse = await api
       .post('/api/v1/categories')
       .set('Authorization', `Bearer ${first.accessToken}`)
-      .send({ name: `Private ${unique}` })
+      .send({ name: `Private ${unique}`, colorHex: '#14B8A6' })
       .expect(201);
     const custom = (customResponse.body as ApiEnvelope<Category>).data;
+    expect(custom.colorHex).toBe('#14B8A6');
 
     await api
       .post('/api/v1/categories')
@@ -231,8 +234,19 @@ describe('Expense Tracker API (e2e)', () => {
 
     await api
       .patch(`/api/v1/categories/${custom.id}`)
+      .set('Authorization', `Bearer ${first.accessToken}`)
+      .send({ name: custom.name, colorHex: '#0ea5e9' })
+      .expect(200)
+      .expect((response) => {
+        expect((response.body as ApiEnvelope<Category>).data.colorHex).toBe(
+          '#0EA5E9',
+        );
+      });
+
+    await api
+      .patch(`/api/v1/categories/${custom.id}`)
       .set('Authorization', `Bearer ${second.accessToken}`)
-      .send({ name: 'Stolen' })
+      .send({ name: 'Stolen', colorHex: '#FFFFFF' })
       .expect(404);
 
     const expenseResponse = await api

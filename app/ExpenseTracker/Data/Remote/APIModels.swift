@@ -48,6 +48,7 @@ struct RefreshTokenRequest: Encodable {
 struct RemoteCategoryDTO: Decodable {
     let id: Int
     let name: String
+    let colorHex: String?
     let isDefault: Bool
     let type: String
     let userId: Int?
@@ -58,10 +59,12 @@ struct RemoteCategoryDTO: Decodable {
 struct CreateCategoryRequest: Encodable {
     let name: String
     let type: String
+    let colorHex: String
 }
 
 struct UpdateCategoryRequest: Encodable {
     let name: String
+    let colorHex: String
 }
 
 struct ExpenseCategoryDTO: Decodable {
@@ -96,6 +99,20 @@ struct ExpensePageDTO: Decodable {
 
     let items: [RemoteExpenseDTO]
     let pagination: Pagination
+}
+
+struct ExpenseTrendItemDTO: Decodable {
+    let date: String
+    let amount: String
+}
+
+struct ExpenseTrendDTO: Decodable {
+    let type: String
+    let period: String
+    let granularity: String
+    let from: String
+    let to: String
+    let items: [ExpenseTrendItemDTO]
 }
 
 struct SaveExpenseRequest: Encodable {

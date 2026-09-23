@@ -4,6 +4,15 @@ struct TransactionFormView: View {
     @State var viewModel: TransactionFormViewModel
     @Environment(\.dismiss) private var dismiss
     @State private var isShowingDeleteConfirmation = false
+    private let onSuccess: ((String) -> Void)?
+
+    init(
+        viewModel: TransactionFormViewModel,
+        onSuccess: ((String) -> Void)? = nil
+    ) {
+        _viewModel = State(initialValue: viewModel)
+        self.onSuccess = onSuccess
+    }
 
     var body: some View {
         @Bindable var viewModel = viewModel
@@ -42,7 +51,8 @@ struct TransactionFormView: View {
                         }
                     }
                     DatePicker("Ngày", selection: $viewModel.date, displayedComponents: [.date])
-                        .environment(\.locale, Locale(identifier: "vi_VN"))
+                        .environment(\.locale, AppFormatters.locale)
+                        .environment(\.calendar, AppFormatters.calendar)
                     TextField("Ghi chú (không bắt buộc)", text: $viewModel.note, axis: .vertical)
                 }
                 if let error = viewModel.errorMessage {
@@ -101,6 +111,7 @@ struct TransactionFormView: View {
                 Button("Xoá", role: .destructive) {
                     Task {
                         if await viewModel.delete() {
+                            onSuccess?("Đã xoá giao dịch thành công")
                             dismiss()
                         }
                     }
@@ -114,7 +125,18 @@ struct TransactionFormView: View {
 
     private func save() {
         Task {
-            if await viewModel.save() { dismiss() }
+            if await viewModel.save() {
+                let message: String
+                if viewModel.isEditing {
+                    message = "Đã cập nhật giao dịch thành công"
+                } else {
+                    message = viewModel.type == .income
+                        ? "Đã thêm khoản thu thành công"
+                        : "Đã thêm khoản chi thành công"
+                }
+                onSuccess?(message)
+                dismiss()
+            }
         }
     }
 

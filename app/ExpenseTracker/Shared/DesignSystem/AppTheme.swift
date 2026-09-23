@@ -8,6 +8,7 @@ enum AppTheme {
     // Compatibility aliases for existing views while the design token remains centralized.
     static let teal = primary
     static let tealDark = primaryDark
+    static let success = Color(red: 0.12, green: 0.62, blue: 0.32)
     static let navy = Color(red: 0.07, green: 0.14, blue: 0.22)
     static let coral = Color(red: 0.93, green: 0.31, blue: 0.29)
     static let gold = Color(red: 0.94, green: 0.62, blue: 0.12)

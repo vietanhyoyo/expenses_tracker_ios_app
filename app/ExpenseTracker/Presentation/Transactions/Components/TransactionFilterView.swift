@@ -7,6 +7,7 @@ struct TransactionFilterView: View {
     var body: some View {
         NavigationStack {
             Form {
+                dateRangeSection
                 typeSection
                 categorySection
                 accountSection
@@ -20,12 +21,57 @@ struct TransactionFilterView: View {
                     Button("Đặt lại") { viewModel.clearFilters() }
                 }
                 ToolbarItem(placement: .confirmationAction) {
-                    Button("Xong") { dismiss() }
+                    Button("Xong") {
+                        dismiss()
+                        Task { await viewModel.load() }
+                    }
                         .fontWeight(.semibold)
+                        .disabled(!viewModel.isDateRangeValid)
                 }
             }
         }
         .presentationDetents([.medium, .large])
+    }
+
+    private var dateRangeSection: some View {
+        Section("Khoảng thời gian") {
+            Toggle(
+                "Lọc theo khoảng ngày",
+                isOn: Binding(
+                    get: { viewModel.isDateRangeEnabled },
+                    set: { viewModel.setDateRangeEnabled($0) }
+                )
+            )
+
+            if viewModel.isDateRangeEnabled {
+                DatePicker(
+                    "Từ ngày",
+                    selection: Binding(
+                        get: { viewModel.fromDate ?? Date() },
+                        set: { viewModel.fromDate = $0 }
+                    ),
+                    displayedComponents: .date
+                )
+                .environment(\.locale, AppFormatters.locale)
+                .environment(\.calendar, AppFormatters.calendar)
+                DatePicker(
+                    "Đến ngày",
+                    selection: Binding(
+                        get: { viewModel.toDate ?? Date() },
+                        set: { viewModel.toDate = $0 }
+                    ),
+                    displayedComponents: .date
+                )
+                .environment(\.locale, AppFormatters.locale)
+                .environment(\.calendar, AppFormatters.calendar)
+
+                if !viewModel.isDateRangeValid {
+                    Text("Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.")
+                        .font(.footnote)
+                        .foregroundStyle(AppTheme.coral)
+                }
+            }
+        }
     }
 
     private var typeSection: some View {

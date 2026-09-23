@@ -9,17 +9,52 @@ struct StatisticsUseCases {
         for month: Date,
         calendar: Calendar = .current
     ) async throws -> MonthlySummary {
-        let transactionsInMonth = try await transactions(in: month, calendar: calendar)
-        return Self.summary(from: transactionsInMonth)
+        guard let interval = calendar.dateInterval(of: .month, for: month) else {
+            return MonthlySummary(income: 0, expense: 0)
+        }
+        return try await summary(for: interval, calendar: calendar)
+    }
+
+    func summary(
+        for interval: DateInterval,
+        calendar: Calendar = .current
+    ) async throws -> MonthlySummary {
+        Self.summary(from: try await transactions(in: interval, calendar: calendar))
     }
 
     func expenseByCategory(
         for month: Date,
         calendar: Calendar = .current
     ) async throws -> [CategorySpending] {
+        guard let interval = calendar.dateInterval(of: .month, for: month) else {
+            return []
+        }
+        return try await expenseByCategory(for: interval, calendar: calendar)
+    }
+
+    func expenseByCategory(
+        for interval: DateInterval,
+        calendar: Calendar = .current
+    ) async throws -> [CategorySpending] {
+        try await spendingByCategory(
+            for: interval,
+            type: .expense,
+            calendar: calendar
+        )
+    }
+
+    func spendingByCategory(
+        for interval: DateInterval,
+        type: TransactionType,
+        calendar: Calendar = .current
+    ) async throws -> [CategorySpending] {
         let allCategories = try await categories.getCategories()
-        let expenses = try await transactions(in: month, calendar: calendar).ofType(.expense)
-        return Self.expenseByCategory(from: expenses, categories: allCategories)
+        let values = try await transactions(in: interval, calendar: calendar).ofType(type)
+        return Self.categorySpending(
+            from: values,
+            categories: allCategories,
+            type: type
+        )
     }
 
     func dailyExpense(
@@ -34,8 +69,32 @@ struct StatisticsUseCases {
         for month: Date,
         calendar: Calendar = .current
     ) async throws -> [DailyCashFlow] {
-        let transactionsInMonth = try await transactions(in: month, calendar: calendar)
-        return Self.dailyCashFlow(from: transactionsInMonth, calendar: calendar)
+        guard let interval = calendar.dateInterval(of: .month, for: month) else {
+            return []
+        }
+        return try await dailyCashFlow(for: interval, calendar: calendar)
+    }
+
+    func dailyCashFlow(
+        for interval: DateInterval,
+        calendar: Calendar = .current
+    ) async throws -> [DailyCashFlow] {
+        let transactionsInRange = try await transactions(in: interval, calendar: calendar)
+        return Self.dailyCashFlow(from: transactionsInRange, calendar: calendar)
+    }
+
+    func spendingTrend(
+        period: String,
+        type: TransactionType,
+        for date: Date,
+        calendar: Calendar = .current
+    ) async throws -> [DailySpending] {
+        try await transactions.getSpendingTrend(
+            period: period,
+            type: type,
+            date: date,
+            calendar: calendar
+        )
     }
 
     func recent(limit: Int) async throws -> [ExpenseTransaction] {
@@ -56,12 +115,20 @@ struct StatisticsUseCases {
         from expenses: [ExpenseTransaction],
         categories: [ExpenseCategory]
     ) -> [CategorySpending] {
-        let expensesByCategory = Dictionary(grouping: expenses, by: \.categoryID)
+        categorySpending(from: expenses, categories: categories, type: .expense)
+    }
+
+    static func categorySpending(
+        from values: [ExpenseTransaction],
+        categories: [ExpenseCategory],
+        type: TransactionType
+    ) -> [CategorySpending] {
+        let valuesByCategory = Dictionary(grouping: values, by: \.categoryID)
 
         return categories
-            .filter { $0.type == .expense }
+            .filter { $0.type == type }
             .compactMap { category in
-                let amount = expensesByCategory[category.id]?.totalAmount ?? 0
+                let amount = valuesByCategory[category.id]?.totalAmount ?? 0
                 return amount > 0
                     ? CategorySpending(category: category, amount: amount)
                     : nil
@@ -94,9 +161,21 @@ struct StatisticsUseCases {
     }
 
     private func transactions(
-        in month: Date,
+        in interval: DateInterval,
         calendar: Calendar
     ) async throws -> [ExpenseTransaction] {
-        try await transactions.getTransactions().inMonth(month, calendar: calendar)
+        guard let inclusiveEnd = calendar.date(
+            byAdding: .second,
+            value: -1,
+            to: interval.end
+        ) else {
+            return []
+        }
+        return try await transactions.getTransactions(
+            from: interval.start,
+            to: inclusiveEnd,
+            type: nil,
+            categoryID: nil
+        )
     }
 }

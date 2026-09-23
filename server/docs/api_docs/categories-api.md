@@ -38,6 +38,7 @@ Error response:
 interface Category {
   id: number;
   name: string;
+  colorHex: string; // #RRGGBB
   type: 'income' | 'expense';
   isDefault: boolean;
   userId: number | null;
@@ -70,6 +71,7 @@ Authorization: Bearer <access-token>
     {
       "id": 1,
       "name": "Food",
+      "colorHex": "#FF5D73",
       "type": "expense",
       "isDefault": true,
       "userId": null,
@@ -79,6 +81,7 @@ Authorization: Bearer <access-token>
     {
       "id": 9,
       "name": "Gym",
+      "colorHex": "#7C3AED",
       "type": "expense",
       "isDefault": false,
       "userId": 1,
@@ -99,6 +102,7 @@ Request body:
 | --- | --- | --- | --- |
 | `name` | string | Yes | Must not contain only whitespace; maximum 100 characters |
 | `type` | string | No | `income` or `expense`; defaults to `expense` |
+| `colorHex` | string | No | Hex color in `#RRGGBB` format; defaults by transaction type |
 
 ```http
 POST /api/v1/categories
@@ -107,7 +111,8 @@ Content-Type: application/json
 
 {
   "name": "Gym",
-  "type": "expense"
+  "type": "expense",
+  "colorHex": "#7C3AED"
 }
 ```
 
@@ -120,6 +125,7 @@ Content-Type: application/json
   "data": {
     "id": 9,
     "name": "Gym",
+    "colorHex": "#7C3AED",
     "type": "expense",
     "isDefault": false,
     "userId": 1,
@@ -145,7 +151,8 @@ Request body:
 
 ```json
 {
-  "name": "Fitness"
+  "name": "Fitness",
+  "colorHex": "#14B8A6"
 }
 ```
 
@@ -158,6 +165,7 @@ The `200 OK` response returns the updated `Category`:
   "data": {
     "id": 9,
     "name": "Fitness",
+    "colorHex": "#14B8A6",
     "type": "expense",
     "isDefault": false,
     "userId": 1,

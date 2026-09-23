@@ -3,6 +3,7 @@ import SwiftUI
 
 struct CategorySpendingChart: View {
     let items: [CategorySpending]
+    let transactionType: TransactionType
 
     private var categoryNames: [String] {
         items.map(\.category.name)
@@ -15,7 +16,7 @@ struct CategorySpendingChart: View {
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             AppSectionHeader(
-                title: "Phân bổ theo danh mục",
+                title: "Phân bổ \(transactionType.title.lowercased()) theo danh mục",
                 icon: "chart.pie.fill"
             )
             Chart(items) { item in

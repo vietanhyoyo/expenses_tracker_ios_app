@@ -16,7 +16,10 @@ struct BudgetsView: View {
             MonthSelector(
                 month: viewModel.selectedMonth,
                 previous: { Task { await viewModel.moveMonth(-1) } },
-                next: { Task { await viewModel.moveMonth(1) } }
+                next: { Task { await viewModel.moveMonth(1) } },
+                selectMonth: { month in
+                    Task { await viewModel.selectMonth(month) }
+                }
             )
             .padding(.horizontal, AppSpacing.medium)
             .padding(.vertical, AppSpacing.small)

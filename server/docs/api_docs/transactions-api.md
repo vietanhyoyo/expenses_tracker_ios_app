@@ -84,6 +84,44 @@ Response `200`:
 }
 ```
 
+## Xu hướng chi tiêu
+
+`GET /transactions/trend`
+
+Endpoint cộng các giao dịch theo `type` của user hiện tại và luôn trả đủ bucket trong khoảng thời gian, kể cả bucket có số tiền `0`.
+
+Query:
+
+| Field | Mặc định | Quy tắc |
+| --- | --- | --- |
+| `type` | `expense` | `income` hoặc `expense` |
+| `period` | `month` | `week`, `month` hoặc `year` |
+| `date` | Ngày hiện tại | `YYYY-MM-DD`, dùng làm ngày neo để xác định tuần/tháng/năm |
+
+- `week`: tuần bắt đầu từ thứ Hai, `items` là 7 ngày.
+- `month`: `items` là từng ngày trong tháng.
+- `year`: `items` là 12 tháng, ngày đại diện là ngày đầu tháng (`YYYY-MM-01`).
+
+Ví dụ `GET /transactions/trend?period=year&date=2026-09-23`:
+
+```json
+{
+  "statusCode": 200,
+  "message": "Transaction trend retrieved successfully",
+  "data": {
+    "type": "expense",
+    "period": "year",
+    "granularity": "month",
+    "from": "2026-01-01",
+    "to": "2027-01-01",
+    "items": [
+      { "date": "2026-01-01", "amount": "1200000" },
+      { "date": "2026-02-01", "amount": "0" }
+    ]
+  }
+}
+```
+
 ## Chi tiết, cập nhật và xóa
 
 - `GET /transactions/:id`: trả một giao dịch.

@@ -50,6 +50,8 @@ struct RootView: View {
         .task {
             await session.restore()
         }
+        .environment(\.locale, AppFormatters.locale)
+        .environment(\.calendar, AppFormatters.calendar)
     }
 
     private func loadingView(message: String) -> some View {

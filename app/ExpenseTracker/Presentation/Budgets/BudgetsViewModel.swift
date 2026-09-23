@@ -27,6 +27,11 @@ final class BudgetsViewModel {
         await load()
     }
 
+    func selectMonth(_ month: Date) async {
+        selectedMonth = month
+        await load()
+    }
+
     func delete(_ progress: BudgetProgress) async {
         do {
             try await budgets.delete(id: progress.budget.id)
