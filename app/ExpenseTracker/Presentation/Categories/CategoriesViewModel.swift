@@ -18,6 +18,7 @@ final class CategoriesViewModel {
     }
 
     func load() async {
+        errorMessage = nil
         do {
             categories = try await useCases.getAll()
         } catch {
@@ -25,12 +26,15 @@ final class CategoriesViewModel {
         }
     }
 
-    func delete(_ category: ExpenseCategory) async {
+    func delete(_ category: ExpenseCategory) async -> Bool {
+        errorMessage = nil
         do {
             try await useCases.delete(id: category.id)
             await load()
+            return true
         } catch {
             errorMessage = error.userMessage
+            return false
         }
     }
 }

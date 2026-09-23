@@ -13,9 +13,11 @@ final class SessionViewModel {
     var mode: Mode = .login
     var email = ""
     var password = ""
+    var passwordConfirmation = ""
     var isRestoring = true
     var isSubmitting = false
     var errorMessage: String?
+    var didAttemptValidation = false
 
     private let auth: AuthUseCases
 
@@ -25,9 +27,46 @@ final class SessionViewModel {
 
     var isAuthenticated: Bool { user != nil }
 
+    var emailValidationMessage: String? {
+        let value = email.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard didAttemptValidation || !value.isEmpty else { return nil }
+        guard !value.isEmpty else { return "Vui lòng nhập email." }
+        guard value.count <= 255,
+              value.range(
+                  of: #"^[^\s@]+@[^\s@]+\.[^\s@]+$"#,
+                  options: .regularExpression
+              ) != nil else {
+            return "Email không hợp lệ."
+        }
+        return nil
+    }
+
+    var passwordValidationMessage: String? {
+        guard didAttemptValidation || !password.isEmpty else { return nil }
+        guard !password.isEmpty else { return "Vui lòng nhập mật khẩu." }
+        guard (8...72).contains(password.count) else {
+            return "Mật khẩu phải có từ 8 đến 72 ký tự."
+        }
+        return nil
+    }
+
+    var passwordConfirmationValidationMessage: String? {
+        guard mode == .register else { return nil }
+        guard didAttemptValidation || !passwordConfirmation.isEmpty else { return nil }
+        guard !passwordConfirmation.isEmpty else { return "Vui lòng nhập lại mật khẩu." }
+        guard passwordConfirmation == password else {
+            return "Mật khẩu nhập lại không khớp."
+        }
+        return nil
+    }
+
     var canSubmit: Bool {
-        !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        emailValidationMessage == nil
+            && passwordValidationMessage == nil
+            && passwordConfirmationValidationMessage == nil
+            && !email.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
             && !password.isEmpty
+            && (mode == .login || !passwordConfirmation.isEmpty)
             && !isSubmitting
     }
 
@@ -45,6 +84,7 @@ final class SessionViewModel {
     }
 
     func submit() async -> Bool {
+        didAttemptValidation = true
         guard canSubmit else { return false }
         isSubmitting = true
         errorMessage = nil
@@ -58,6 +98,7 @@ final class SessionViewModel {
                 user = try await auth.register(email: email, password: password)
             }
             password = ""
+            passwordConfirmation = ""
             return true
         } catch {
             errorMessage = error.userMessage
@@ -68,7 +109,9 @@ final class SessionViewModel {
     func switchMode() {
         mode = mode == .login ? .register : .login
         password = ""
+        passwordConfirmation = ""
         errorMessage = nil
+        didAttemptValidation = false
     }
 
     func logout() async {
@@ -78,6 +121,7 @@ final class SessionViewModel {
             user = nil
             email = ""
             password = ""
+            passwordConfirmation = ""
             mode = .login
         }
         do {
@@ -91,6 +135,7 @@ final class SessionViewModel {
     func sessionDidExpire() {
         user = nil
         password = ""
+        passwordConfirmation = ""
         mode = .login
         errorMessage = DomainError.sessionExpired.userMessage
     }

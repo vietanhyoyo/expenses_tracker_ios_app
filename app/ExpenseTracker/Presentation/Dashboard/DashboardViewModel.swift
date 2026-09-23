@@ -35,7 +35,9 @@ final class DashboardViewModel {
 
         do {
             let dashboardSummary = try await dashboard.summary(for: selectedMonth)
-            balance = dashboardSummary.totalBalance
+            // The dashboard balance follows the selected month. The API also
+            // returns an all-time total, but that value must not be shown here.
+            balance = dashboardSummary.monthlyBalance
             summary = MonthlySummary(
                 income: dashboardSummary.monthlyIncome,
                 expense: dashboardSummary.monthlyExpense

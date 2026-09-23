@@ -93,6 +93,7 @@ struct DashboardView: View {
             }
             .successToast(message: $successMessage)
         }
+        .environment(\.colorScheme, .light)
     }
 
     private var dashboardHeader: some View {

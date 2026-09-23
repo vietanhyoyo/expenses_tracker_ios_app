@@ -3,6 +3,17 @@ import SwiftUI
 struct CategoryFormView: View {
     @State var viewModel: CategoryFormViewModel
     @Environment(\.dismiss) private var dismiss
+    @State private var failureMessage: String?
+
+    private let onSuccess: ((String) -> Void)?
+
+    init(
+        viewModel: CategoryFormViewModel,
+        onSuccess: ((String) -> Void)? = nil
+    ) {
+        _viewModel = State(initialValue: viewModel)
+        self.onSuccess = onSuccess
+    }
 
     private let icons = [
         // Food and transport
@@ -41,6 +52,7 @@ struct CategoryFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .formToolbar(isSaveDisabled: !viewModel.canSave, onSave: save)
         }
+        .errorToast(message: $failureMessage)
     }
 
     @ViewBuilder
@@ -125,7 +137,16 @@ struct CategoryFormView: View {
 
     private func save() {
         Task {
-            if await viewModel.save() { dismiss() }
+            if await viewModel.save() {
+                onSuccess?(
+                    viewModel.isEditing
+                        ? "Đã cập nhật danh mục thành công"
+                        : "Đã thêm danh mục thành công"
+                )
+                dismiss()
+            } else if let errorMessage = viewModel.errorMessage {
+                failureMessage = errorMessage
+            }
         }
     }
 }

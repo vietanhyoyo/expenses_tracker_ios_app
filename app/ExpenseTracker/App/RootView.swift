@@ -50,6 +50,7 @@ struct RootView: View {
         .task {
             await session.restore()
         }
+        .preferredColorScheme(!session.isAuthenticated || selectedTab == 0 ? .dark : .light)
         .environment(\.locale, AppFormatters.locale)
         .environment(\.calendar, AppFormatters.calendar)
     }

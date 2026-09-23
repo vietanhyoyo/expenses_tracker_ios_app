@@ -5,6 +5,7 @@ struct CategoriesView: View {
     @State private var viewModel: CategoriesViewModel
     @State private var editingCategory: ExpenseCategory?
     @State private var isShowingForm = false
+    @State private var successMessage: String?
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -31,12 +32,19 @@ struct CategoriesView: View {
         }
         .task { await viewModel.load() }
         .sheet(isPresented: $isShowingForm, onDismiss: reload) {
-            CategoryFormView(viewModel: factory.makeCategoryFormViewModel(category: nil))
+            CategoryFormView(
+                viewModel: factory.makeCategoryFormViewModel(category: nil),
+                onSuccess: { successMessage = $0 }
+            )
         }
         .sheet(item: $editingCategory, onDismiss: reload) { category in
-            CategoryFormView(viewModel: factory.makeCategoryFormViewModel(category: category))
+            CategoryFormView(
+                viewModel: factory.makeCategoryFormViewModel(category: category),
+                onSuccess: { successMessage = $0 }
+            )
         }
-        .errorAlert(message: $viewModel.errorMessage)
+        .errorToast(message: $viewModel.errorMessage)
+        .successToast(message: $successMessage)
     }
 
     private func categoryRow(_ category: ExpenseCategory) -> some View {
@@ -47,7 +55,11 @@ struct CategoriesView: View {
                 }
                 .swipeActions {
                     Button("Xoá", role: .destructive) {
-                        Task { await viewModel.delete(category) }
+                        Task {
+                            if await viewModel.delete(category) {
+                                successMessage = "Đã xoá danh mục thành công"
+                            }
+                        }
                     }
                 }
             } else {
