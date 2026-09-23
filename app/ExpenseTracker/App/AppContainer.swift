@@ -16,9 +16,6 @@ final class AppContainer {
 
     init(inMemory: Bool = false) throws {
         let schema = Schema([
-            TransactionEntity.self,
-            CategoryEntity.self,
-            AccountEntity.self,
             BudgetEntity.self
         ])
         let configuration = ModelConfiguration(
@@ -30,15 +27,6 @@ final class AppContainer {
 
         let context = modelContainer.mainContext
         context.autosaveEnabled = true
-        let localTransactionRepository = TransactionRepositoryImpl(
-            source: TransactionLocalDataSource(context: context)
-        )
-        let localCategoryRepository = CategoryRepositoryImpl(
-            source: CategoryLocalDataSource(context: context)
-        )
-        let localAccountRepository = AccountRepositoryImpl(
-            source: AccountLocalDataSource(context: context)
-        )
         let budgetRepository = BudgetRepositoryImpl(
             source: BudgetLocalDataSource(context: context)
         )
@@ -59,13 +47,13 @@ final class AppContainer {
         )
 
         let accountRepository: any AccountRepository = inMemory
-            ? localAccountRepository
+            ? InMemoryAccountRepository()
             : RemoteAccountRepository(api: apiClient)
         let transactionRepository: any TransactionRepository
         let categoryRepository: any CategoryRepository
         if inMemory {
-            transactionRepository = localTransactionRepository
-            categoryRepository = localCategoryRepository
+            transactionRepository = InMemoryTransactionRepository()
+            categoryRepository = InMemoryCategoryRepository()
         } else {
             let metadata = RemoteMetadataStore()
             let remoteCategories = RemoteCategoryRepository(
@@ -105,12 +93,12 @@ final class AppContainer {
         )
         defaultDataSeeder = DefaultDataSeeder(
             categories: CategoryUseCases(
-                categories: localCategoryRepository,
-                transactions: localTransactionRepository
+                categories: categoryRepository,
+                transactions: transactionRepository
             ),
             accounts: AccountUseCases(
-                accounts: localAccountRepository,
-                transactions: localTransactionRepository
+                accounts: accountRepository,
+                transactions: transactionRepository
             ),
             includeCategories: inMemory,
             includeAccounts: inMemory

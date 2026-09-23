@@ -1,53 +1,45 @@
-# Sổ Thu Chi — Expense Tracker
+# Sổ Thu Chi
 
-Ứng dụng quản lý thu chi bằng SwiftUI, SwiftData, Swift Charts và REST API. Dự án tuân theo Clean Architecture (`Presentation → Domain ← Data`) với MVVM ở lớp Presentation.
+Ứng dụng iOS quản lý các khoản thu, chi và số dư cá nhân. Ứng dụng được xây dựng bằng SwiftUI, SwiftData, Swift Charts và kết nối REST API cho tài khoản, giao dịch, danh mục và dữ liệu tổng quan. Giao diện và nội dung hiển thị bằng tiếng Việt.
 
 ## Kiến trúc
 
+Dự án sử dụng Clean Architecture kết hợp MVVM:
+
 ```text
 ExpenseTracker/
-├── App/                    # Composition root, dependency injection, bootstrap
+├── App/
+│   ├── AppContainer.swift       # Khởi tạo dependency và nối các tầng
+│   └── RootView.swift           # Điều hướng theo trạng thái phiên đăng nhập
+├── Presentation/                # SwiftUI View, ViewModel và component theo feature
 ├── Domain/
-│   ├── Entities/           # Model nghiệp vụ thuần Swift
-│   ├── Repositories/       # Contract mà Domain yêu cầu
-│   ├── UseCases/           # Quy tắc và thao tác nghiệp vụ
-│   └── Errors/             # Lỗi nghiệp vụ
+│   ├── Entities/                 # Model nghiệp vụ thuần Swift
+│   ├── Repositories/            # Protocol repository
+│   ├── UseCases/                 # Quy tắc và luồng nghiệp vụ
+│   └── Errors/                   # Lỗi nghiệp vụ
 ├── Data/
-│   ├── Local/Models/       # SwiftData persistence models
-│   ├── Local/DataSources/  # Đọc/ghi ModelContext
-│   ├── Remote/             # API client, DTO, Keychain và ánh xạ ID server
-│   ├── Mappers/            # Chuyển đổi Domain ↔ persistence
-│   └── Repositories/       # Hiện thực repository contract
-├── Presentation/           # View + ViewModel, nhóm theo feature
-└── Shared/                 # Design system, component và utility dùng chung
+│   ├── Local/                    # SwiftData model và data source
+│   ├── Remote/                   # API client, DTO, Keychain và xử lý token
+│   ├── Mappers/                  # Chuyển đổi giữa các loại model
+│   └── Repositories/             # Hiện thực repository
+└── Shared/                       # Design system, component và tiện ích dùng chung
 ```
 
-Hướng phụ thuộc là `Presentation → Domain ← Data`. `AppContainer` là nơi duy nhất khởi tạo implementation và nối dependency. View không truy cập SwiftData trực tiếp; local data source không nhận Domain model; việc chuyển đổi dữ liệu nằm trong mapper và repository.
+Luồng phụ thuộc chính là `Presentation → Domain ← Data`. `AppContainer` là composition root, chịu trách nhiệm tạo các repository/use case và inject vào ViewModel. View chỉ làm nhiệm vụ hiển thị và tương tác; nghiệp vụ nằm trong Domain, còn việc lưu trữ hoặc gọi API nằm trong Data.
 
-Khi thêm feature mới, ưu tiên tạo một thư mục riêng trong `Presentation`, một file cho mỗi View/ViewModel/component có trách nhiệm rõ ràng, và thêm nghiệp vụ vào `Domain` trước khi hiện thực lưu trữ ở `Data`.
+## Chạy bằng Xcode
 
-Tài liệu chi tiết:
+### Yêu cầu
 
-- [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) — kiến trúc, luồng dữ liệu, đánh đổi đã biết.
-- [docs/CODING_CHECKLIST.md](docs/CODING_CHECKLIST.md) — checklist khi code và review.
+- macOS và Xcode hỗ trợ iOS 17 trở lên.
+- iOS Simulator hoặc iPhone thật đã được Xcode nhận diện.
+- Backend REST API đang chạy tại `http://localhost:3000/api/v1` nếu cần đăng nhập và đồng bộ dữ liệu. Địa chỉ này được cấu hình trong `ExpenseTracker/Info.plist` bằng khóa `API_BASE_URL`.
 
-## Chức năng
+### Các bước chạy
 
-- Dashboard: tổng số dư, thu/chi tháng, danh mục, ngân sách và giao dịch gần đây.
-- CRUD giao dịch; tìm kiếm, lọc theo loại/danh mục/tài khoản và sắp xếp.
-- Quản lý tài khoản, danh mục và ngân sách tháng.
-- Thống kê chi tiêu theo ngày và danh mục bằng Swift Charts.
-- Đăng ký, đăng nhập, tự refresh token và đăng xuất; token lưu trong Keychain.
-- Khoản thu, khoản chi, danh mục, tài khoản và số liệu Tổng quan dùng REST API; ngân sách và metadata chưa có API tiếp tục lưu cục bộ.
-- Định dạng VND và giao diện tiếng Việt, hỗ trợ Dark Mode/Dynamic Type.
+1. Mở file `ExpenseTracker.xcodeproj` trong thư mục `app` bằng Xcode.
+2. Chọn scheme `ExpenseTracker` ở thanh công cụ.
+3. Chọn thiết bị chạy, ví dụ `iPhone 17 Pro` trong danh sách Simulator.
+4. Chọn **Product → Run** hoặc nhấn `⌘R`.
 
-## Chạy dự án
-
-Khởi động backend trong `../server` bằng `docker compose up --build -d`. Sau đó mở `ExpenseTracker.xcodeproj`, chọn scheme `ExpenseTracker`, chọn iOS Simulator và Run. Simulator dùng API mặc định tại `http://localhost:3000/api/v1`.
-
-```sh
-xcodebuild -project ExpenseTracker.xcodeproj -scheme ExpenseTracker \
-  -destination 'platform=iOS Simulator,name=iPhone 17 Pro' test
-```
-
-Nếu thêm hoặc xoá file Swift, có thể tái tạo project bằng `ruby scripts/generate_project.rb`.
+Xcode sẽ build ứng dụng, cài lên thiết bị đã chọn và mở ứng dụng. Nếu backend dùng địa chỉ khác, cập nhật giá trị `API_BASE_URL` trong `ExpenseTracker/Info.plist` trước khi chạy.

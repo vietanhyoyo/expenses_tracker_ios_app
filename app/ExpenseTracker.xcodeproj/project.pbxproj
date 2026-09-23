@@ -13,7 +13,6 @@
 		04BC29CFC661E7A9585DAF39 /* TransactionFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AD49270C1D599AEF4F240731 /* TransactionFormView.swift */; };
 		06A73C13DF5D02BF9DCB3DBD /* CategoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = ED80ADD1820E5B570456A9F6 /* CategoryRepository.swift */; };
 		0882CB801AE37D87594E26B7 /* CategoryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E2ACDAADFDE0EA2849331 /* CategoryFormView.swift */; };
-		089DE36DCEED3831B97F93ED /* AccountMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 807148EB52C00A20F9C95278 /* AccountMapper.swift */; };
 		094A2AA52E474835175B1CED /* MonthlyCashFlowCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA65D5406B6698D005D62C5 /* MonthlyCashFlowCalendar.swift */; };
 		0AFDD73B18532337C2A46846 /* AppIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2974BA81361FC3A40D429BCE /* AppIconBadge.swift */; };
 		0E061DDCC8E2A46ABFEC2C1B /* AppMetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F619EF0EEF32264E57664D9A /* AppMetricCard.swift */; };
@@ -32,10 +31,7 @@
 		27D5C2DB6CCAF652C586800E /* RemoteCategoryRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 32F7FE7CA10D038A0521CC76 /* RemoteCategoryRepository.swift */; };
 		2900CB25ED671C0B27046E77 /* CategoriesViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8234BAEEBFBEC93F2247361A /* CategoriesViewModel.swift */; };
 		2A7E12A30C1F46862CE7162E /* AppContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4B7323959B850FE1FE42492B /* AppContainer.swift */; };
-		2AFEEF9D6354DB66B620C023 /* TransactionRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 911D6C5A6105255C38DC7EC6 /* TransactionRepositoryImpl.swift */; };
-		2EC35BDC2D7B8E45FAF0CC9E /* AccountLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9CE220F3D04F2B972BC81965 /* AccountLocalDataSource.swift */; };
 		31594366FE4D9BB12D46DC81 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 968283A35DD5701A618C3DDF /* Assets.xcassets */; };
-		31D0C5CC111F37A11CAABF0B /* CategoryMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7C3D05EAF9DFD885262202B0 /* CategoryMapper.swift */; };
 		3204B28D9C1C0C866B0A45C4 /* TransactionListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3DF7B4BE7B97EB28A205BF45 /* TransactionListView.swift */; };
 		33A9E2894E385F5C69FC3064 /* AuthRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D4615B6A76AB840D52E3E50 /* AuthRepositoryImpl.swift */; };
 		37DA2ED4D84B7883394DD60E /* DashboardSectionCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1E50F795645F494B8E1DCFD0 /* DashboardSectionCard.swift */; };
@@ -49,7 +45,6 @@
 		43818EDA2E745979E6C7516B /* AccountFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 504F7DC7C9F6CE18ACC2C1BC /* AccountFormViewModel.swift */; };
 		43E9EEF06616FD8EB05C384B /* ServerIDCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039338E67BCBCB149FB3FD72 /* ServerIDCodec.swift */; };
 		45A4CC2D6E2DF2F7D4B128D3 /* RemoteDateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F1C41285B719AFF626CB /* RemoteDateParser.swift */; };
-		4876D3B1DE17FBE2CEEE5C70 /* CategoryEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = EF05703477F29A8811572214 /* CategoryEntity.swift */; };
 		4957D695711A6E3E6858639D /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5581CA932EF95E578E14B0C4 /* APIClient.swift */; };
 		4AA4E1F67BAEADD436724135 /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B366BCF2D99AD1C4592A5B12 /* Budget.swift */; };
 		4E687762CB046E3FD1980462 /* DashboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A88494001BA43E8A8F1AF7 /* DashboardRepository.swift */; };
@@ -66,9 +61,9 @@
 		5D6064732E0864715999247F /* ExpenseCategory+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48AE69CE9713121F5469132D /* ExpenseCategory+Presentation.swift */; };
 		5F5D5A67266BF755BB4402EF /* BudgetRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4DBB5D830BCAF4156AA3932 /* BudgetRow.swift */; };
 		60CFB046F0CD5C8E31152B72 /* StatisticsUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AC66055A3C6B9E798D052FF /* StatisticsUseCases.swift */; };
-		6128D7A19363ACC4EAB6097D /* TransactionEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 20613D70C321067BDD123C03 /* TransactionEntity.swift */; };
 		62B1CCCF8B9875A2BA1D32CF /* CategorySpending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D8CECE6B69421B82C366BC4 /* CategorySpending.swift */; };
 		62DC97087BCBEDBA3ECA98B2 /* CategoriesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C231D2EE6B2F7FB6D386B32F /* CategoriesView.swift */; };
+		677E1925BF360E25D30AB19A /* InMemoryRepositories.swift in Sources */ = {isa = PBXBuildFile; fileRef = B551177CD1D8BFB866D857AA /* InMemoryRepositories.swift */; };
 		67C0D2B69D812A881FEE907A /* StatisticsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 404C71447E2331B44432BB09 /* StatisticsView.swift */; };
 		67EE649B119D48294D22A1B3 /* CategoryFormViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 72588185CCC9FAFE1B3F30CA /* CategoryFormViewModel.swift */; };
 		6A43C51A7AD699E643DE5E83 /* AuthRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CB19AFD9B07FC8E16F06877 /* AuthRepository.swift */; };
@@ -91,7 +86,6 @@
 		8E9E0D35CCFDC15511745AC9 /* AccountsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15D38D4A8E0967DED784CFAA /* AccountsView.swift */; };
 		925DBAA7F233BC4E6161675A /* DailySpending.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3EBD70159E616AD97573BFF1 /* DailySpending.swift */; };
 		93D1C836277DF527DAAFB1B6 /* RemoteErrorMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = E3AB2F76750A90C976A38714 /* RemoteErrorMapper.swift */; };
-		9691955918F5C4DE8FA30397 /* TransactionLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = BF968C27CE34D5616669FB12 /* TransactionLocalDataSource.swift */; };
 		97EDD9C559372C9475B2F4B8 /* CategoryUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0862123B60C1AEF168BEEC7F /* CategoryUseCases.swift */; };
 		9889DE7DA33BDDC547BDC66D /* TransactionUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = DCCFC09E09DE61DBF9E82F8E /* TransactionUseCases.swift */; };
 		998B4184AB310475432210B4 /* RemoteMetadataStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = 43979493A1ADB24F551F262B /* RemoteMetadataStore.swift */; };
@@ -113,17 +107,13 @@
 		C348E50D83CDC771A4886760 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A4C29D8DD283461DBADB2BFD /* RootView.swift */; };
 		C490FA1FD841F9B6110F1A0D /* BudgetRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0327B28B5921069D67E24813 /* BudgetRepository.swift */; };
 		C5CFFE57B00B6D2C331EB5E8 /* View+AppStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = DFAF6B9C8E3EE6FE636A16EF /* View+AppStyle.swift */; };
-		C73E6BC279286742475522B5 /* AccountRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = B80ECD8D73312C4247812DE4 /* AccountRepositoryImpl.swift */; };
 		CA6821E4C416788D70CBA837 /* DomainError.swift in Sources */ = {isa = PBXBuildFile; fileRef = CF92CC559F0015905EE21670 /* DomainError.swift */; };
-		CB64BBF31908A0BD7C9C3436 /* CategoryRepositoryImpl.swift in Sources */ = {isa = PBXBuildFile; fileRef = F3CC15A9823A54B7EBDFCC0C /* CategoryRepositoryImpl.swift */; };
 		CD3BE44D66BE3D1AC1413038 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9EFCB3958AC9717B03B51BC9 /* PersistenceTests.swift */; };
 		D39DEDDDEBD3A928E3E3AB54 /* BudgetProgress.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2D4ACFC3F69399CD033415C /* BudgetProgress.swift */; };
 		D438B297571EA7B85B038B7C /* AppContainer+ViewModelFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 284169318BEA958C204D1DBC /* AppContainer+ViewModelFactory.swift */; };
 		D6010FE4B93032875C145D36 /* AuthUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBAC8F56C4B8CFDCB7A57168 /* AuthUseCases.swift */; };
-		DCC618721958202526960C52 /* AccountEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = B51DEC56285B3FFB91C75B89 /* AccountEntity.swift */; };
 		DCF512C25C92560CE1026955 /* Error+UserMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7136873A6664AE3A2C2DC04F /* Error+UserMessage.swift */; };
 		DECD2B45ACF2ADDAA0218A0F /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01E2980BE68EFCE458E575C /* AppTypography.swift */; };
-		E25A12BF469C461F3B87FE2A /* CategoryLocalDataSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7DA1CBBCBD56147DEFA2DA78 /* CategoryLocalDataSource.swift */; };
 		E2FF45477DF4B93F109F74C1 /* MonthSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9702A7B243BCC9D67D196E /* MonthSelector.swift */; };
 		E3D8F41A3F12E0735736B4DB /* Decimal+Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5959E6D496526AC6D0B22C85 /* Decimal+Double.swift */; };
 		E96A50E378CE1BF273301FFB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13B218FF81460867D67D9450 /* Foundation.framework */; };
@@ -132,7 +122,6 @@
 		EEF1212A497AF1AFD748F875 /* ExpenseCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9DD0618F906D5BD46464A419 /* ExpenseCategory.swift */; };
 		F1EE5B8F0833433E1D01625B /* SettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6049561C9B5C106E0BA8B689 /* SettingsView.swift */; };
 		F2AE63B1BED8426E5FE1FFFD /* BudgetsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9205FB5A40CAC9872CDE574D /* BudgetsViewModel.swift */; };
-		F336CD2F5679BCD046756DF3 /* TransactionMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 893C572EAE03CC7DE3BD6544 /* TransactionMapper.swift */; };
 		F3C7A84B64E024B3F68AF741 /* TransactionType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9BFC027FEDABAA8652E197B7 /* TransactionType.swift */; };
 		F4713DAE9C3B71BC406230ED /* BudgetEntity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 136225FB41EB32B694FB74EF /* BudgetEntity.swift */; };
 		F8059C9492CE1415B5F160FD /* View+ErrorAlert.swift in Sources */ = {isa = PBXBuildFile; fileRef = FCE3DB5E378D4D4D827D9C36 /* View+ErrorAlert.swift */; };
@@ -166,7 +155,6 @@
 		13B218FF81460867D67D9450 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		15D38D4A8E0967DED784CFAA /* AccountsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountsView.swift; path = Presentation/Accounts/AccountsView.swift; sourceTree = "<group>"; };
 		1E50F795645F494B8E1DCFD0 /* DashboardSectionCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardSectionCard.swift; path = Presentation/Dashboard/Components/DashboardSectionCard.swift; sourceTree = "<group>"; };
-		20613D70C321067BDD123C03 /* TransactionEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionEntity.swift; path = Data/Local/Models/TransactionEntity.swift; sourceTree = "<group>"; };
 		22FB832EE0D1AEE63BCE099C /* DashboardBudgetCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardBudgetCard.swift; path = Presentation/Dashboard/Components/DashboardBudgetCard.swift; sourceTree = "<group>"; };
 		240F842B9C510A1FB1A5C2E8 /* DashboardSpendingCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardSpendingCard.swift; path = Presentation/Dashboard/Components/DashboardSpendingCard.swift; sourceTree = "<group>"; };
 		24DA8E96E5FC1E1E0C63BBAB /* BudgetUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetUseCases.swift; path = Domain/UseCases/BudgetUseCases.swift; sourceTree = "<group>"; };
@@ -209,23 +197,17 @@
 		72588185CCC9FAFE1B3F30CA /* CategoryFormViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryFormViewModel.swift; path = Presentation/Categories/CategoryFormViewModel.swift; sourceTree = "<group>"; };
 		7961F6A0844A19C9AB74BB44 /* AccountRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountRepository.swift; path = Domain/Repositories/AccountRepository.swift; sourceTree = "<group>"; };
 		7B1A5DA4EB11634AE7ED97B8 /* DashboardUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardUseCases.swift; path = Domain/UseCases/DashboardUseCases.swift; sourceTree = "<group>"; };
-		7C3D05EAF9DFD885262202B0 /* CategoryMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryMapper.swift; path = Data/Mappers/CategoryMapper.swift; sourceTree = "<group>"; };
-		7DA1CBBCBD56147DEFA2DA78 /* CategoryLocalDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryLocalDataSource.swift; path = Data/Local/DataSources/CategoryLocalDataSource.swift; sourceTree = "<group>"; };
-		807148EB52C00A20F9C95278 /* AccountMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountMapper.swift; path = Data/Mappers/AccountMapper.swift; sourceTree = "<group>"; };
 		8234BAEEBFBEC93F2247361A /* CategoriesViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoriesViewModel.swift; path = Presentation/Categories/CategoriesViewModel.swift; sourceTree = "<group>"; };
 		8466C61E173510A99314C303 /* BudgetFormViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetFormViewModel.swift; path = Presentation/Budgets/BudgetFormViewModel.swift; sourceTree = "<group>"; };
 		86355AEE20520A267ADB1EE7 /* StatisticsViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatisticsViewModel.swift; path = Presentation/Statistics/StatisticsViewModel.swift; sourceTree = "<group>"; };
 		872A4FAA53EF732F8ED591D5 /* TransactionListViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionListViewModel.swift; path = Presentation/Transactions/TransactionListViewModel.swift; sourceTree = "<group>"; };
-		893C572EAE03CC7DE3BD6544 /* TransactionMapper.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionMapper.swift; path = Data/Mappers/TransactionMapper.swift; sourceTree = "<group>"; };
 		8DA43DC2CBAE53D83B4B0311 /* BudgetProgress+Presentation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "BudgetProgress+Presentation.swift"; path = "Presentation/Shared/Extensions/BudgetProgress+Presentation.swift"; sourceTree = "<group>"; };
 		8E0E70A016B124510499F648 /* DashboardViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardViewModel.swift; path = Presentation/Dashboard/DashboardViewModel.swift; sourceTree = "<group>"; };
 		8E15928F83BDB43B95117D33 /* TransactionRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionRepository.swift; path = Domain/Repositories/TransactionRepository.swift; sourceTree = "<group>"; };
-		911D6C5A6105255C38DC7EC6 /* TransactionRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionRepositoryImpl.swift; path = Data/Repositories/TransactionRepositoryImpl.swift; sourceTree = "<group>"; };
 		9205FB5A40CAC9872CDE574D /* BudgetsViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetsViewModel.swift; path = Presentation/Budgets/BudgetsViewModel.swift; sourceTree = "<group>"; };
 		93E93E4E7CFBE761A523527F /* MonthlySummary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MonthlySummary.swift; path = Domain/Entities/Statistics/MonthlySummary.swift; sourceTree = "<group>"; };
 		968283A35DD5701A618C3DDF /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
 		9BFC027FEDABAA8652E197B7 /* TransactionType.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionType.swift; path = Domain/Entities/TransactionType.swift; sourceTree = "<group>"; };
-		9CE220F3D04F2B972BC81965 /* AccountLocalDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountLocalDataSource.swift; path = Data/Local/DataSources/AccountLocalDataSource.swift; sourceTree = "<group>"; };
 		9D4615B6A76AB840D52E3E50 /* AuthRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthRepositoryImpl.swift; path = Data/Repositories/AuthRepositoryImpl.swift; sourceTree = "<group>"; };
 		9DA01A60C0B59CA087A85BE9 /* DomainUseCaseTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = DomainUseCaseTests.swift; sourceTree = "<group>"; };
 		9DD0618F906D5BD46464A419 /* ExpenseCategory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpenseCategory.swift; path = Domain/Entities/ExpenseCategory.swift; sourceTree = "<group>"; };
@@ -241,13 +223,11 @@
 		B2F55BB8E3695570B0105CB0 /* SwiftDataLocalDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SwiftDataLocalDataSource.swift; path = Data/Local/DataSources/SwiftDataLocalDataSource.swift; sourceTree = "<group>"; };
 		B366BCF2D99AD1C4592A5B12 /* Budget.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Budget.swift; path = Domain/Entities/Budget.swift; sourceTree = "<group>"; };
 		B5093052883892DCD77485D3 /* ExpenseTrackerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ExpenseTrackerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		B51DEC56285B3FFB91C75B89 /* AccountEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountEntity.swift; path = Data/Local/Models/AccountEntity.swift; sourceTree = "<group>"; };
+		B551177CD1D8BFB866D857AA /* InMemoryRepositories.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = InMemoryRepositories.swift; path = Data/Repositories/InMemoryRepositories.swift; sourceTree = "<group>"; };
 		B578EA7DE715C6EC3B354AF3 /* Date+Month.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Date+Month.swift"; path = "Shared/Extensions/Date+Month.swift"; sourceTree = "<group>"; };
-		B80ECD8D73312C4247812DE4 /* AccountRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountRepositoryImpl.swift; path = Data/Repositories/AccountRepositoryImpl.swift; sourceTree = "<group>"; };
 		B909449AD8B7BC6EAEA68E9F /* TransactionDaySection.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionDaySection.swift; path = Presentation/Transactions/Components/TransactionDaySection.swift; sourceTree = "<group>"; };
 		BBAC8F56C4B8CFDCB7A57168 /* AuthUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthUseCases.swift; path = Domain/UseCases/AuthUseCases.swift; sourceTree = "<group>"; };
 		BEC208DDFC8E4D54ACE401A9 /* Sequence+Identifiable.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "Sequence+Identifiable.swift"; path = "Shared/Extensions/Sequence+Identifiable.swift"; sourceTree = "<group>"; };
-		BF968C27CE34D5616669FB12 /* TransactionLocalDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionLocalDataSource.swift; path = Data/Local/DataSources/TransactionLocalDataSource.swift; sourceTree = "<group>"; };
 		C1B98B7EA3BB7AF3C0FA9843 /* ExpenseTrackerApp.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ExpenseTrackerApp.swift; path = App/ExpenseTrackerApp.swift; sourceTree = "<group>"; };
 		C231D2EE6B2F7FB6D386B32F /* CategoriesView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoriesView.swift; path = Presentation/Categories/CategoriesView.swift; sourceTree = "<group>"; };
 		C348F1C41285B719AFF626CB /* RemoteDateParser.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = RemoteDateParser.swift; path = Data/Remote/RemoteDateParser.swift; sourceTree = "<group>"; };
@@ -271,10 +251,8 @@
 		ECC6B62E4F5A6626B6BD5C4A /* BudgetLocalDataSource.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetLocalDataSource.swift; path = Data/Local/DataSources/BudgetLocalDataSource.swift; sourceTree = "<group>"; };
 		ED80ADD1820E5B570456A9F6 /* CategoryRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryRepository.swift; path = Domain/Repositories/CategoryRepository.swift; sourceTree = "<group>"; };
 		EDA65D5406B6698D005D62C5 /* MonthlyCashFlowCalendar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MonthlyCashFlowCalendar.swift; path = Presentation/Statistics/Components/MonthlyCashFlowCalendar.swift; sourceTree = "<group>"; };
-		EF05703477F29A8811572214 /* CategoryEntity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryEntity.swift; path = Data/Local/Models/CategoryEntity.swift; sourceTree = "<group>"; };
 		F255CC1F224ABBA1BDDE021A /* AccountFormView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountFormView.swift; path = Presentation/Accounts/AccountFormView.swift; sourceTree = "<group>"; };
 		F34F31B1C929CCF7964D06DD /* Account.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = Account.swift; path = Domain/Entities/Account.swift; sourceTree = "<group>"; };
-		F3CC15A9823A54B7EBDFCC0C /* CategoryRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryRepositoryImpl.swift; path = Data/Repositories/CategoryRepositoryImpl.swift; sourceTree = "<group>"; };
 		F619EF0EEF32264E57664D9A /* AppMetricCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppMetricCard.swift; path = Shared/Components/AppMetricCard.swift; sourceTree = "<group>"; };
 		F74ACEF8524B98602AD5B04E /* DashboardBalanceCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardBalanceCard.swift; path = Presentation/Dashboard/Components/DashboardBalanceCard.swift; sourceTree = "<group>"; };
 		FCE3DB5E378D4D4D827D9C36 /* View+ErrorAlert.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "View+ErrorAlert.swift"; path = "Shared/DesignSystem/View+ErrorAlert.swift"; sourceTree = "<group>"; };
@@ -304,10 +282,7 @@
 		0201E74C8339C61F5E1ECAEF /* Models */ = {
 			isa = PBXGroup;
 			children = (
-				B51DEC56285B3FFB91C75B89 /* AccountEntity.swift */,
 				136225FB41EB32B694FB74EF /* BudgetEntity.swift */,
-				EF05703477F29A8811572214 /* CategoryEntity.swift */,
-				20613D70C321067BDD123C03 /* TransactionEntity.swift */,
 			);
 			name = Models;
 			sourceTree = "<group>";
@@ -336,16 +311,14 @@
 		0587FFE96A58EDE7FD20145D /* Repositories */ = {
 			isa = PBXGroup;
 			children = (
-				B80ECD8D73312C4247812DE4 /* AccountRepositoryImpl.swift */,
 				9D4615B6A76AB840D52E3E50 /* AuthRepositoryImpl.swift */,
 				6A57D585306596C23875F578 /* BudgetRepositoryImpl.swift */,
-				F3CC15A9823A54B7EBDFCC0C /* CategoryRepositoryImpl.swift */,
 				C8749A2494CACBAC2B99D984 /* PersistenceErrorMapper.swift */,
 				CC6C14FCEFC91AC95312302C /* RemoteAccountRepository.swift */,
 				32F7FE7CA10D038A0521CC76 /* RemoteCategoryRepository.swift */,
 				CD68AA26DBB352901CC1316A /* RemoteDashboardRepository.swift */,
 				2C71508B89A3D0D71096D37A /* RemoteTransactionRepository.swift */,
-				911D6C5A6105255C38DC7EC6 /* TransactionRepositoryImpl.swift */,
+				B551177CD1D8BFB866D857AA /* InMemoryRepositories.swift */,
 			);
 			name = Repositories;
 			sourceTree = "<group>";
@@ -403,10 +376,6 @@
 			children = (
 				5581CA932EF95E578E14B0C4 /* APIClient.swift */,
 				484F9F4059A5B29309056EAD /* APIModels.swift */,
-				8B24E4BACD7CC3DC77D677E0 /* Auth */,
-				3282EE39CD3F6D362781890C /* Category */,
-				6D4809734AE954077B98BD63 /* DTOs */,
-				4CF00DC60207749FAE26A18A /* Expense */,
 				C348F1C41285B719AFF626CB /* RemoteDateParser.swift */,
 				E3AB2F76750A90C976A38714 /* RemoteErrorMapper.swift */,
 				43979493A1ADB24F551F262B /* RemoteMetadataStore.swift */,
@@ -472,13 +441,6 @@
 			name = iOS;
 			sourceTree = "<group>";
 		};
-		3282EE39CD3F6D362781890C /* Category */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Category;
-			sourceTree = "<group>";
-		};
 		35EAFEE03A0738D7E9E653D4 /* Components */ = {
 			isa = PBXGroup;
 			children = (
@@ -521,13 +483,6 @@
 			name = Settings;
 			sourceTree = "<group>";
 		};
-		4CF00DC60207749FAE26A18A /* Expense */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Expense;
-			sourceTree = "<group>";
-		};
 		4EA3754DCD2E1D6FF194C251 /* Shared */ = {
 			isa = PBXGroup;
 			children = (
@@ -560,20 +515,6 @@
 				93E93E4E7CFBE761A523527F /* MonthlySummary.swift */,
 			);
 			name = Statistics;
-			sourceTree = "<group>";
-		};
-		60C7080779F144F2BAA603DD /* Remote */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Remote;
-			sourceTree = "<group>";
-		};
-		6D4809734AE954077B98BD63 /* DTOs */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = DTOs;
 			sourceTree = "<group>";
 		};
 		6DC5C4728A43B9E94BDBE909 /* Components */ = {
@@ -664,20 +605,6 @@
 			name = Statistics;
 			sourceTree = "<group>";
 		};
-		8B24E4BACD7CC3DC77D677E0 /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Auth;
-			sourceTree = "<group>";
-		};
-		8B3915A7DF572F4DA1FA0E5C /* Auth */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Auth;
-			sourceTree = "<group>";
-		};
 		92244E5616438F55E54E1464 /* Transactions */ = {
 			isa = PBXGroup;
 			children = (
@@ -694,11 +621,8 @@
 		926EB14B958D3D3BC4C9AAB3 /* DataSources */ = {
 			isa = PBXGroup;
 			children = (
-				9CE220F3D04F2B972BC81965 /* AccountLocalDataSource.swift */,
 				ECC6B62E4F5A6626B6BD5C4A /* BudgetLocalDataSource.swift */,
-				7DA1CBBCBD56147DEFA2DA78 /* CategoryLocalDataSource.swift */,
 				B2F55BB8E3695570B0105CB0 /* SwiftDataLocalDataSource.swift */,
-				BF968C27CE34D5616669FB12 /* TransactionLocalDataSource.swift */,
 			);
 			name = DataSources;
 			sourceTree = "<group>";
@@ -740,13 +664,6 @@
 			name = Components;
 			sourceTree = "<group>";
 		};
-		B6295B48F318A8CF27AAA469 /* Sync */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			name = Sync;
-			sourceTree = "<group>";
-		};
 		C66B6EC7F2D5D3D2485C0D47 /* Sync */ = {
 			isa = PBXGroup;
 			children = (
@@ -777,10 +694,7 @@
 		CE6A337C9BA2BAC3E8686DAB /* Mappers */ = {
 			isa = PBXGroup;
 			children = (
-				807148EB52C00A20F9C95278 /* AccountMapper.swift */,
 				4EC551CFD3B12A9B4D0483D4 /* BudgetMapper.swift */,
-				7C3D05EAF9DFD885262202B0 /* CategoryMapper.swift */,
-				893C572EAE03CC7DE3BD6544 /* TransactionMapper.swift */,
 			);
 			name = Mappers;
 			sourceTree = "<group>";
@@ -857,15 +771,12 @@
 			isa = PBXGroup;
 			children = (
 				F34F31B1C929CCF7964D06DD /* Account.swift */,
-				8B3915A7DF572F4DA1FA0E5C /* Auth */,
 				04D8F9E563DF57CC21DE8784 /* AuthUser.swift */,
 				B366BCF2D99AD1C4592A5B12 /* Budget.swift */,
 				E3001D9F3182A3043A09EFC0 /* DashboardSummary.swift */,
 				9DD0618F906D5BD46464A419 /* ExpenseCategory.swift */,
 				0821DBEA3A02B6678AEE2B16 /* ExpenseTransaction.swift */,
-				60C7080779F144F2BAA603DD /* Remote */,
 				5CEEB424A6FA1439FAD4A98C /* Statistics */,
-				B6295B48F318A8CF27AAA469 /* Sync */,
 				9BFC027FEDABAA8652E197B7 /* TransactionType.swift */,
 			);
 			name = Entities;
@@ -965,19 +876,10 @@
 				3A9B2DEDD89EFD31718A25E5 /* ExpenseTrackerApp.swift in Sources */,
 				D438B297571EA7B85B038B7C /* AppContainer+ViewModelFactory.swift in Sources */,
 				C348E50D83CDC771A4886760 /* RootView.swift in Sources */,
-				2EC35BDC2D7B8E45FAF0CC9E /* AccountLocalDataSource.swift in Sources */,
 				8BD3F51EAD554BA6AFCA2736 /* BudgetLocalDataSource.swift in Sources */,
-				E25A12BF469C461F3B87FE2A /* CategoryLocalDataSource.swift in Sources */,
 				57CD6B83072FAAD203DD304C /* SwiftDataLocalDataSource.swift in Sources */,
-				9691955918F5C4DE8FA30397 /* TransactionLocalDataSource.swift in Sources */,
-				DCC618721958202526960C52 /* AccountEntity.swift in Sources */,
 				F4713DAE9C3B71BC406230ED /* BudgetEntity.swift in Sources */,
-				4876D3B1DE17FBE2CEEE5C70 /* CategoryEntity.swift in Sources */,
-				6128D7A19363ACC4EAB6097D /* TransactionEntity.swift in Sources */,
-				089DE36DCEED3831B97F93ED /* AccountMapper.swift in Sources */,
 				EAE010BF0930556E6E4A6AEF /* BudgetMapper.swift in Sources */,
-				31D0C5CC111F37A11CAABF0B /* CategoryMapper.swift in Sources */,
-				F336CD2F5679BCD046756DF3 /* TransactionMapper.swift in Sources */,
 				4957D695711A6E3E6858639D /* APIClient.swift in Sources */,
 				12496F1EE5CB8F15237DE0F1 /* APIModels.swift in Sources */,
 				45A4CC2D6E2DF2F7D4B128D3 /* RemoteDateParser.swift in Sources */,
@@ -985,16 +887,13 @@
 				998B4184AB310475432210B4 /* RemoteMetadataStore.swift in Sources */,
 				43E9EEF06616FD8EB05C384B /* ServerIDCodec.swift in Sources */,
 				8C242B39AE0419EBD801477B /* TokenStore.swift in Sources */,
-				C73E6BC279286742475522B5 /* AccountRepositoryImpl.swift in Sources */,
 				33A9E2894E385F5C69FC3064 /* AuthRepositoryImpl.swift in Sources */,
 				54E98AC4CC7FDF7A03AC5ECC /* BudgetRepositoryImpl.swift in Sources */,
-				CB64BBF31908A0BD7C9C3436 /* CategoryRepositoryImpl.swift in Sources */,
 				A8CC64746F93C4E168D3A35C /* PersistenceErrorMapper.swift in Sources */,
 				14C433117507D265A6D07327 /* RemoteAccountRepository.swift in Sources */,
 				27D5C2DB6CCAF652C586800E /* RemoteCategoryRepository.swift in Sources */,
 				5565A5E4D7D898F7EF66A746 /* RemoteDashboardRepository.swift in Sources */,
 				A8C1741783EA1D53F7CCB0BD /* RemoteTransactionRepository.swift in Sources */,
-				2AFEEF9D6354DB66B620C023 /* TransactionRepositoryImpl.swift in Sources */,
 				A6DA18F7442318F2837891F2 /* Account.swift in Sources */,
 				1A92D940E48C54592520D238 /* AuthUser.swift in Sources */,
 				4AA4E1F67BAEADD436724135 /* Budget.swift in Sources */,
@@ -1083,6 +982,7 @@
 				E3D8F41A3F12E0735736B4DB /* Decimal+Double.swift in Sources */,
 				151FBBABE37DCE4F31CE8769 /* Sequence+Identifiable.swift in Sources */,
 				513FFCC55801B9B3DC81A4B5 /* AppFormatters.swift in Sources */,
+				677E1925BF360E25D30AB19A /* InMemoryRepositories.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

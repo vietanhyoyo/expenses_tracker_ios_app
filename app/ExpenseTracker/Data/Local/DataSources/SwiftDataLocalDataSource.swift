@@ -1,8 +1,8 @@
 import Foundation
 import SwiftData
 
-/// Thin wrapper around `ModelContext` shared by every entity-specific data source.
-/// Entity-specific queries live in constrained extensions (see `AccountLocalDataSource`).
+/// Thin wrapper around `ModelContext` used by the remaining local budget store.
+/// Entity-specific queries live in constrained extensions.
 @MainActor
 final class SwiftDataLocalDataSource<Entity: PersistentModel> {
     private let context: ModelContext
