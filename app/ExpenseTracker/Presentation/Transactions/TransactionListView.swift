@@ -107,7 +107,6 @@ struct TransactionListView: View {
                 }
                 .errorAlert(message: $viewModel.errorMessage)
                 .successToast(message: $successMessage)
-                .appLoadingOverlay(viewModel.isLoading, message: "Đang tải giao dịch…")
             }
             .appIPadTypography(isEnabled: mode != .iPhonePortrait)
         }
@@ -158,21 +157,30 @@ struct TransactionListView: View {
     }
 
     private func iPadNavigationHeader(mode: LayoutMode) -> some View {
-        ZStack {
-            Text("Giao dịch")
-                .font(.system(size: 22, weight: .bold, design: .rounded))
+        VStack(spacing: AppSpacing.xSmall) {
+            ZStack {
+                Text("Giao dịch")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
 
-            HStack {
-                Spacer()
-                iPadToolbarControls(mode: mode)
+                HStack {
+                    Spacer()
+                    iPadToolbarControls
+                }
             }
+
+            iPadSearchField
+                .padding(
+                    .horizontal,
+                    mode == .iPadLandscape ? AppSpacing.xLarge : 0
+                )
+                .frame(maxWidth: mode == .iPadLandscape ? 1100 : .infinity)
         }
         .padding(.horizontal, AppSpacing.xLarge)
-        .frame(height: 76)
+        .padding(.vertical, AppSpacing.xSmall)
         .background(AppTheme.background)
     }
 
-    private func iPadToolbarControls(mode: LayoutMode) -> some View {
+    private var iPadToolbarControls: some View {
         HStack(spacing: AppSpacing.xxSmall) {
             Button { showingFilters = true } label: {
                 Image(systemName: filterIcon)
@@ -193,11 +201,8 @@ struct TransactionListView: View {
             }
             .buttonStyle(.plain)
             .accessibilityLabel("Thêm giao dịch")
-
-            iPadSearchField(width: mode == .iPadLandscape ? 290 : 230)
         }
         .padding(6)
-        .frame(height: 60)
         .background(AppTheme.elevatedSurface, in: Capsule(style: .continuous))
         .overlay {
             Capsule(style: .continuous)
@@ -206,31 +211,28 @@ struct TransactionListView: View {
         .shadow(color: AppTheme.navy.opacity(0.08), radius: 10, y: 4)
     }
 
-    private func iPadSearchField(width: CGFloat) -> some View {
+    private var iPadSearchField: some View {
         HStack(spacing: AppSpacing.xxSmall) {
             Image(systemName: "magnifyingglass")
-                .font(.system(size: 19, weight: .semibold))
-                .foregroundStyle(AppTheme.primary)
+                .font(.system(size: 22, weight: .regular))
+                .foregroundStyle(.primary)
             TextField("Ghi chú hoặc danh mục", text: $viewModel.query)
-                .font(.system(size: 17, weight: .medium, design: .rounded))
+                .font(.system(size: 18, weight: .regular))
                 .textFieldStyle(.plain)
             if !viewModel.query.isEmpty {
                 Button { viewModel.query = "" } label: {
                     Image(systemName: "xmark.circle.fill")
                         .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(AppTheme.primary.opacity(0.75))
+                        .foregroundStyle(.secondary)
                 }
                 .buttonStyle(.plain)
                 .accessibilityLabel("Xoá nội dung tìm kiếm")
             }
         }
         .padding(.horizontal, AppSpacing.small)
-        .frame(width: width, height: 46)
-        .background(AppTheme.primary.opacity(0.045), in: Capsule(style: .continuous))
-        .overlay {
-            Capsule(style: .continuous)
-                .stroke(AppTheme.primary.opacity(0.22), lineWidth: 1)
-        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 46)
+        .background(Color(uiColor: .systemFill), in: Capsule(style: .continuous))
     }
 
     private func reload() {

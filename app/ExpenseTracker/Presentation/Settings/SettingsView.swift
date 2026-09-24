@@ -18,9 +18,10 @@ struct SettingsView: View {
                 Group {
                     if mode == .iPhonePortrait {
                         List {
+                            profileSection
                             managementSection
-                            accountSection
                             privacySection
+                            logoutSection
                         }
                     } else {
                         iPadSettings(mode: mode)
@@ -35,9 +36,28 @@ struct SettingsView: View {
         }
     }
 
-    private var accountSection: some View {
-        Section("Tài khoản đăng nhập") {
-            accountRows
+    private var profileSection: some View {
+        Section {
+            if let user = session.user {
+                HStack(spacing: AppSpacing.medium) {
+                    Text(userInitials(for: user.email))
+                        .font(.system(.title3, design: .rounded).weight(.semibold))
+                        .foregroundStyle(.white)
+                        .frame(width: 56, height: 56)
+                        .background(AppTheme.primary, in: Circle())
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Xin chào!")
+                            .font(AppTypography.captionEmphasis)
+                            .foregroundStyle(.secondary)
+                        Text(user.email)
+                            .font(AppTypography.bodyEmphasis)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                    }
+                }
+                .padding(.vertical, AppSpacing.xSmall)
+            }
         }
     }
 
@@ -67,15 +87,19 @@ struct SettingsView: View {
         }
     }
 
-    @ViewBuilder
-    private var accountRows: some View {
-        if let user = session.user {
-            LabeledContent("Email", value: user.email)
+    private var logoutSection: some View {
+        Section {
+            Button("Đăng xuất", role: .destructive) {
+                Task { await session.logout() }
+            }
+            .frame(maxWidth: .infinity, alignment: .center)
+            .disabled(session.isSubmitting)
         }
-        Button("Đăng xuất", role: .destructive) {
-            Task { await session.logout() }
-        }
-        .disabled(session.isSubmitting)
+    }
+
+    private func userInitials(for email: String) -> String {
+        let localPart = email.split(separator: "@").first.map(String.init) ?? "TK"
+        return String(localPart.prefix(2)).uppercased()
     }
 
     @ViewBuilder
@@ -112,34 +136,25 @@ struct SettingsView: View {
             let columnWidth = max((contentWidth - AppSpacing.large) / 2, 0)
 
             ScrollView {
-                if mode == .iPadLandscape {
-                    HStack(alignment: .top, spacing: AppSpacing.large) {
-                        VStack(spacing: AppSpacing.large) {
+                VStack(spacing: AppSpacing.large) {
+                    iPadProfileCard
+
+                    if mode == .iPadLandscape {
+                        HStack(alignment: .top, spacing: AppSpacing.large) {
                             settingsCard(title: "Quản lý") {
                                 managementRows
                             }
                             .frame(width: columnWidth, alignment: .leading)
+
                             settingsCard(title: "Chính sách & quyền riêng tư") {
                                 privacyRows
                             }
                             .frame(width: columnWidth, alignment: .leading)
                         }
-                        .frame(width: columnWidth, alignment: .top)
-
-                        settingsCard(title: "Tài khoản đăng nhập") {
-                            accountRows
-                        }
-                        .frame(width: columnWidth, alignment: .top)
-                    }
-                    .frame(width: contentWidth, alignment: .top)
-                } else {
-                    VStack(spacing: AppSpacing.large) {
+                        .frame(width: contentWidth, alignment: .top)
+                    } else {
                         settingsCard(title: "Quản lý") {
                             managementRows
-                        }
-                        .frame(width: contentWidth, alignment: .leading)
-                        settingsCard(title: "Tài khoản đăng nhập") {
-                            accountRows
                         }
                         .frame(width: contentWidth, alignment: .leading)
                         settingsCard(title: "Chính sách & quyền riêng tư") {
@@ -147,12 +162,67 @@ struct SettingsView: View {
                         }
                         .frame(width: contentWidth, alignment: .leading)
                     }
-                    .frame(width: contentWidth, alignment: .top)
+
+                    iPadLogoutCard
                 }
+                .frame(width: contentWidth, alignment: .top)
             }
             .padding(.vertical, AppSpacing.large)
             .frame(maxWidth: .infinity)
         }
+    }
+
+    private var iPadProfileCard: some View {
+        Group {
+            if let user = session.user {
+                HStack(spacing: AppSpacing.medium) {
+                    Text(userInitials(for: user.email))
+                        .font(.system(size: 22, weight: .semibold, design: .rounded))
+                        .foregroundStyle(.white)
+                        .frame(width: 64, height: 64)
+                        .background(AppTheme.primary, in: Circle())
+
+                    VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
+                        Text("Xin chào!")
+                            .font(AppTypography.bodyEmphasis)
+                            .foregroundStyle(.secondary)
+                        Text(user.email)
+                            .font(AppTypography.sectionTitle)
+                            .foregroundStyle(.primary)
+                            .lineLimit(1)
+                    }
+                }
+            }
+        }
+        .padding(.horizontal, AppSpacing.large)
+        .padding(.vertical, AppSpacing.medium)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            AppTheme.elevatedSurface,
+            in: RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .stroke(AppTheme.separator, lineWidth: 0.5)
+        }
+    }
+
+    private var iPadLogoutCard: some View {
+        Button("Đăng xuất", role: .destructive) {
+            Task { await session.logout() }
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, AppSpacing.medium)
+        .background(
+            AppTheme.elevatedSurface,
+            in: RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .stroke(AppTheme.separator, lineWidth: 0.5)
+        }
+        .buttonStyle(.plain)
+        .disabled(session.isSubmitting)
     }
 
     private func settingsCard<Content: View>(

@@ -92,7 +92,6 @@ struct DashboardView: View {
                 .transactionFormSheetPresentation()
             }
             .successToast(message: $successMessage)
-            .appLoadingOverlay(viewModel.isLoading, message: "Đang tải tổng quan…")
         }
     }
 
@@ -140,20 +139,19 @@ struct DashboardView: View {
             .dynamicTypeSize(.xxxLarge)
 
         case .iPadLandscape:
+            let heroWidth = min(max(size.width * 0.34, 310), 420)
+
             HStack(alignment: .top, spacing: AppSpacing.xLarge) {
-                iPadHero(height: 390)
-                    .frame(width: min(max(size.width * 0.34, 310), 420))
+                VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                    iPadHero(height: 390)
+                    dashboardPeriodSelector(for: mode)
+                }
+                .frame(width: heroWidth, alignment: .top)
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: AppSpacing.medium) {
                         dashboardSections(for: mode)
                     }
-                        .padding(AppSpacing.large)
-                        .background(
-                            AppTheme.elevatedSurface,
-                            in: RoundedRectangle(cornerRadius: 28, style: .continuous)
-                        )
-                        .shadow(color: AppTheme.navy.opacity(0.06), radius: 14, y: 6)
                         .frame(maxWidth: .infinity, alignment: .top)
                         .padding(.bottom, 72)
                 }
@@ -186,21 +184,10 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func dashboardSections(for mode: LayoutMode) -> some View {
-        dashboardCard(
-            StatisticsPeriodSelector(
-                period: viewModel.selectedPeriod,
-                date: viewModel.selectedDate,
-                usesLargeText: mode != .iPhonePortrait,
-                previous: { Task { await viewModel.movePeriod(-1) } },
-                next: { Task { await viewModel.movePeriod(1) } },
-                selectPeriod: { period, date in
-                    Task { await viewModel.selectPeriod(period, date: date) }
-                }
-            ),
-            for: mode
-        )
-
-        DashboardPillDivider()
+        if mode != .iPadLandscape {
+            dashboardPeriodSelector(for: mode)
+            DashboardPillDivider()
+        }
 
         if let errorMessage = viewModel.errorMessage {
             ErrorBanner(message: errorMessage)
@@ -225,6 +212,23 @@ struct DashboardView: View {
                 transactions: viewModel.recentTransactions,
                 categories: viewModel.categories,
                 onShowAll: onShowTransactions
+            ),
+            for: mode
+        )
+    }
+
+    @ViewBuilder
+    private func dashboardPeriodSelector(for mode: LayoutMode) -> some View {
+        dashboardCard(
+            StatisticsPeriodSelector(
+                period: viewModel.selectedPeriod,
+                date: viewModel.selectedDate,
+                usesLargeText: mode != .iPhonePortrait,
+                previous: { Task { await viewModel.movePeriod(-1) } },
+                next: { Task { await viewModel.movePeriod(1) } },
+                selectPeriod: { period, date in
+                    Task { await viewModel.selectPeriod(period, date: date) }
+                }
             ),
             for: mode
         )

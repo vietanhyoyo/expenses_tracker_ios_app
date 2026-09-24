@@ -54,7 +54,6 @@ struct StatisticsView: View {
                 .navigationBarTitleDisplayMode(.inline)
                 .task { await viewModel.load() }
                 .refreshable { await viewModel.load() }
-                .appLoadingOverlay(viewModel.isLoading, message: "Đang tải thống kê…")
             }
             .appIPadTypography(isEnabled: mode != .iPhonePortrait)
         }
