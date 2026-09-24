@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import {
@@ -19,6 +20,7 @@ import { CurrentUser } from '../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import type { AuthUser } from '../common/interfaces/auth-user.interface';
 import { CreateCategoryDto } from '../dto/create-category.dto';
+import { DeleteCategoryDto } from '../dto/delete-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { CategoriesService } from '../services/categories.service';
 
@@ -53,9 +55,19 @@ export class CategoriesController {
   }
 
   @Delete(':id')
-  @ApiOperation({ summary: 'Delete an unused owned custom category' })
+  @ApiOperation({
+    summary: 'Delete an owned custom category and reassign its transactions',
+  })
   @ApiParam({ name: 'id', type: Number })
-  remove(@CurrentUser() user: AuthUser, @Param('id', ParseIntPipe) id: number) {
-    return this.categoriesService.remove(user.id, id);
+  remove(
+    @CurrentUser() user: AuthUser,
+    @Param('id', ParseIntPipe) id: number,
+    @Query() query: DeleteCategoryDto,
+  ) {
+    return this.categoriesService.remove(
+      user.id,
+      id,
+      query.replacementCategoryId,
+    );
   }
 }

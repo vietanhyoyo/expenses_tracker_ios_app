@@ -92,18 +92,27 @@ export class CategoriesRepository {
     }
   }
 
-  countExpenses(id: number): Promise<number> {
+  countTransactions(id: number): Promise<number> {
     return this.prisma.expense.count({ where: { categoryId: id } });
   }
 
-  async remove(id: number): Promise<boolean> {
+  async removeAndReassign(
+    id: number,
+    replacementCategoryId: number,
+  ): Promise<boolean> {
     try {
-      await this.prisma.category.delete({ where: { id } });
+      await this.prisma.$transaction(async (transaction) => {
+        await transaction.expense.updateMany({
+          where: { categoryId: id },
+          data: { categoryId: replacementCategoryId },
+        });
+        await transaction.category.delete({ where: { id } });
+      });
       return true;
     } catch (error: unknown) {
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
-        error.code === 'P2003'
+        (error.code === 'P2003' || error.code === 'P2025')
       ) {
         return false;
       }

@@ -2,5 +2,5 @@ import Foundation
 
 @MainActor
 protocol DashboardRepository {
-    func getSummary(month: Date) async throws -> DashboardSummary
+    func getSummary(period: String, date: Date) async throws -> DashboardSummary
 }

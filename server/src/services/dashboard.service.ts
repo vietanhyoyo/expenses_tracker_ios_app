@@ -12,19 +12,73 @@ export class DashboardService {
     userId: number,
     query: QueryDashboardSummaryDto,
   ): Promise<ServiceResponse<DashboardSummaryEntity>> {
-    const [year, month] = query.month.split('-').map(Number);
-    const from = new Date(Date.UTC(year, month - 1, 1));
-    const to = new Date(Date.UTC(year, month, 1));
-    const values = await this.repository.summary(userId, from, to);
+    const anchor = this.parseCalendarDate(query.date);
+    const range = this.rangeFor(query.period, anchor);
+    const values = await this.repository.summary(userId, range.from, range.to);
     return {
       message: 'Dashboard summary retrieved successfully',
       data: {
-        month: query.month,
+        month: query.date.slice(0, 7),
+        period: query.period,
+        from: this.formatCalendarDate(range.from),
+        to: this.formatCalendarDate(range.to),
         totalBalance: values.totalIncome.minus(values.totalExpense),
         monthlyIncome: values.monthlyIncome,
         monthlyExpense: values.monthlyExpense,
         monthlyBalance: values.monthlyIncome.minus(values.monthlyExpense),
       },
     };
+  }
+
+  private parseCalendarDate(value: string): Date {
+    const [year, month, day] = value.split('-').map(Number);
+    return new Date(Date.UTC(year, month - 1, day));
+  }
+
+  private rangeFor(
+    period: QueryDashboardSummaryDto['period'],
+    anchor: Date,
+  ): { from: Date; to: Date } {
+    if (period === 'year') {
+      const from = new Date(Date.UTC(anchor.getUTCFullYear(), 0, 1));
+      return {
+        from,
+        to: new Date(Date.UTC(anchor.getUTCFullYear() + 1, 0, 1)),
+      };
+    }
+    if (period === 'month') {
+      const from = new Date(
+        Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth(), 1),
+      );
+      return {
+        from,
+        to: new Date(
+          Date.UTC(anchor.getUTCFullYear(), anchor.getUTCMonth() + 1, 1),
+        ),
+      };
+    }
+
+    const dayOffset = (anchor.getUTCDay() + 6) % 7;
+    const from = new Date(
+      Date.UTC(
+        anchor.getUTCFullYear(),
+        anchor.getUTCMonth(),
+        anchor.getUTCDate() - dayOffset,
+      ),
+    );
+    return {
+      from,
+      to: new Date(
+        Date.UTC(
+          from.getUTCFullYear(),
+          from.getUTCMonth(),
+          from.getUTCDate() + 7,
+        ),
+      ),
+    };
+  }
+
+  private formatCalendarDate(date: Date): string {
+    return date.toISOString().slice(0, 10);
   }
 }

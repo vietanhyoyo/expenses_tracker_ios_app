@@ -4,7 +4,7 @@ import Foundation
 struct DashboardUseCases {
     let repository: any DashboardRepository
 
-    func summary(for month: Date) async throws -> DashboardSummary {
-        try await repository.getSummary(month: month)
+    func summary(for period: String, date: Date) async throws -> DashboardSummary {
+        try await repository.getSummary(period: period, date: date)
     }
 }

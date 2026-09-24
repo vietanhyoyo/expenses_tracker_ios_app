@@ -104,6 +104,15 @@ struct StatisticsUseCases {
         return Array(sortedTransactions.prefix(limit))
     }
 
+    func recent(
+        limit: Int,
+        in interval: DateInterval,
+        calendar: Calendar = .current
+    ) async throws -> [ExpenseTransaction] {
+        let values = try await transactions(in: interval, calendar: calendar)
+        return Array(values.sorted { $0.date > $1.date }.prefix(limit))
+    }
+
     static func summary(from transactions: [ExpenseTransaction]) -> MonthlySummary {
         MonthlySummary(
             income: transactions.ofType(.income).totalAmount,

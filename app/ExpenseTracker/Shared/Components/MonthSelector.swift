@@ -1,5 +1,71 @@
 import SwiftUI
 
+/// A date input with one explicit presentation format across the app.
+struct AppDatePickerField: View {
+    let title: String
+    @Binding var date: Date
+
+    @State private var draftDate: Date
+    @State private var isShowingPicker = false
+
+    init(title: String, date: Binding<Date>) {
+        self.title = title
+        _date = date
+        _draftDate = State(initialValue: date.wrappedValue)
+    }
+
+    var body: some View {
+        Button {
+            draftDate = date
+            isShowingPicker = true
+        } label: {
+            HStack {
+                Text(title)
+                    .foregroundStyle(.primary)
+                Spacer()
+                Text(AppFormatters.dateString(date))
+                    .foregroundStyle(.primary)
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(AppTheme.primary)
+            }
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(title)
+        .accessibilityValue(AppFormatters.dateString(date))
+        .sheet(isPresented: $isShowingPicker) {
+            NavigationStack {
+                DatePicker(
+                    title,
+                    selection: $draftDate,
+                    displayedComponents: .date
+                )
+                .datePickerStyle(.graphical)
+                .environment(\.locale, AppFormatters.locale)
+                .environment(\.calendar, AppFormatters.calendar)
+                .padding(.horizontal, AppSpacing.small)
+                .navigationTitle(title)
+                .navigationBarTitleDisplayMode(.inline)
+                .toolbar {
+                    ToolbarItem(placement: .cancellationAction) {
+                        Button("Huỷ") { isShowingPicker = false }
+                    }
+                    ToolbarItem(placement: .confirmationAction) {
+                        Button("Áp dụng") {
+                            date = draftDate
+                            isShowingPicker = false
+                        }
+                        .fontWeight(.semibold)
+                    }
+                }
+            }
+            .presentationDetents([.medium])
+            .presentationBackground(AppTheme.elevatedSurface)
+            .presentationDragIndicator(.visible)
+        }
+    }
+}
+
 struct MonthSelector: View {
     let month: Date
     let previous: () -> Void
@@ -302,11 +368,7 @@ private struct StatisticsPeriodPickerSheet: View {
 
                 Section("Chọn thời gian") {
                     if period == .week {
-                        DatePicker(
-                            "Ngày trong tuần",
-                            selection: $date,
-                            displayedComponents: .date
-                        )
+                        AppDatePickerField(title: "Ngày trong tuần", date: $date)
                     } else if period == .year {
                         Picker("Năm", selection: yearBinding) {
                             ForEach(years, id: \.self) { value in

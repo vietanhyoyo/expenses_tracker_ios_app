@@ -8,6 +8,8 @@ final class CategoriesViewModel {
     var errorMessage: String?
 
     private let useCases: CategoryUseCases
+    private var requestVersion = 0
+    private var isDeleting = false
 
     init(useCases: CategoryUseCases) {
         self.useCases = useCases
@@ -18,21 +20,34 @@ final class CategoriesViewModel {
     }
 
     func load() async {
+        guard !isDeleting else { return }
+        requestVersion += 1
+        let version = requestVersion
         errorMessage = nil
         do {
-            categories = try await useCases.getAll()
+            let loadedCategories = try await useCases.getAll()
+            guard version == requestVersion else { return }
+            categories = loadedCategories
         } catch {
+            guard version == requestVersion else { return }
             errorMessage = error.userMessage
         }
     }
 
-    func delete(_ category: ExpenseCategory) async -> Bool {
+    func delete(_ category: ExpenseCategory, replacementID: UUID) async -> Bool {
+        guard !isDeleting else { return false }
+        isDeleting = true
+        defer { isDeleting = false }
+        requestVersion += 1
+        let version = requestVersion
         errorMessage = nil
         do {
-            try await useCases.delete(id: category.id)
-            await load()
+            try await useCases.delete(id: category.id, replacementID: replacementID)
+            guard version == requestVersion else { return false }
+            categories.removeAll { $0.id == category.id }
             return true
         } catch {
+            guard version == requestVersion else { return false }
             errorMessage = error.userMessage
             return false
         }

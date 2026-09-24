@@ -116,12 +116,14 @@ final class TransactionListViewModel {
         }
     }
 
-    func delete(_ transaction: ExpenseTransaction) async {
+    func delete(_ transaction: ExpenseTransaction) async -> Bool {
         do {
             try await useCases.delete(id: transaction.id)
             await load()
+            return true
         } catch {
             errorMessage = error.userMessage
+            return false
         }
     }
 

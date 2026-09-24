@@ -177,14 +177,17 @@ The `200 OK` response returns the updated `Category`:
 
 The frontend should display the edit action only when `isDefault === false` and `userId` matches the current user's ID.
 
-## Delete a custom category
+## Delete a custom category and reassign transactions
 
 `DELETE /categories/:id`
 
-Only a custom category owned by the current user and not referenced by any transaction can be deleted.
+The request must provide a visible category of the same transaction type in
+`replacementCategoryId`. All transactions that reference the deleted category
+(including income transactions) are reassigned to that category in the same
+database transaction before deletion.
 
 ```http
-DELETE /api/v1/categories/9
+DELETE /api/v1/categories/9?replacementCategoryId=1
 Authorization: Bearer <access-token>
 ```
 
@@ -202,10 +205,10 @@ Authorization: Bearer <access-token>
 
 | HTTP | `errorCode` | Cause |
 | --- | --- | --- |
-| 400 | `VALIDATION_ERROR` | Invalid body or `id`, or an undeclared field in the body |
+| 400 | `VALIDATION_ERROR` | Invalid `id` or `replacementCategoryId`, or an undeclared query field |
 | 401 | `ACCESS_TOKEN_INVALID` | Missing or invalid access token |
 | 401 | `ACCESS_TOKEN_EXPIRED` | The access token has expired |
 | 403 | `CATEGORY_NOT_EDITABLE` | An attempt was made to update or delete a default category |
 | 404 | `CATEGORY_NOT_FOUND` | The category does not exist or belongs to another user |
+| 400 | `CATEGORY_REPLACEMENT_INVALID` | The replacement category is not visible, is the same category, or has a different transaction type |
 | 409 | `CATEGORY_ALREADY_EXISTS` | The name duplicates a system category or an existing custom category |
-| 409 | `CATEGORY_IN_USE` | One or more expenses currently use the category |

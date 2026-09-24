@@ -68,10 +68,14 @@ final class APIClient {
         )
     }
 
-    func delete<Response: Decodable>(_ path: String) async throws -> Response {
+    func delete<Response: Decodable>(
+        _ path: String,
+        queryItems: [URLQueryItem] = []
+    ) async throws -> Response {
         try await send(
             path,
             method: "DELETE",
+            queryItems: queryItems,
             body: nil,
             authorized: true,
             canRefresh: true

@@ -38,6 +38,7 @@ struct TransactionDaySection: View {
             Button("Xoá", role: .destructive) {
                 onDelete(transaction)
             }
+            .tint(AppTheme.coral)
         }
     }
 

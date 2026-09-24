@@ -4,8 +4,10 @@ struct TransactionListView: View {
     private let factory: any ViewModelFactory
     @State private var viewModel: TransactionListViewModel
     @State private var editingTransaction: ExpenseTransaction?
+    @State private var transactionToDelete: ExpenseTransaction?
     @State private var showingAdd = false
     @State private var showingFilters = false
+    @State private var isShowingDeleteConfirmation = false
     @State private var successMessage: String?
 
     init(factory: any ViewModelFactory) {
@@ -61,6 +63,25 @@ struct TransactionListView: View {
             .sheet(isPresented: $showingFilters) {
                 TransactionFilterView(viewModel: viewModel)
             }
+            .alert(
+                "Xoá giao dịch?",
+                isPresented: $isShowingDeleteConfirmation
+            ) {
+                Button("Huỷ", role: .cancel) {
+                    transactionToDelete = nil
+                }
+                Button("Xoá", role: .destructive) {
+                    guard let transaction = transactionToDelete else { return }
+                    transactionToDelete = nil
+                    Task {
+                        if await viewModel.delete(transaction) {
+                            successMessage = "Đã xoá giao dịch thành công"
+                        }
+                    }
+                }
+            } message: {
+                Text("Giao dịch này sẽ bị xoá vĩnh viễn và không thể hoàn tác.")
+            }
             .errorAlert(message: $viewModel.errorMessage)
             .successToast(message: $successMessage)
         }
@@ -93,7 +114,8 @@ struct TransactionListView: View {
                     accounts: viewModel.accounts,
                     onEdit: { editingTransaction = $0 },
                     onDelete: { transaction in
-                        Task { await viewModel.delete(transaction) }
+                        transactionToDelete = transaction
+                        isShowingDeleteConfirmation = true
                     }
                 )
             }

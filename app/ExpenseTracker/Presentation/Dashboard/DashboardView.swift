@@ -34,12 +34,13 @@ struct DashboardView: View {
                     LazyVStack(spacing: 0) {
                         dashboardHeader
                         VStack(spacing: AppSpacing.xLarge) {
-                            MonthSelector(
-                                month: viewModel.selectedMonth,
-                                previous: { Task { await viewModel.moveMonth(-1) } },
-                                next: { Task { await viewModel.moveMonth(1) } },
-                                selectMonth: { month in
-                                    Task { await viewModel.selectMonth(month) }
+                            StatisticsPeriodSelector(
+                                period: viewModel.selectedPeriod,
+                                date: viewModel.selectedDate,
+                                previous: { Task { await viewModel.movePeriod(-1) } },
+                                next: { Task { await viewModel.movePeriod(1) } },
+                                selectPeriod: { period, date in
+                                    Task { await viewModel.selectPeriod(period, date: date) }
                                 }
                             )
                             DashboardPillDivider()
@@ -93,7 +94,6 @@ struct DashboardView: View {
             }
             .successToast(message: $successMessage)
         }
-        .environment(\.colorScheme, .light)
     }
 
     private var dashboardHeader: some View {
@@ -127,7 +127,8 @@ struct DashboardView: View {
 
             DashboardBalanceCard(
                 balance: viewModel.balance,
-                summary: viewModel.summary
+                summary: viewModel.summary,
+                period: viewModel.selectedPeriod
             )
         }
         .padding(.horizontal, AppSpacing.xLarge)

@@ -25,6 +25,7 @@ enum RemoteErrorMapper {
                 return .sessionExpired
             case "CATEGORY_NOT_EDITABLE": return .categoryNotEditable
             case "CATEGORY_ALREADY_EXISTS": return .duplicateCategory
+            case "CATEGORY_REPLACEMENT_INVALID": return .invalidCategoryReplacement
             case "CATEGORY_IN_USE": return .itemInUse
             case "CATEGORY_NOT_FOUND": return .categoryNotFound
             case "EXPENSE_NOT_FOUND", "TRANSACTION_NOT_FOUND": return .transactionNotFound

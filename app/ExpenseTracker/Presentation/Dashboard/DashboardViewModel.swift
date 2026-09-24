@@ -11,7 +11,8 @@ final class DashboardViewModel {
     var budgetProgress: [BudgetProgress] = []
     var recentTransactions: [ExpenseTransaction] = []
     var categories: [UUID: ExpenseCategory] = [:]
-    var selectedMonth = Date()
+    var selectedDate = Date()
+    var selectedPeriod: StatisticsPeriod = .month
 
     private let statistics: StatisticsUseCases
     private let dashboard: DashboardUseCases
@@ -34,30 +35,58 @@ final class DashboardViewModel {
         errorMessage = nil
 
         do {
-            let dashboardSummary = try await dashboard.summary(for: selectedMonth)
-            // The dashboard balance follows the selected month. The API also
-            // returns an all-time total, but that value must not be shown here.
+            let calendar = AppFormatters.calendar
+            guard let interval = selectedPeriod.interval(
+                for: selectedDate,
+                calendar: calendar
+            ) else {
+                throw DomainError.remoteError("Không xác định được khoảng thời gian.")
+            }
+
+            let dashboardSummary = try await dashboard.summary(
+                for: selectedPeriod.rawValue,
+                date: selectedDate
+            )
             balance = dashboardSummary.monthlyBalance
             summary = MonthlySummary(
                 income: dashboardSummary.monthlyIncome,
                 expense: dashboardSummary.monthlyExpense
             )
-            categorySpending = try await statistics.expenseByCategory(for: selectedMonth)
-            budgetProgress = try await budgets.progress(for: selectedMonth)
-            recentTransactions = try await statistics.recent(limit: 5)
+            categorySpending = try await statistics.expenseByCategory(
+                for: interval,
+                calendar: calendar
+            )
+            budgetProgress = selectedPeriod == .month
+                ? try await budgets.progress(for: selectedDate, calendar: calendar)
+                : []
+            recentTransactions = try await statistics.recent(
+                limit: 5,
+                in: interval,
+                calendar: calendar
+            )
             categories = try await categoryUseCases.getAll().keyedByID()
         } catch {
             errorMessage = error.userMessage
         }
     }
 
-    func moveMonth(_ offset: Int) async {
-        selectedMonth = selectedMonth.addingMonths(offset)
+    func movePeriod(_ offset: Int) async {
+        let component: Calendar.Component = switch selectedPeriod {
+        case .week: .weekOfYear
+        case .month: .month
+        case .year: .year
+        }
+        selectedDate = AppFormatters.calendar.date(
+            byAdding: component,
+            value: offset,
+            to: selectedDate
+        ) ?? selectedDate
         await load()
     }
 
-    func selectMonth(_ month: Date) async {
-        selectedMonth = month
+    func selectPeriod(_ period: StatisticsPeriod, date: Date) async {
+        selectedPeriod = period
+        selectedDate = date
         await load()
     }
 }

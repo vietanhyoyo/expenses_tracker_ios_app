@@ -19,6 +19,7 @@ enum DomainError: Error, Equatable {
     case sessionExpired
     case categoryNotEditable
     case duplicateCategory
+    case invalidCategoryReplacement
     case duplicateAccount
     case networkUnavailable
     case remoteError(String)

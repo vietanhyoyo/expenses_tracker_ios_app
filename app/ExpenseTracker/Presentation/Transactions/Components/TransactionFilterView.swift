@@ -44,26 +44,20 @@ struct TransactionFilterView: View {
             )
 
             if viewModel.isDateRangeEnabled {
-                DatePicker(
-                    "Từ ngày",
-                    selection: Binding(
+                AppDatePickerField(
+                    title: "Từ ngày",
+                    date: Binding(
                         get: { viewModel.fromDate ?? Date() },
                         set: { viewModel.fromDate = $0 }
-                    ),
-                    displayedComponents: .date
+                    )
                 )
-                .environment(\.locale, AppFormatters.locale)
-                .environment(\.calendar, AppFormatters.calendar)
-                DatePicker(
-                    "Đến ngày",
-                    selection: Binding(
+                AppDatePickerField(
+                    title: "Đến ngày",
+                    date: Binding(
                         get: { viewModel.toDate ?? Date() },
                         set: { viewModel.toDate = $0 }
-                    ),
-                    displayedComponents: .date
+                    )
                 )
-                .environment(\.locale, AppFormatters.locale)
-                .environment(\.calendar, AppFormatters.calendar)
 
                 if !viewModel.isDateRangeValid {
                     Text("Ngày bắt đầu phải trước hoặc bằng ngày kết thúc.")

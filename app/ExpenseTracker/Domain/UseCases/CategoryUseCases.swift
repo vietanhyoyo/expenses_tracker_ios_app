@@ -30,13 +30,17 @@ struct CategoryUseCases {
         }
     }
 
-    func delete(id: UUID) async throws {
-        let isUsed = try await transactions.getTransactions().contains {
-            $0.categoryID == id
+    func delete(id: UUID, replacementID: UUID) async throws {
+        let availableCategories = try await categories.getCategories()
+        guard let category = availableCategories.first(where: { $0.id == id }),
+              category.isEditable else {
+            throw DomainError.categoryNotEditable
         }
-        guard !isUsed else {
-            throw DomainError.itemInUse
+        guard let replacement = availableCategories.first(where: { $0.id == replacementID }),
+              replacement.id != category.id,
+              replacement.type == category.type else {
+            throw DomainError.invalidCategoryReplacement
         }
-        try await categories.deleteCategory(id: id)
+        try await categories.deleteCategory(id: id, replacementID: replacementID)
     }
 }

@@ -48,7 +48,7 @@ final class InMemoryCategoryRepository: CategoryRepository {
         items[index] = category
     }
 
-    func deleteCategory(id: UUID) async throws {
+    func deleteCategory(id: UUID, replacementID: UUID) async throws {
         guard items.contains(where: { $0.id == id }) else {
             throw DomainError.categoryNotFound
         }

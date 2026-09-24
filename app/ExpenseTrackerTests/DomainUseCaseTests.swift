@@ -144,6 +144,37 @@ final class DomainUseCaseTests: XCTestCase {
         XCTAssertEqual(repository.items.map(\.name), ["Du lịch"])
     }
 
+    func testDeleteCategoryRequiresSameTypeReplacement() async throws {
+        let category = ExpenseCategory(
+            id: UUID(),
+            name: "Du lịch",
+            icon: "airplane",
+            type: .expense
+        )
+        let incomeReplacement = ExpenseCategory(
+            id: UUID(),
+            name: "Lương",
+            icon: "banknote",
+            type: .income,
+            isEditable: false
+        )
+        let repository = MockCategoryRepository(items: [category, incomeReplacement])
+        let useCases = CategoryUseCases(
+            categories: repository,
+            transactions: MockTransactionRepository()
+        )
+
+        do {
+            try await useCases.delete(
+                id: category.id,
+                replacementID: incomeReplacement.id
+            )
+            XCTFail("Expected invalidCategoryReplacement")
+        } catch {
+            XCTAssertEqual(error as? DomainError, .invalidCategoryReplacement)
+        }
+    }
+
     func testSaveBudgetRejectsUnknownCategory() async {
         let useCases = BudgetUseCases(
             budgets: MockBudgetRepository(),
@@ -228,7 +259,9 @@ private final class MockCategoryRepository: CategoryRepository {
     func getCategories() async throws -> [ExpenseCategory] { items }
     func addCategory(_ category: ExpenseCategory) async throws { items.append(category) }
     func updateCategory(_ category: ExpenseCategory) async throws { if let index = items.firstIndex(where: { $0.id == category.id }) { items[index] = category } }
-    func deleteCategory(id: UUID) async throws { items.removeAll { $0.id == id } }
+    func deleteCategory(id: UUID, replacementID: UUID) async throws {
+        items.removeAll { $0.id == id }
+    }
 }
 
 @MainActor

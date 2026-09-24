@@ -8,12 +8,16 @@ final class RemoteDashboardRepository: DashboardRepository {
         self.api = api
     }
 
-    func getSummary(month: Date) async throws -> DashboardSummary {
+    func getSummary(period: String, date: Date) async throws -> DashboardSummary {
         do {
             let value: DashboardSummaryDTO = try await api.get(
                 "/dashboard/summary",
                 queryItems: [
-                    URLQueryItem(name: "month", value: monthValue(from: month))
+                    URLQueryItem(name: "period", value: period),
+                    URLQueryItem(
+                        name: "date",
+                        value: RemoteDateParser.calendarDate(from: date)
+                    )
                 ]
             )
             guard let totalBalance = decimal(value.totalBalance),
@@ -36,14 +40,5 @@ final class RemoteDashboardRepository: DashboardRepository {
 
     private func decimal(_ value: String) -> Decimal? {
         Decimal(string: value, locale: Locale(identifier: "en_US_POSIX"))
-    }
-
-    private func monthValue(from date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.calendar = Calendar(identifier: .gregorian)
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = .current
-        formatter.dateFormat = "yyyy-MM"
-        return formatter.string(from: date)
     }
 }

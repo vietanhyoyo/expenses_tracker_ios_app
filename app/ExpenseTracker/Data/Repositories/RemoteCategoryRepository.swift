@@ -54,12 +54,23 @@ final class RemoteCategoryRepository: CategoryRepository {
         }
     }
 
-    func deleteCategory(id: UUID) async throws {
+    func deleteCategory(id: UUID, replacementID: UUID) async throws {
         guard let serverID = ServerIDCodec.categoryID(from: id) else {
             throw DomainError.categoryNotFound
         }
+        guard let replacementServerID = ServerIDCodec.categoryID(from: replacementID) else {
+            throw DomainError.invalidCategoryReplacement
+        }
         do {
-            let _: APIEmpty? = try await api.delete("/categories/\(serverID)")
+            let _: APIEmpty? = try await api.delete(
+                "/categories/\(serverID)",
+                queryItems: [
+                    URLQueryItem(
+                        name: "replacementCategoryId",
+                        value: String(replacementServerID)
+                    )
+                ]
+            )
         } catch {
             throw RemoteErrorMapper.map(error)
         }

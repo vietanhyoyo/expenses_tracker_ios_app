@@ -19,6 +19,7 @@ extension DomainError {
         case .sessionExpired: "Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại."
         case .categoryNotEditable: "Danh mục mặc định của hệ thống không thể chỉnh sửa."
         case .duplicateCategory: "Tên danh mục đã tồn tại."
+        case .invalidCategoryReplacement: "Vui lòng chọn danh mục thay thế cùng loại."
         case .duplicateAccount: "Tên tài khoản đã tồn tại."
         case .networkUnavailable: "Không thể kết nối máy chủ. Vui lòng kiểm tra lại kết nối."
         case let .remoteError(message): message

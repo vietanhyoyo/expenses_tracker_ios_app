@@ -1,4 +1,5 @@
 import SwiftUI
+import UIKit
 
 struct RootView: View {
     let container: AppContainer
@@ -50,9 +51,22 @@ struct RootView: View {
         .task {
             await session.restore()
         }
-        .preferredColorScheme(!session.isAuthenticated || selectedTab == 0 ? .dark : .light)
+        .onAppear(perform: updateStatusBarStyle)
+        .onChange(of: session.isAuthenticated) { _, _ in
+            updateStatusBarStyle()
+        }
+        .onChange(of: selectedTab) { _, _ in
+            updateStatusBarStyle()
+        }
+        .preferredColorScheme(session.isAuthenticated ? .light : .dark)
         .environment(\.locale, AppFormatters.locale)
         .environment(\.calendar, AppFormatters.calendar)
+    }
+
+    @MainActor
+    private func updateStatusBarStyle() {
+        UIApplication.shared.statusBarStyle =
+            !session.isAuthenticated || selectedTab == 0 ? .lightContent : .darkContent
     }
 
     private func loadingView(message: String) -> some View {

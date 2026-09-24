@@ -50,9 +50,7 @@ struct TransactionFormView: View {
                             Text(account.name).tag(Optional(account.id))
                         }
                     }
-                    DatePicker("Ngày", selection: $viewModel.date, displayedComponents: [.date])
-                        .environment(\.locale, AppFormatters.locale)
-                        .environment(\.calendar, AppFormatters.calendar)
+                    AppDatePickerField(title: "Ngày", date: $viewModel.date)
                     TextField("Ghi chú (không bắt buộc)", text: $viewModel.note, axis: .vertical)
                 }
                 if let error = viewModel.errorMessage {

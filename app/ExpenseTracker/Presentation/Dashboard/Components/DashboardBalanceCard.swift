@@ -3,6 +3,7 @@ import SwiftUI
 struct DashboardBalanceCard: View {
     let balance: Decimal
     let summary: MonthlySummary
+    let period: StatisticsPeriod
 
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
@@ -31,7 +32,7 @@ struct DashboardBalanceCard: View {
 
     private var balanceHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
-            Label("Tổng số dư", systemImage: "wallet.bifold.fill")
+            Label(period.balanceTitle, systemImage: "wallet.bifold.fill")
                 .font(AppTypography.captionEmphasis)
                 .foregroundStyle(.white.opacity(0.75))
             Text(AppFormatters.money(balance))
@@ -39,6 +40,16 @@ struct DashboardBalanceCard: View {
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.62)
                 .lineLimit(1)
+        }
+    }
+}
+
+private extension StatisticsPeriod {
+    var balanceTitle: String {
+        switch self {
+        case .week: "Số dư tuần"
+        case .month: "Số dư tháng"
+        case .year: "Số dư năm"
         }
     }
 }

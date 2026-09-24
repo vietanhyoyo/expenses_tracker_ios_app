@@ -76,7 +76,7 @@ export class CategoriesService {
       data.normalizedName = normalizedName;
     }
     if (dto.type !== undefined && dto.type !== current.type) {
-      if ((await this.categoriesRepository.countExpenses(id)) > 0) {
+      if ((await this.categoriesRepository.countTransactions(id)) > 0) {
         this.throwInUse();
       }
       data.type = dto.type;
@@ -90,12 +90,39 @@ export class CategoriesService {
     return { message: 'Category updated successfully', data: category };
   }
 
-  async remove(userId: number, id: number): Promise<ServiceResponse<null>> {
-    await this.assertEditable(userId, id);
-    if ((await this.categoriesRepository.countExpenses(id)) > 0) {
-      this.throwInUse();
+  async remove(
+    userId: number,
+    id: number,
+    replacementCategoryId: number,
+  ): Promise<ServiceResponse<null>> {
+    const category = await this.assertEditable(userId, id);
+    const replacement = await this.categoriesRepository.findById(
+      replacementCategoryId,
+    );
+    const replacementIsVisible =
+      replacement !== null &&
+      ((replacement.isDefault && replacement.userId === null) ||
+        replacement.userId === userId);
+    if (
+      !replacementIsVisible ||
+      replacement.id === category.id ||
+      replacement.type !== category.type
+    ) {
+      this.throwInvalidReplacement();
     }
-    if (!(await this.categoriesRepository.remove(id))) this.throwInUse();
+
+    if (
+      !(await this.categoriesRepository.removeAndReassign(
+        id,
+        replacementCategoryId,
+      ))
+    ) {
+      throw new ApiException(
+        ErrorCode.CATEGORY_NOT_FOUND,
+        'Category not found',
+        HttpStatus.NOT_FOUND,
+      );
+    }
     return { message: 'Category deleted successfully', data: null };
   }
 
@@ -131,6 +158,14 @@ export class CategoriesService {
       ErrorCode.CATEGORY_IN_USE,
       'Category is currently used by one or more expenses',
       HttpStatus.CONFLICT,
+    );
+  }
+
+  private throwInvalidReplacement(): never {
+    throw new ApiException(
+      ErrorCode.CATEGORY_REPLACEMENT_INVALID,
+      'Replacement category must be visible and have the same type',
+      HttpStatus.BAD_REQUEST,
     );
   }
 }
