@@ -1,28 +1,162 @@
 import SwiftUI
 
 struct AuthView: View {
+    private enum LayoutMode {
+        case iPhonePortrait
+        case iPadPortrait
+        case iPadLandscape
+    }
+
     @Bindable var viewModel: SessionViewModel
     @State private var isPasswordVisible = false
     @State private var isPasswordConfirmationVisible = false
 
     var body: some View {
         GeometryReader { proxy in
-            ZStack(alignment: .bottom) {
+            ZStack(alignment: .topLeading) {
                 authBackground
-                header(topInset: proxy.safeAreaInsets.top)
-                formCard(bottomInset: proxy.safeAreaInsets.bottom)
-                    .environment(\.colorScheme, .light)
-                    .frame(
-                        width: proxy.size.width,
-                        height: max(min(max(proxy.size.height * 0.64, 500), 620) - 30, 470)
-                    )
+
+                switch layoutMode(for: proxy.size) {
+                case .iPhonePortrait:
+                    compactLayout(proxy: proxy)
+                case .iPadPortrait:
+                    iPadPortraitLayout(proxy: proxy)
+                case .iPadLandscape:
+                    wideLayout(proxy: proxy)
+                }
             }
-            .frame(width: proxy.size.width, height: proxy.size.height)
-            .ignoresSafeArea()
+            .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+            .id("\(proxy.size.width)x\(proxy.size.height)")
         }
+        .ignoresSafeArea()
         .background(Color.white.ignoresSafeArea())
         .tint(AppTheme.primary)
         .preferredColorScheme(.dark)
+    }
+
+    private func compactLayout(proxy: GeometryProxy) -> some View {
+        ZStack(alignment: .bottom) {
+            header(topInset: proxy.safeAreaInsets.top)
+
+            formCard(
+                bottomInset: proxy.safeAreaInsets.bottom,
+                contentMaxWidth: proxy.size.width - 44,
+                contentTopPadding: 27
+            )
+            .environment(\.colorScheme, .light)
+            .frame(
+                width: proxy.size.width,
+                height: max(min(max(proxy.size.height * 0.64, 500), 620) - 30, 470),
+                alignment: .top
+            )
+            .background(Color.white)
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 34,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 34
+                )
+            )
+        }
+        .frame(width: proxy.size.width, height: proxy.size.height, alignment: .topLeading)
+    }
+
+    private func iPadPortraitLayout(proxy: GeometryProxy) -> some View {
+        let bottomInset = proxy.safeAreaInsets.bottom
+        let baseCardHeight = min(max(proxy.size.height * 0.46, 500), 680)
+        let cardHeight = baseCardHeight + bottomInset
+        let brandHeight = max(proxy.size.height - baseCardHeight, 0)
+
+        return ZStack(alignment: .bottom) {
+            VStack(spacing: 14) {
+                Image("MainLogoIcon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 250, height: 250)
+                    .accessibilityHidden(true)
+
+                Text("App quản lý chi tiêu")
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: proxy.size.width, height: brandHeight)
+            .position(x: proxy.size.width / 2, y: brandHeight / 2)
+
+            formCard(
+                bottomInset: proxy.safeAreaInsets.bottom,
+                contentMaxWidth: 400,
+                contentTopPadding: 38
+            )
+            .environment(\.colorScheme, .light)
+            .frame(width: proxy.size.width, height: cardHeight)
+            .background(Color.white)
+            .clipShape(
+                UnevenRoundedRectangle(
+                    topLeadingRadius: 28,
+                    bottomLeadingRadius: 0,
+                    bottomTrailingRadius: 0,
+                    topTrailingRadius: 28
+                )
+            )
+        }
+        .frame(width: proxy.size.width, height: proxy.size.height + bottomInset)
+    }
+
+    private func wideLayout(proxy: GeometryProxy) -> some View {
+        let leftInset = max(proxy.safeAreaInsets.leading, 24)
+        let rightInset = max(proxy.safeAreaInsets.trailing, 40)
+        let cardWidth = min(max(proxy.size.width * 0.33, 380), 430)
+        let cardHeight = min(max(proxy.size.height - 64, 560), 720)
+        let cardX = proxy.size.width - rightInset - (cardWidth / 2)
+        let brandWidth = max(proxy.size.width - leftInset - rightInset - cardWidth, 0)
+
+        return ZStack(alignment: .topLeading) {
+            Color.clear
+                .frame(width: proxy.size.width, height: proxy.size.height)
+
+            VStack(spacing: 16) {
+                Image("MainLogoIcon")
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 300, height: 300)
+                    .accessibilityHidden(true)
+
+                Text("App quản lý chi tiêu")
+                    .font(.system(size: 18, weight: .semibold, design: .rounded))
+                    .foregroundStyle(.white)
+            }
+            .frame(width: brandWidth, height: proxy.size.height)
+            .position(
+                x: leftInset + (brandWidth / 2),
+                y: proxy.size.height / 2
+            )
+
+            formCard(
+                bottomInset: 0,
+                contentMaxWidth: nil,
+                contentTopPadding: 154
+            )
+            .environment(\.colorScheme, .light)
+            .frame(width: cardWidth, height: cardHeight)
+            .background(Color.white)
+            .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+            .position(
+                x: cardX,
+                y: proxy.size.height / 2
+            )
+        }
+    }
+
+    private func layoutMode(for size: CGSize) -> LayoutMode {
+        switch size {
+        case let size where size.width >= 900 && size.width > size.height:
+            return .iPadLandscape
+        case let size where size.width >= 700 && size.height > size.width:
+            return .iPadPortrait
+        default:
+            return .iPhonePortrait
+        }
     }
 
     private var authBackground: some View {
@@ -38,16 +172,16 @@ struct AuthView: View {
     private func header(topInset: CGFloat) -> some View {
         VStack(spacing: 9) {
             Spacer()
-                .frame(height: topInset + 38)
+                .frame(height: topInset + 96)
 
             Image("MainLogoIcon")
                 .resizable()
                 .scaledToFit()
-                .frame(width: 128, height: 128)
+                .frame(width: 144, height: 144)
                 .accessibilityHidden(true)
 
             Text("App quản lý chi tiêu")
-                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .font(.system(size: 16, weight: .semibold, design: .rounded))
                 .foregroundStyle(.white)
 
             Spacer()
@@ -55,7 +189,11 @@ struct AuthView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
-    private func formCard(bottomInset: CGFloat) -> some View {
+    private func formCard(
+        bottomInset: CGFloat,
+        contentMaxWidth: CGFloat?,
+        contentTopPadding: CGFloat
+    ) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
                 VStack(spacing: 7) {
@@ -82,7 +220,7 @@ struct AuthView: View {
                         .autocorrectionDisabled()
                         .submitLabel(.next)
                         .padding(.horizontal, 15)
-                        .frame(height: 46)
+                        .frame(height: 52)
                         .background(Color(hex: "F1F1F1"), in: RoundedRectangle(cornerRadius: 14))
 
                     validationMessage(viewModel.emailValidationMessage)
@@ -112,7 +250,7 @@ struct AuthView: View {
                         .accessibilityLabel(isPasswordVisible ? "Ẩn mật khẩu" : "Hiện mật khẩu")
                     }
                     .padding(.horizontal, 15)
-                    .frame(height: 46)
+                    .frame(height: 52)
                     .background(Color(hex: "F1F1F1"), in: RoundedRectangle(cornerRadius: 14))
 
                     validationMessage(viewModel.passwordValidationMessage)
@@ -147,7 +285,7 @@ struct AuthView: View {
                             )
                         }
                         .padding(.horizontal, 15)
-                        .frame(height: 46)
+                        .frame(height: 52)
                         .background(Color(hex: "F1F1F1"), in: RoundedRectangle(cornerRadius: 14))
 
                         validationMessage(viewModel.passwordConfirmationValidationMessage)
@@ -172,7 +310,7 @@ struct AuthView: View {
                     }
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 46)
+                    .frame(height: 52)
                 }
                 .background(AppTheme.primary, in: Capsule())
                 .buttonStyle(.plain)
@@ -194,19 +332,13 @@ struct AuthView: View {
                 .padding(.top, 29)
             }
             .padding(.horizontal, 22)
-            .padding(.top, 27)
+            .padding(.top, contentTopPadding)
             .padding(.bottom, bottomInset + 25)
+            .frame(width: contentMaxWidth ?? nil, alignment: .top)
+            .frame(maxWidth: .infinity, alignment: .top)
         }
         .scrollBounceBehavior(.basedOnSize)
-        .background(Color.white)
-        .clipShape(
-            UnevenRoundedRectangle(
-                topLeadingRadius: 34,
-                bottomLeadingRadius: 0,
-                bottomTrailingRadius: 0,
-                topTrailingRadius: 34
-            )
-        )
+        .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
     }
 
     private func fieldLabel(_ title: String) -> some View {
