@@ -45,7 +45,7 @@ struct RefreshTokenRequest: Encodable {
     let refreshToken: String
 }
 
-struct RemoteCategoryDTO: Decodable {
+struct CategoryDTO: Decodable {
     let id: Int
     let name: String
     let colorHex: String?
@@ -74,7 +74,7 @@ struct ExpenseCategoryDTO: Decodable {
     let type: String
 }
 
-struct RemoteExpenseDTO: Decodable {
+struct ExpenseDTO: Decodable {
     let id: Int
     let userId: Int
     let categoryId: Int
@@ -97,7 +97,7 @@ struct ExpensePageDTO: Decodable {
         let totalPages: Int
     }
 
-    let items: [RemoteExpenseDTO]
+    let items: [ExpenseDTO]
     let pagination: Pagination
 }
 
@@ -133,7 +133,7 @@ struct DashboardSummaryDTO: Decodable {
     let monthlyBalance: String
 }
 
-struct RemoteAccountDTO: Decodable {
+struct AccountDTO: Decodable {
     let id: Int
     let userId: Int
     let name: String
@@ -153,6 +153,28 @@ struct CreateAccountRequest: Encodable {
 struct UpdateAccountRequest: Encodable {
     let name: String
     let initialBalance: Decimal
+}
+
+struct BudgetDTO: Decodable {
+    struct Category: Decodable {
+        let userId: Int?
+        let isDefault: Bool
+    }
+
+    let id: Int
+    let userId: Int
+    let categoryId: Int
+    let amount: String
+    let month: String
+    let category: Category
+    let createdAt: String
+    let updatedAt: String
+}
+
+struct SaveBudgetRequest: Encodable {
+    let categoryId: Int
+    let amount: Decimal
+    let month: String
 }
 
 struct APIEmpty: Decodable {}

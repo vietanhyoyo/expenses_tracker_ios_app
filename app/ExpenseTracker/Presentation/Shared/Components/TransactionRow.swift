@@ -4,6 +4,19 @@ struct TransactionRow: View {
     let transaction: ExpenseTransaction
     let category: ExpenseCategory?
     let account: Account?
+    let showsWeekday: Bool
+
+    init(
+        transaction: ExpenseTransaction,
+        category: ExpenseCategory?,
+        account: Account?,
+        showsWeekday: Bool = false
+    ) {
+        self.transaction = transaction
+        self.category = category
+        self.account = account
+        self.showsWeekday = showsWeekday
+    }
 
     private var amountColor: Color {
         transaction.type.color
@@ -43,7 +56,7 @@ struct TransactionRow: View {
                     .foregroundStyle(amountColor)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
-                Text(AppFormatters.shortDate.string(from: transaction.date))
+                Text(dateText)
                     .font(.caption2)
                     .foregroundStyle(.tertiary)
             }
@@ -56,5 +69,11 @@ struct TransactionRow: View {
     private var signedAmount: String {
         let sign = transaction.type == .income ? "+" : "−"
         return sign + AppFormatters.money(transaction.amount)
+    }
+
+    private var dateText: String {
+        showsWeekday
+            ? AppFormatters.weekdayDateString(transaction.date)
+            : AppFormatters.dateString(transaction.date)
     }
 }

@@ -106,6 +106,28 @@ export class CategoriesRepository {
           where: { categoryId: id },
           data: { categoryId: replacementCategoryId },
         });
+        const budgets = await transaction.budget.findMany({
+          where: { categoryId: id },
+          select: { id: true, userId: true, month: true },
+        });
+        for (const budget of budgets) {
+          const replacementBudget = await transaction.budget.findFirst({
+            where: {
+              userId: budget.userId,
+              categoryId: replacementCategoryId,
+              month: budget.month,
+            },
+            select: { id: true },
+          });
+          if (replacementBudget) {
+            await transaction.budget.delete({ where: { id: budget.id } });
+          } else {
+            await transaction.budget.update({
+              where: { id: budget.id },
+              data: { categoryId: replacementCategoryId },
+            });
+          }
+        }
         await transaction.category.delete({ where: { id } });
       });
       return true;

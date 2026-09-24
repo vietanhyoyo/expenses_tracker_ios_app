@@ -1,9 +1,7 @@
 import Foundation
-import SwiftData
 
 @MainActor
 final class AppContainer {
-    private let modelContainer: ModelContainer
     let authUseCases: AuthUseCases
     let dashboardUseCases: DashboardUseCases
     let transactionUseCases: TransactionUseCases
@@ -15,22 +13,6 @@ final class AppContainer {
     private let defaultDataSeeder: DefaultDataSeeder
 
     init(inMemory: Bool = false) throws {
-        let schema = Schema([
-            BudgetEntity.self
-        ])
-        let configuration = ModelConfiguration(
-            "ExpenseTracker",
-            schema: schema,
-            isStoredInMemoryOnly: inMemory
-        )
-        modelContainer = try ModelContainer(for: schema, configurations: [configuration])
-
-        let context = modelContainer.mainContext
-        context.autosaveEnabled = true
-        let budgetRepository = BudgetRepositoryImpl(
-            source: BudgetLocalDataSource(context: context)
-        )
-
         let tokenStore = KeychainTokenStore()
         let configuredURL = Bundle.main.object(forInfoDictionaryKey: "API_BASE_URL") as? String
         guard let baseURL = URL(
@@ -39,34 +21,38 @@ final class AppContainer {
             throw DomainError.remoteError("Cấu hình địa chỉ API không hợp lệ.")
         }
         apiClient = APIClient(baseURL: baseURL, tokenStore: tokenStore)
+        let budgetRepository: any BudgetRepository
+        if inMemory {
+            budgetRepository = InMemoryBudgetRepository()
+        } else {
+            budgetRepository = BudgetRepositoryImpl(api: apiClient)
+        }
         authUseCases = AuthUseCases(
             repository: AuthRepositoryImpl(api: apiClient, tokenStore: tokenStore)
         )
         dashboardUseCases = DashboardUseCases(
-            repository: RemoteDashboardRepository(api: apiClient)
+            repository: DashboardRepositoryImpl(api: apiClient)
         )
 
         let accountRepository: any AccountRepository = inMemory
             ? InMemoryAccountRepository()
-            : RemoteAccountRepository(api: apiClient)
+            : AccountRepositoryImpl(api: apiClient)
         let transactionRepository: any TransactionRepository
         let categoryRepository: any CategoryRepository
         if inMemory {
             transactionRepository = InMemoryTransactionRepository()
             categoryRepository = InMemoryCategoryRepository()
         } else {
-            let metadata = RemoteMetadataStore()
-            let remoteCategories = RemoteCategoryRepository(
+            let metadata = MetadataStore()
+            categoryRepository = CategoryRepositoryImpl(
                 api: apiClient,
                 metadata: metadata
             )
-            let remoteTransactions = RemoteTransactionRepository(
+            transactionRepository = TransactionRepositoryImpl(
                 api: apiClient,
                 accounts: accountRepository,
                 metadata: metadata
             )
-            categoryRepository = remoteCategories
-            transactionRepository = remoteTransactions
         }
 
         transactionUseCases = TransactionUseCases(

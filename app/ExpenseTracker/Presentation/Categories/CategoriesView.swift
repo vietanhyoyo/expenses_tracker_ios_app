@@ -67,6 +67,7 @@ struct CategoriesView: View {
         }
         .errorToast(message: $viewModel.errorMessage)
         .successToast(message: $successMessage)
+        .appLoadingOverlay(viewModel.isLoading, message: "Đang tải danh mục…")
     }
 
     private func categoryRow(_ category: ExpenseCategory) -> some View {

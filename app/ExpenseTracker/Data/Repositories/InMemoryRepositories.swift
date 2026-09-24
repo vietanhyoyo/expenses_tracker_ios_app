@@ -57,6 +57,33 @@ final class InMemoryCategoryRepository: CategoryRepository {
 }
 
 @MainActor
+final class InMemoryBudgetRepository: BudgetRepository {
+    private var items: [Budget] = []
+
+    func getBudgets() async throws -> [Budget] {
+        items.sorted { $0.month > $1.month }
+    }
+
+    func addBudget(_ budget: Budget) async throws {
+        items.append(budget)
+    }
+
+    func updateBudget(_ budget: Budget) async throws {
+        guard let index = items.firstIndex(where: { $0.id == budget.id }) else {
+            throw DomainError.budgetNotFound
+        }
+        items[index] = budget
+    }
+
+    func deleteBudget(id: UUID) async throws {
+        guard items.contains(where: { $0.id == id }) else {
+            throw DomainError.budgetNotFound
+        }
+        items.removeAll { $0.id == id }
+    }
+}
+
+@MainActor
 final class InMemoryTransactionRepository: TransactionRepository {
     private var items: [ExpenseTransaction] = []
 

@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class RemoteDashboardRepository: DashboardRepository {
+final class DashboardRepositoryImpl: DashboardRepository {
     private let api: APIClient
 
     init(api: APIClient) {
@@ -16,7 +16,7 @@ final class RemoteDashboardRepository: DashboardRepository {
                     URLQueryItem(name: "period", value: period),
                     URLQueryItem(
                         name: "date",
-                        value: RemoteDateParser.calendarDate(from: date)
+                        value: DateParser.calendarDate(from: date)
                     )
                 ]
             )
@@ -34,7 +34,7 @@ final class RemoteDashboardRepository: DashboardRepository {
                 monthlyBalance: monthlyBalance
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 

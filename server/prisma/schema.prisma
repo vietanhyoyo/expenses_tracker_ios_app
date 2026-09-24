@@ -25,6 +25,7 @@ model User {
   expenses      Expense[]
   accounts      Account[]
   categories    Category[]
+  budgets       Budget[]
   refreshTokens RefreshToken[]
   createdAt     DateTime       @default(now()) @map("created_at")
   updatedAt     DateTime       @updatedAt @map("updated_at")
@@ -58,6 +59,7 @@ model Category {
   type           TransactionType @default(expense)
   user           User?     @relation(fields: [userId], references: [id], onDelete: Cascade)
   expenses       Expense[]
+  budgets        Budget[]
   createdAt      DateTime  @default(now()) @map("created_at")
   updatedAt      DateTime  @updatedAt @map("updated_at")
 
@@ -84,6 +86,22 @@ model Expense {
   @@index([userId, expenseDate])
   @@index([userId, categoryId])
   @@map("expenses")
+}
+
+model Budget {
+  id         Int      @id @default(autoincrement())
+  userId     Int      @map("user_id")
+  categoryId Int      @map("category_id")
+  amount     Decimal  @db.Decimal(15, 2)
+  month      DateTime @db.DateTime(3)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  createdAt  DateTime @default(now()) @map("created_at")
+  updatedAt  DateTime @updatedAt @map("updated_at")
+
+  @@unique([userId, categoryId, month])
+  @@index([userId, month])
+  @@map("budgets")
 }
 
 model RefreshToken {

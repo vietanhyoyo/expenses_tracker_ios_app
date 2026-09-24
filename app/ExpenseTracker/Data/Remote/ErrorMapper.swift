@@ -1,6 +1,6 @@
 import Foundation
 
-enum RemoteErrorMapper {
+enum ErrorMapper {
     static func map(_ error: Error) -> DomainError {
         if let domainError = error as? DomainError { return domainError }
         if error is URLError { return .networkUnavailable }
@@ -32,6 +32,8 @@ enum RemoteErrorMapper {
             case "ACCOUNT_NOT_FOUND": return .accountNotFound
             case "ACCOUNT_ALREADY_EXISTS": return .duplicateAccount
             case "ACCOUNT_NOT_EDITABLE": return .itemInUse
+            case "BUDGET_NOT_FOUND": return .budgetNotFound
+            case "BUDGET_ALREADY_EXISTS": return .duplicateBudget
             default: return .remoteError(message)
             }
         }

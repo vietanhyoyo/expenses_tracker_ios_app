@@ -16,7 +16,7 @@ final class AuthRepositoryImpl: AuthRepository {
             let user: CurrentUserDTO = try await api.get("/users/me")
             return try map(user)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -38,7 +38,7 @@ final class AuthRepositoryImpl: AuthRepository {
             )
         } catch {
             try? tokenStore.clear()
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -59,19 +59,19 @@ final class AuthRepositoryImpl: AuthRepository {
             ))
             return try map(result.user)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
     private func map(_ dto: AuthUserDTO) throws -> AuthUser {
-        guard let createdAt = RemoteDateParser.date(from: dto.createdAt) else {
+        guard let createdAt = DateParser.date(from: dto.createdAt) else {
             throw DomainError.remoteError("Ngày tạo tài khoản không hợp lệ.")
         }
         return AuthUser(id: dto.id, email: dto.email, createdAt: createdAt)
     }
 
     private func map(_ dto: CurrentUserDTO) throws -> AuthUser {
-        guard let createdAt = RemoteDateParser.date(from: dto.createdAt) else {
+        guard let createdAt = DateParser.date(from: dto.createdAt) else {
             throw DomainError.remoteError("Ngày tạo tài khoản không hợp lệ.")
         }
         return AuthUser(id: dto.id, email: dto.email, createdAt: createdAt)

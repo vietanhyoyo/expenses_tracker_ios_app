@@ -1,6 +1,6 @@
 import Foundation
 
-enum RemoteDateParser {
+enum DateParser {
     static func date(from value: String) -> Date? {
         let fractional = ISO8601DateFormatter()
         fractional.formatOptions = [.withInternetDateTime, .withFractionalSeconds]

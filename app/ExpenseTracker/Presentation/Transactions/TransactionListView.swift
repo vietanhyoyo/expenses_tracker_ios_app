@@ -20,10 +20,7 @@ struct TransactionListView: View {
 
         NavigationStack {
             Group {
-                if viewModel.isInitialLoading {
-                    ProgressView("Đang tải giao dịch…")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else if sections.isEmpty {
+                if sections.isEmpty {
                     emptyState
                 } else {
                     transactionList(sections)
@@ -84,6 +81,7 @@ struct TransactionListView: View {
             }
             .errorAlert(message: $viewModel.errorMessage)
             .successToast(message: $successMessage)
+            .appLoadingOverlay(viewModel.isLoading, message: "Đang tải giao dịch…")
         }
     }
 

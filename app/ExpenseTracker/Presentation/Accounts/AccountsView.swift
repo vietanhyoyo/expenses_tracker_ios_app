@@ -39,6 +39,7 @@ struct AccountsView: View {
             AccountFormView(viewModel: factory.makeAccountFormViewModel(account: account))
         }
         .errorAlert(message: $viewModel.errorMessage)
+        .appLoadingOverlay(viewModel.isLoading, message: "Đang tải tài khoản…")
     }
 
     private func accountRow(_ account: Account) -> some View {

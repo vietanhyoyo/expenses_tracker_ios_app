@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class CategoriesViewModel {
+    var isLoading = false
     var categories: [ExpenseCategory] = []
     var errorMessage: String?
 
@@ -21,6 +22,8 @@ final class CategoriesViewModel {
 
     func load() async {
         guard !isDeleting else { return }
+        isLoading = true
+        defer { isLoading = false }
         requestVersion += 1
         let version = requestVersion
         errorMessage = nil
@@ -37,7 +40,11 @@ final class CategoriesViewModel {
     func delete(_ category: ExpenseCategory, replacementID: UUID) async -> Bool {
         guard !isDeleting else { return false }
         isDeleting = true
-        defer { isDeleting = false }
+        isLoading = true
+        defer {
+            isDeleting = false
+            isLoading = false
+        }
         requestVersion += 1
         let version = requestVersion
         errorMessage = nil

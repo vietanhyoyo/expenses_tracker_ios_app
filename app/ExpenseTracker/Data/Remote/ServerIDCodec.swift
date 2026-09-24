@@ -4,6 +4,7 @@ enum ServerIDCodec {
     private static let categoryPrefix = "CA7E6000"
     private static let expensePrefix = "E9FE6000"
     private static let accountPrefix = "ACCE6000"
+    private static let budgetPrefix = "B0D66000"
 
     static func categoryUUID(id: Int, userID: Int?) -> UUID {
         makeUUID(prefix: categoryPrefix, id: id, userID: userID ?? 0)
@@ -17,6 +18,10 @@ enum ServerIDCodec {
         makeUUID(prefix: accountPrefix, id: id, userID: userID)
     }
 
+    static func budgetUUID(id: Int, userID: Int) -> UUID {
+        makeUUID(prefix: budgetPrefix, id: id, userID: userID)
+    }
+
     static func categoryID(from uuid: UUID) -> Int? {
         decode(uuid, expectedPrefix: categoryPrefix)
     }
@@ -27,6 +32,10 @@ enum ServerIDCodec {
 
     static func accountID(from uuid: UUID) -> Int? {
         decode(uuid, expectedPrefix: accountPrefix)
+    }
+
+    static func budgetID(from uuid: UUID) -> Int? {
+        decode(uuid, expectedPrefix: budgetPrefix)
     }
 
     static func userID(from uuid: UUID) -> Int? {

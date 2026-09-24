@@ -47,6 +47,7 @@ enum StatisticsPeriod: String, CaseIterable, Sendable {
 @MainActor
 @Observable
 final class StatisticsViewModel {
+    var isLoading = false
     var selectedDate = Date()
     var selectedPeriod: StatisticsPeriod = .month
     var selectedType: TransactionType = .expense
@@ -67,7 +68,9 @@ final class StatisticsViewModel {
     }
 
     func load() async {
+        isLoading = true
         errorMessage = nil
+        defer { isLoading = false }
 
         do {
             let calendar = AppFormatters.calendar

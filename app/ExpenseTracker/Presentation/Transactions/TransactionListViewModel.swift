@@ -84,11 +84,6 @@ final class TransactionListViewModel {
         !query.isEmpty || hasFilters
     }
 
-    /// True only for the first load, so refreshes keep the current list visible.
-    var isInitialLoading: Bool {
-        isLoading && transactions.isEmpty
-    }
-
     var sortedCategories: [ExpenseCategory] {
         categories.values.sorted { $0.name < $1.name }
     }
@@ -117,6 +112,8 @@ final class TransactionListViewModel {
     }
 
     func delete(_ transaction: ExpenseTransaction) async -> Bool {
+        isLoading = true
+        defer { isLoading = false }
         do {
             try await useCases.delete(id: transaction.id)
             await load()

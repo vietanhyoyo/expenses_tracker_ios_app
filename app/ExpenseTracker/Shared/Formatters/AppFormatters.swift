@@ -36,11 +36,18 @@ enum AppFormatters {
     /// The single date format used throughout the app: `dd/MM/yyyy`.
     static let dateOnly: DateFormatter = makeDateFormatter("dd/MM/yyyy")
 
+    /// Date format used by the transaction list, including the Vietnamese weekday.
+    static let weekdayDate: DateFormatter = makeDateFormatter("EEEE, dd/MM/yyyy")
+
     /// Backwards-compatible alias for existing date-only presentation code.
     static let shortDate = dateOnly
 
     static func dateString(_ date: Date) -> String {
         dateOnly.string(from: date)
+    }
+
+    static func weekdayDateString(_ date: Date) -> String {
+        weekdayDate.string(from: date)
     }
 
     static func money(_ value: Decimal) -> String {

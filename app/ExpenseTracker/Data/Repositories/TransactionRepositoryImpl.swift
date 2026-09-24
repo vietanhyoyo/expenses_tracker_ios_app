@@ -1,15 +1,15 @@
 import Foundation
 
 @MainActor
-final class RemoteTransactionRepository: TransactionRepository {
+final class TransactionRepositoryImpl: TransactionRepository {
     private let api: APIClient
     private let accounts: any AccountRepository
-    private let metadata: RemoteMetadataStore
+    private let metadata: MetadataStore
 
     init(
         api: APIClient,
         accounts: any AccountRepository,
-        metadata: RemoteMetadataStore
+        metadata: MetadataStore
     ) {
         self.api = api
         self.accounts = accounts
@@ -28,7 +28,7 @@ final class RemoteTransactionRepository: TransactionRepository {
     ) async throws -> [ExpenseTransaction] {
         do {
             var page = 1
-            var values: [RemoteExpenseDTO] = []
+            var values: [ExpenseDTO] = []
             var totalPages = 1
 
             var queryItems = [
@@ -40,13 +40,13 @@ final class RemoteTransactionRepository: TransactionRepository {
             if let startDate {
                 queryItems.append(URLQueryItem(
                     name: "from",
-                    value: RemoteDateParser.calendarDate(from: startDate)
+                    value: DateParser.calendarDate(from: startDate)
                 ))
             }
             if let endDate {
                 queryItems.append(URLQueryItem(
                     name: "to",
-                    value: RemoteDateParser.calendarDate(from: endDate)
+                    value: DateParser.calendarDate(from: endDate)
                 ))
             }
             if let type {
@@ -74,7 +74,7 @@ final class RemoteTransactionRepository: TransactionRepository {
             let fallbackAccountID = try await defaultAccountID()
             return try values.map { try map($0, fallbackAccountID: fallbackAccountID) }
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -92,7 +92,7 @@ final class RemoteTransactionRepository: TransactionRepository {
                     URLQueryItem(name: "type", value: type.rawValue),
                     URLQueryItem(
                         name: "date",
-                        value: RemoteDateParser.calendarDate(from: date)
+                        value: DateParser.calendarDate(from: date)
                     )
                 ]
             )
@@ -100,23 +100,23 @@ final class RemoteTransactionRepository: TransactionRepository {
                 guard let amount = Decimal(
                     string: item.amount,
                     locale: Locale(identifier: "en_US_POSIX")
-                ), let date = RemoteDateParser.calendarDateValue(from: item.date) else {
+                ), let date = DateParser.calendarDateValue(from: item.date) else {
                     throw DomainError.remoteError("Dữ liệu xu hướng giao dịch không hợp lệ.")
                 }
                 return DailySpending(date: date, amount: amount)
             }
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
     func getTransaction(id: UUID) async throws -> ExpenseTransaction? {
         guard let serverID = ServerIDCodec.expenseID(from: id) else { return nil }
         do {
-            let value: RemoteExpenseDTO = try await api.get("/transactions/\(serverID)")
+            let value: ExpenseDTO = try await api.get("/transactions/\(serverID)")
             return try map(value, fallbackAccountID: try await defaultAccountID())
         } catch {
-            let mapped = RemoteErrorMapper.map(error)
+            let mapped = ErrorMapper.map(error)
             if mapped == .transactionNotFound { return nil }
             throw mapped
         }
@@ -124,7 +124,7 @@ final class RemoteTransactionRepository: TransactionRepository {
 
     func addTransaction(_ transaction: ExpenseTransaction) async throws {
         do {
-            let created: RemoteExpenseDTO = try await api.post(
+            let created: ExpenseDTO = try await api.post(
                 "/transactions",
                 body: try request(from: transaction)
             )
@@ -134,7 +134,7 @@ final class RemoteTransactionRepository: TransactionRepository {
                 expenseID: created.id
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -143,7 +143,7 @@ final class RemoteTransactionRepository: TransactionRepository {
             throw DomainError.transactionNotFound
         }
         do {
-            let updated: RemoteExpenseDTO = try await api.patch(
+            let updated: ExpenseDTO = try await api.patch(
                 "/transactions/\(serverID)",
                 body: try request(from: transaction)
             )
@@ -153,7 +153,7 @@ final class RemoteTransactionRepository: TransactionRepository {
                 expenseID: updated.id
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -168,18 +168,18 @@ final class RemoteTransactionRepository: TransactionRepository {
                 expenseID: serverID
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
     private func map(
-        _ dto: RemoteExpenseDTO,
+        _ dto: ExpenseDTO,
         fallbackAccountID: UUID
     ) throws -> ExpenseTransaction {
         guard let amount = Decimal(
             string: dto.amount,
             locale: Locale(identifier: "en_US_POSIX")
-        ), let date = RemoteDateParser.date(from: dto.transactionDate),
+        ), let date = DateParser.date(from: dto.transactionDate),
            let type = TransactionType(rawValue: dto.type),
            dto.category.type == dto.type else {
             throw DomainError.remoteError("Dữ liệu giao dịch từ máy chủ không hợp lệ.")
@@ -210,7 +210,7 @@ final class RemoteTransactionRepository: TransactionRepository {
             type: transaction.type.rawValue,
             title: note ?? (transaction.type == .income ? "Khoản thu" : "Khoản chi"),
             amount: transaction.amount,
-            transactionDate: RemoteDateParser.calendarDate(from: transaction.date),
+            transactionDate: DateParser.calendarDate(from: transaction.date),
             categoryId: categoryID,
             location: nil,
             // The API uses an empty string to clear an existing optional note.

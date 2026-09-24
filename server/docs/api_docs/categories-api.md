@@ -182,9 +182,9 @@ The frontend should display the edit action only when `isDefault === false` and 
 `DELETE /categories/:id`
 
 The request must provide a visible category of the same transaction type in
-`replacementCategoryId`. All transactions that reference the deleted category
-(including income transactions) are reassigned to that category in the same
-database transaction before deletion.
+`replacementCategoryId`. All transactions and budgets that reference the
+deleted category (including income transactions) are reassigned to that
+category in the same database transaction before deletion.
 
 ```http
 DELETE /api/v1/categories/9?replacementCategoryId=1

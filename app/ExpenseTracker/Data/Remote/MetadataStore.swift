@@ -1,6 +1,6 @@
 import Foundation
 
-final class RemoteMetadataStore {
+final class MetadataStore {
     struct Appearance: Codable {
         let icon: String
         let colorHex: String

@@ -6,7 +6,7 @@ struct ExpenseTrackerApp: App {
 
     init() {
         do { container = try AppContainer() }
-        catch { fatalError("Unable to initialize local store: \(error)") }
+        catch { fatalError("Unable to initialize app container: \(error)") }
     }
 
     var body: some Scene {

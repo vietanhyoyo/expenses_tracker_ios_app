@@ -1,27 +1,27 @@
 import Foundation
 
 @MainActor
-final class RemoteCategoryRepository: CategoryRepository {
+final class CategoryRepositoryImpl: CategoryRepository {
     private let api: APIClient
-    private let metadata: RemoteMetadataStore
+    private let metadata: MetadataStore
 
-    init(api: APIClient, metadata: RemoteMetadataStore) {
+    init(api: APIClient, metadata: MetadataStore) {
         self.api = api
         self.metadata = metadata
     }
 
     func getCategories() async throws -> [ExpenseCategory] {
         do {
-            let values: [RemoteCategoryDTO] = try await api.get("/categories")
+            let values: [CategoryDTO] = try await api.get("/categories")
             return try values.map(map)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
     func addCategory(_ category: ExpenseCategory) async throws {
         do {
-            let created: RemoteCategoryDTO = try await api.post(
+            let created: CategoryDTO = try await api.post(
                 "/categories",
                 body: CreateCategoryRequest(
                     name: category.name,
@@ -31,7 +31,7 @@ final class RemoteCategoryRepository: CategoryRepository {
             )
             saveAppearance(of: category, for: created)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -41,7 +41,7 @@ final class RemoteCategoryRepository: CategoryRepository {
             throw DomainError.categoryNotFound
         }
         do {
-            let updated: RemoteCategoryDTO = try await api.patch(
+            let updated: CategoryDTO = try await api.patch(
                 "/categories/\(id)",
                 body: UpdateCategoryRequest(
                     name: category.name,
@@ -50,7 +50,7 @@ final class RemoteCategoryRepository: CategoryRepository {
             )
             saveAppearance(of: category, for: updated)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -72,11 +72,11 @@ final class RemoteCategoryRepository: CategoryRepository {
                 ]
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
-    private func map(_ dto: RemoteCategoryDTO) throws -> ExpenseCategory {
+    private func map(_ dto: CategoryDTO) throws -> ExpenseCategory {
         guard let type = TransactionType(rawValue: dto.type) else {
             throw DomainError.invalidTransactionType
         }
@@ -93,7 +93,7 @@ final class RemoteCategoryRepository: CategoryRepository {
         )
     }
 
-    private func saveAppearance(of category: ExpenseCategory, for dto: RemoteCategoryDTO) {
+    private func saveAppearance(of category: ExpenseCategory, for dto: CategoryDTO) {
         metadata.saveAppearance(
             .init(icon: category.icon, colorHex: category.colorHex),
             userID: dto.userId,

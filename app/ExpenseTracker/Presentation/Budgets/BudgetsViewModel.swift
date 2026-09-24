@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class BudgetsViewModel {
+    var isLoading = false
     var selectedMonth = Date()
     var progress: [BudgetProgress] = []
     var errorMessage: String?
@@ -15,6 +16,8 @@ final class BudgetsViewModel {
     }
 
     func load() async {
+        isLoading = true
+        defer { isLoading = false }
         do {
             progress = try await budgets.progress(for: selectedMonth)
         } catch {

@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-final class RemoteAccountRepository: AccountRepository {
+final class AccountRepositoryImpl: AccountRepository {
     private let api: APIClient
 
     init(api: APIClient) {
@@ -10,16 +10,16 @@ final class RemoteAccountRepository: AccountRepository {
 
     func getAccounts() async throws -> [Account] {
         do {
-            let values: [RemoteAccountDTO] = try await api.get("/accounts")
+            let values: [AccountDTO] = try await api.get("/accounts")
             return try values.map(map)
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
     func addAccount(_ account: Account) async throws {
         do {
-            let _: RemoteAccountDTO = try await api.post(
+            let _: AccountDTO = try await api.post(
                 "/accounts",
                 body: CreateAccountRequest(
                     name: account.name,
@@ -28,7 +28,7 @@ final class RemoteAccountRepository: AccountRepository {
                 )
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -37,7 +37,7 @@ final class RemoteAccountRepository: AccountRepository {
             throw DomainError.accountNotFound
         }
         do {
-            let _: RemoteAccountDTO = try await api.patch(
+            let _: AccountDTO = try await api.patch(
                 "/accounts/\(serverID)",
                 body: UpdateAccountRequest(
                     name: account.name,
@@ -45,7 +45,7 @@ final class RemoteAccountRepository: AccountRepository {
                 )
             )
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
@@ -56,11 +56,11 @@ final class RemoteAccountRepository: AccountRepository {
         do {
             let _: APIEmpty? = try await api.delete("/accounts/\(serverID)")
         } catch {
-            throw RemoteErrorMapper.map(error)
+            throw ErrorMapper.map(error)
         }
     }
 
-    private func map(_ dto: RemoteAccountDTO) throws -> Account {
+    private func map(_ dto: AccountDTO) throws -> Account {
         guard let initialBalance = Decimal(
             string: dto.initialBalance,
             locale: Locale(identifier: "en_US_POSIX")

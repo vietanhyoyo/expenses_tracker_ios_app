@@ -93,6 +93,7 @@ struct DashboardView: View {
                 )
             }
             .successToast(message: $successMessage)
+            .appLoadingOverlay(viewModel.isLoading, message: "Đang tải tổng quan…")
         }
     }
 

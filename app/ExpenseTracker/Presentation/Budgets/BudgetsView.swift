@@ -54,6 +54,7 @@ struct BudgetsView: View {
             )
         }
         .errorAlert(message: $viewModel.errorMessage)
+        .appLoadingOverlay(viewModel.isLoading, message: "Đang tải ngân sách…")
     }
 
     private var budgetList: some View {

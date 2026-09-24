@@ -207,10 +207,10 @@ extension SwiftDataLocalDataSource where Entity == AccountEntity {
 ### 5.5 Remote repository
 
 - `APIClient` giải mã response envelope, gắn access token, refresh một lần khi nhận `ACCESS_TOKEN_EXPIRED`, rồi thử lại request. Refresh thất bại sẽ xoá phiên và đưa người dùng về màn đăng nhập.
-- `KeychainTokenStore` lưu access/refresh token. `RemoteMetadataStore` chỉ lưu icon/màu danh mục và tài khoản được chọn cho khoản chi vì transaction API chưa có các field metadata này.
-- `RemoteCategoryRepository` dùng `/categories` cho cả danh mục thu và chi; danh mục mặc định có `isEditable = false`.
-- `RemoteTransactionRepository` dùng `/transactions` cho cả khoản thu và chi, tải đủ các trang (100 phần tử/trang), giữ amount bằng `Decimal` và ánh xạ ID số của server sang UUID ổn định.
-- `RemoteDashboardRepository` dùng `/dashboard/summary?month=YYYY-MM` cho tổng số dư và tổng thu/chi theo tháng.
+- `KeychainTokenStore` lưu access/refresh token. `MetadataStore` chỉ lưu icon/màu danh mục và tài khoản được chọn cho khoản chi vì transaction API chưa có các field metadata này.
+- `CategoryRepositoryImpl` dùng `/categories` cho cả danh mục thu và chi; danh mục mặc định có `isEditable = false`.
+- `TransactionRepositoryImpl` dùng `/transactions` cho cả khoản thu và chi, tải đủ các trang (100 phần tử/trang), giữ amount bằng `Decimal` và ánh xạ ID số của server sang UUID ổn định.
+- `DashboardRepositoryImpl` dùng `/dashboard/summary?month=YYYY-MM` cho tổng số dư và tổng thu/chi theo tháng.
 - `AppContainer(inMemory: true)` vẫn dùng repository local hoàn toàn để test độc lập với mạng.
 
 ---
@@ -285,7 +285,7 @@ TransactionFormView ─ Lưu
   → TransactionFormViewModel.save()          # parse tiền, trim ghi chú, dựng ExpenseTransaction
   → TransactionUseCases.save(_, isEditing:)  # validate nghiệp vụ
   → TransactionRepository.addTransaction     # protocol
-  → RemoteTransactionRepository → POST /transactions
+  → TransactionRepositoryImpl → POST /transactions
 ```
 
 ### Đọc (Dashboard)

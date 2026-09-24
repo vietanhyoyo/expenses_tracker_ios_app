@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class DashboardViewModel {
+    var isLoading = false
     var errorMessage: String?
     var balance: Decimal = 0
     var summary = MonthlySummary(income: 0, expense: 0)
@@ -32,7 +33,9 @@ final class DashboardViewModel {
     }
 
     func load() async {
+        isLoading = true
         errorMessage = nil
+        defer { isLoading = false }
 
         do {
             let calendar = AppFormatters.calendar

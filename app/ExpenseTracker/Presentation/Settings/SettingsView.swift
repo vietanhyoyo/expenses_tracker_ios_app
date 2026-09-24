@@ -15,6 +15,7 @@ struct SettingsView: View {
             .navigationTitle("Cài đặt")
             .navigationBarTitleDisplayMode(.inline)
         }
+        .appLoadingOverlay(session.isSubmitting, message: "Đang xử lý…")
     }
 
     private var accountSection: some View {

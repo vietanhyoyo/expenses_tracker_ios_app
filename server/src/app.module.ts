@@ -12,6 +12,7 @@ import { PrismaModule } from './modules/prisma.module';
 import { UsersModule } from './modules/users.module';
 import { TransactionsModule } from './modules/transactions.module';
 import { AccountsModule } from './modules/accounts.module';
+import { BudgetsModule } from './modules/budgets.module';
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import { AccountsModule } from './modules/accounts.module';
     TransactionsModule,
     DashboardModule,
     AccountsModule,
+    BudgetsModule,
   ],
   providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })

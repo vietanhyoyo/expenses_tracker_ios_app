@@ -4,6 +4,7 @@ import Observation
 @MainActor
 @Observable
 final class AccountsViewModel {
+    var isLoading = false
     var accounts: [Account] = []
     var balances: [UUID: Decimal] = [:]
     var errorMessage: String?
@@ -19,6 +20,8 @@ final class AccountsViewModel {
     }
 
     func load() async {
+        isLoading = true
+        defer { isLoading = false }
         do {
             accounts = try await useCases.getAll()
             balances = try await useCases.balances()

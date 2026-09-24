@@ -23,7 +23,8 @@ struct TransactionDaySection: View {
             TransactionRow(
                 transaction: transaction,
                 category: categories[transaction.categoryID],
-                account: accounts[transaction.accountID]
+                account: accounts[transaction.accountID],
+                showsWeekday: true
             )
         }
         .buttonStyle(.plain)
@@ -55,6 +56,6 @@ struct TransactionDaySection: View {
     }
 
     private var formattedDay: String {
-        AppFormatters.dateString(day)
+        AppFormatters.weekdayDateString(day)
     }
 }
