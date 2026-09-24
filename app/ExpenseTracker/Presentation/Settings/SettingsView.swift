@@ -1,74 +1,194 @@
 import SwiftUI
 
 struct SettingsView: View {
+    private enum LayoutMode: Equatable {
+        case iPhonePortrait
+        case iPadPortrait
+        case iPadLandscape
+    }
+
     let factory: any ViewModelFactory
     @Bindable var session: SessionViewModel
 
     var body: some View {
-        NavigationStack {
-            List {
-                managementSection
-                accountSection
-                privacySection
+        GeometryReader { proxy in
+            let mode = layoutMode(for: proxy.size)
+
+            NavigationStack {
+                Group {
+                    if mode == .iPhonePortrait {
+                        List {
+                            managementSection
+                            accountSection
+                            privacySection
+                        }
+                    } else {
+                        iPadSettings(mode: mode)
+                    }
+                }
+                .appFormStyle()
+                .navigationTitle("Cài đặt")
+                .navigationBarTitleDisplayMode(.inline)
             }
-            .appFormStyle()
-            .navigationTitle("Cài đặt")
-            .navigationBarTitleDisplayMode(.inline)
+            .appLoadingOverlay(session.isSubmitting, message: "Đang xử lý…")
+            .appIPadTypography(isEnabled: mode != .iPhonePortrait)
         }
-        .appLoadingOverlay(session.isSubmitting, message: "Đang xử lý…")
     }
 
     private var accountSection: some View {
         Section("Tài khoản đăng nhập") {
-            if let user = session.user {
-                LabeledContent("Email", value: user.email)
-            }
-            Button("Đăng xuất", role: .destructive) {
-                Task { await session.logout() }
-            }
-            .disabled(session.isSubmitting)
+            accountRows
         }
     }
 
     private var managementSection: some View {
         Section("Quản lý") {
-            NavigationLink {
-                AccountsView(factory: factory)
-            } label: {
-                SettingsRow(title: "Tài khoản", subtitle: "Ví và số dư", icon: "wallet.bifold.fill", color: AppTheme.teal)
-            }
-            NavigationLink {
-                CategoriesView(factory: factory)
-            } label: {
-                SettingsRow(title: "Danh mục", subtitle: "Nhóm khoản thu chi", icon: "square.grid.2x2.fill", color: AppTheme.violet)
-            }
+            managementRows
         }
     }
 
     private var privacySection: some View {
         Section("Chính sách & quyền riêng tư") {
-            NavigationLink {
-                SettingsLegalDocumentView(document: .privacyPolicy)
-            } label: {
-                SettingsRow(
-                    title: "Chính sách bảo mật",
-                    subtitle: "Cách dữ liệu của bạn được bảo vệ",
-                    icon: "lock.shield.fill",
-                    color: AppTheme.teal
-                )
-            }
-
-            NavigationLink {
-                SettingsLegalDocumentView(document: .privacyRights)
-            } label: {
-                SettingsRow(
-                    title: "Quyền riêng tư",
-                    subtitle: "Quản lý và kiểm soát dữ liệu cá nhân",
-                    icon: "hand.raised.fill",
-                    color: AppTheme.violet
-                )
-            }
+            privacyRows
         }
+    }
+
+    @ViewBuilder
+    private var managementRows: some View {
+        NavigationLink {
+            AccountsView(factory: factory)
+        } label: {
+            SettingsRow(title: "Tài khoản", subtitle: "Ví và số dư", icon: "wallet.bifold.fill", color: AppTheme.teal)
+        }
+        NavigationLink {
+            CategoriesView(factory: factory)
+        } label: {
+            SettingsRow(title: "Danh mục", subtitle: "Nhóm khoản thu chi", icon: "square.grid.2x2.fill", color: AppTheme.violet)
+        }
+    }
+
+    @ViewBuilder
+    private var accountRows: some View {
+        if let user = session.user {
+            LabeledContent("Email", value: user.email)
+        }
+        Button("Đăng xuất", role: .destructive) {
+            Task { await session.logout() }
+        }
+        .disabled(session.isSubmitting)
+    }
+
+    @ViewBuilder
+    private var privacyRows: some View {
+        NavigationLink {
+            SettingsLegalDocumentView(document: .privacyPolicy)
+        } label: {
+            SettingsRow(
+                title: "Chính sách bảo mật",
+                subtitle: "Cách dữ liệu của bạn được bảo vệ",
+                icon: "lock.shield.fill",
+                color: AppTheme.teal
+            )
+        }
+
+        NavigationLink {
+            SettingsLegalDocumentView(document: .privacyRights)
+        } label: {
+            SettingsRow(
+                title: "Quyền riêng tư",
+                subtitle: "Quản lý và kiểm soát dữ liệu cá nhân",
+                icon: "hand.raised.fill",
+                color: AppTheme.violet
+            )
+        }
+    }
+
+    private func iPadSettings(mode: LayoutMode) -> some View {
+        GeometryReader { proxy in
+            let contentWidth = min(
+                max(proxy.size.width - (AppSpacing.xLarge * 2), 0),
+                1100
+            )
+            let columnWidth = max((contentWidth - AppSpacing.large) / 2, 0)
+
+            ScrollView {
+                if mode == .iPadLandscape {
+                    HStack(alignment: .top, spacing: AppSpacing.large) {
+                        VStack(spacing: AppSpacing.large) {
+                            settingsCard(title: "Quản lý") {
+                                managementRows
+                            }
+                            .frame(width: columnWidth, alignment: .leading)
+                            settingsCard(title: "Chính sách & quyền riêng tư") {
+                                privacyRows
+                            }
+                            .frame(width: columnWidth, alignment: .leading)
+                        }
+                        .frame(width: columnWidth, alignment: .top)
+
+                        settingsCard(title: "Tài khoản đăng nhập") {
+                            accountRows
+                        }
+                        .frame(width: columnWidth, alignment: .top)
+                    }
+                    .frame(width: contentWidth, alignment: .top)
+                } else {
+                    VStack(spacing: AppSpacing.large) {
+                        settingsCard(title: "Quản lý") {
+                            managementRows
+                        }
+                        .frame(width: contentWidth, alignment: .leading)
+                        settingsCard(title: "Tài khoản đăng nhập") {
+                            accountRows
+                        }
+                        .frame(width: contentWidth, alignment: .leading)
+                        settingsCard(title: "Chính sách & quyền riêng tư") {
+                            privacyRows
+                        }
+                        .frame(width: contentWidth, alignment: .leading)
+                    }
+                    .frame(width: contentWidth, alignment: .top)
+                }
+            }
+            .padding(.vertical, AppSpacing.large)
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    private func settingsCard<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.small) {
+            Text(title)
+                .font(AppTypography.captionEmphasis)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, AppSpacing.xSmall)
+
+            VStack(alignment: .leading, spacing: AppSpacing.medium, content: content)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding(.horizontal, AppSpacing.medium)
+                .padding(.vertical, AppSpacing.small)
+                .background(
+                    AppTheme.elevatedSurface,
+                    in: RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                        .stroke(AppTheme.separator, lineWidth: 0.5)
+                }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    private func layoutMode(for size: CGSize) -> LayoutMode {
+        if size.width >= 900 && size.width > size.height {
+            return .iPadLandscape
+        }
+        if size.width >= 600 {
+            return .iPadPortrait
+        }
+        return .iPhonePortrait
     }
 }
 

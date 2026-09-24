@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct CategoriesView: View {
+    @Environment(\.dismiss) private var dismiss
     private let factory: any ViewModelFactory
     @State private var viewModel: CategoriesViewModel
     @State private var editingCategory: ExpenseCategory?
@@ -17,29 +18,24 @@ struct CategoriesView: View {
     }
 
     var body: some View {
-        List {
-            Section(TransactionType.income.title) {
-                ForEach(viewModel.categories(of: .income), id: \.id) { category in
-                    categoryRow(category)
+        Group {
+            if isPad {
+                VStack(spacing: 0) {
+                    iPadNavigationHeader
+                    categoriesList
                 }
+                .appScreenBackground()
+                .toolbar(.hidden, for: .navigationBar)
+            } else {
+                categoriesList
+                    .navigationTitle("Danh mục")
+                    .toolbar {
+                        Button { isShowingForm = true } label: {
+                            Image(systemName: "plus.circle.fill")
+                        }
+                        .accessibilityLabel("Thêm danh mục")
+                    }
             }
-            Section(TransactionType.expense.title) {
-                ForEach(viewModel.categories(of: .expense), id: \.id) { category in
-                    categoryRow(category)
-                }
-            }
-        }
-        .id(categoriesListID)
-        .transaction { transaction in
-            transaction.animation = nil
-        }
-        .appFormStyle()
-        .navigationTitle("Danh mục")
-        .toolbar {
-            Button { isShowingForm = true } label: {
-                Image(systemName: "plus.circle.fill")
-            }
-            .accessibilityLabel("Thêm danh mục")
         }
         .task { await viewModel.load() }
         .sheet(isPresented: $isShowingForm, onDismiss: reload) {
@@ -68,6 +64,69 @@ struct CategoriesView: View {
         .errorToast(message: $viewModel.errorMessage)
         .successToast(message: $successMessage)
         .appLoadingOverlay(viewModel.isLoading, message: "Đang tải danh mục…")
+    }
+
+    private var categoriesList: some View {
+        List {
+            Section(TransactionType.income.title) {
+                ForEach(viewModel.categories(of: .income), id: \.id) { category in
+                    categoryRow(category)
+                }
+            }
+            Section(TransactionType.expense.title) {
+                ForEach(viewModel.categories(of: .expense), id: \.id) { category in
+                    categoryRow(category)
+                }
+            }
+        }
+        .id(categoriesListID)
+        .transaction { transaction in
+            transaction.animation = nil
+        }
+        .appFormStyle()
+    }
+
+    private var iPadNavigationHeader: some View {
+        ZStack {
+            Text("Danh mục")
+                .font(.system(size: 22, weight: .bold, design: .rounded))
+
+            HStack {
+                Button { dismiss() } label: {
+                    Image(systemName: "chevron.left")
+                        .font(.system(size: 21, weight: .semibold))
+                        .foregroundStyle(AppTheme.primary)
+                        .frame(width: 48, height: 48)
+                        .background(AppTheme.primary.opacity(0.1), in: Circle())
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Quay lại")
+
+                Spacer()
+
+                Button { isShowingForm = true } label: {
+                    Image(systemName: "plus.circle.fill")
+                        .font(.system(size: 29, weight: .semibold))
+                        .foregroundStyle(AppTheme.primary)
+                        .frame(width: 58, height: 58)
+                        .background(AppTheme.elevatedSurface, in: Circle())
+                        .overlay {
+                            Circle()
+                                .stroke(AppTheme.primary.opacity(0.18), lineWidth: 1)
+                        }
+                        .shadow(color: AppTheme.navy.opacity(0.1), radius: 10, y: 4)
+                }
+                .buttonStyle(.plain)
+                .accessibilityLabel("Thêm danh mục")
+            }
+        }
+        .padding(.horizontal, AppSpacing.xLarge)
+        .frame(height: 76)
+        .background(AppTheme.background)
+    }
+
+    private var isPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
     }
 
     private func categoryRow(_ category: ExpenseCategory) -> some View {

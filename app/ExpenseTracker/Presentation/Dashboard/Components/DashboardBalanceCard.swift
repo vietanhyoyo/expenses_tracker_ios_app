@@ -5,6 +5,10 @@ struct DashboardBalanceCard: View {
     let summary: MonthlySummary
     let period: StatisticsPeriod
 
+    private var isPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+
     var body: some View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             balanceHeader
@@ -17,7 +21,7 @@ struct DashboardBalanceCard: View {
                 )
                 Rectangle()
                     .fill(.white.opacity(0.2))
-                    .frame(width: 1, height: 38)
+                    .frame(width: 1, height: isPad ? 48 : 38)
                 SummaryMetric(
                     title: "Chi tiêu",
                     value: summary.expense,
@@ -33,10 +37,18 @@ struct DashboardBalanceCard: View {
     private var balanceHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
             Label(period.balanceTitle, systemImage: "wallet.bifold.fill")
-                .font(AppTypography.captionEmphasis)
+                .font(
+                    isPad
+                        ? .system(size: 17, weight: .semibold, design: .rounded)
+                        : AppTypography.captionEmphasis
+                )
                 .foregroundStyle(.white.opacity(0.75))
             Text(AppFormatters.money(balance))
-                .font(AppTypography.heroAmount)
+                .font(
+                    isPad
+                        ? .system(size: 50, weight: .bold, design: .rounded)
+                        : AppTypography.heroAmount
+                )
                 .foregroundStyle(.white)
                 .minimumScaleFactor(0.62)
                 .lineLimit(1)
@@ -60,20 +72,32 @@ private struct SummaryMetric: View {
     let icon: String
     let color: Color
 
+    private var isPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+
     var body: some View {
         HStack(spacing: AppSpacing.xSmall) {
             AppIconBadge(
                 icon: icon,
                 color: color,
-                size: 28,
+                size: isPad ? 34 : 28,
                 backgroundColor: .white.opacity(0.1)
             )
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(AppTypography.caption)
+                    .font(
+                        isPad
+                            ? .system(size: 16, weight: .medium, design: .rounded)
+                            : AppTypography.caption
+                    )
                     .foregroundStyle(.white.opacity(0.68))
                 Text(AppFormatters.money(value))
-                    .font(AppTypography.captionEmphasis)
+                    .font(
+                        isPad
+                            ? .system(size: 19, weight: .semibold, design: .rounded)
+                            : AppTypography.captionEmphasis
+                    )
                     .foregroundStyle(.white)
                     .lineLimit(1)
                     .minimumScaleFactor(0.55)

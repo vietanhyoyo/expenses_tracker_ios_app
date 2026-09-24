@@ -123,6 +123,7 @@ final class SessionViewModel {
             password = ""
             passwordConfirmation = ""
             mode = .login
+            didAttemptValidation = false
         }
         do {
             try await auth.logout()

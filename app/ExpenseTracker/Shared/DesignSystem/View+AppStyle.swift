@@ -3,6 +3,7 @@ import SwiftUI
 private struct AppCardModifier: ViewModifier {
     let padding: CGFloat
     let cornerRadius: CGFloat
+    let shadow: Bool
 
     func body(content: Content) -> some View {
         content
@@ -15,7 +16,20 @@ private struct AppCardModifier: ViewModifier {
                 RoundedRectangle(cornerRadius: cornerRadius, style: .continuous)
                     .stroke(AppTheme.separator, lineWidth: 0.5)
             }
-            .shadow(color: AppTheme.navy.opacity(0.06), radius: 12, y: 5)
+            .modifier(AppCardShadowModifier(isEnabled: shadow))
+    }
+}
+
+private struct AppCardShadowModifier: ViewModifier {
+    let isEnabled: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.shadow(color: AppTheme.navy.opacity(0.06), radius: 12, y: 5)
+        } else {
+            content
+        }
     }
 }
 
@@ -28,12 +42,32 @@ private struct AppFormStyleModifier: ViewModifier {
     }
 }
 
+private struct IPadTypographyModifier: ViewModifier {
+    let isEnabled: Bool
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if isEnabled {
+            content.dynamicTypeSize(.xxxLarge)
+        } else {
+            content
+        }
+    }
+}
+
 extension View {
     func appCard(
         padding: CGFloat = AppSpacing.large,
-        cornerRadius: CGFloat = AppRadius.large
+        cornerRadius: CGFloat = AppRadius.large,
+        shadow: Bool = true
     ) -> some View {
-        modifier(AppCardModifier(padding: padding, cornerRadius: cornerRadius))
+        modifier(
+            AppCardModifier(
+                padding: padding,
+                cornerRadius: cornerRadius,
+                shadow: shadow
+            )
+        )
     }
 
     func appScreenBackground() -> some View {
@@ -42,5 +76,9 @@ extension View {
 
     func appFormStyle() -> some View {
         modifier(AppFormStyleModifier())
+    }
+
+    func appIPadTypography(isEnabled: Bool) -> some View {
+        modifier(IPadTypographyModifier(isEnabled: isEnabled))
     }
 }

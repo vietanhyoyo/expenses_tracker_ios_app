@@ -40,8 +40,9 @@ struct AuthView: View {
 
             formCard(
                 bottomInset: proxy.safeAreaInsets.bottom,
-                contentMaxWidth: proxy.size.width - 44,
-                contentTopPadding: 27
+                contentMaxWidth: proxy.size.width - 24,
+                contentTopPadding: 27,
+                horizontalPadding: 12
             )
             .environment(\.colorScheme, .light)
             .frame(
@@ -192,7 +193,8 @@ struct AuthView: View {
     private func formCard(
         bottomInset: CGFloat,
         contentMaxWidth: CGFloat?,
-        contentTopPadding: CGFloat
+        contentTopPadding: CGFloat,
+        horizontalPadding: CGFloat = 22
     ) -> some View {
         ScrollView(.vertical, showsIndicators: false) {
             VStack(alignment: .leading, spacing: 0) {
@@ -331,7 +333,7 @@ struct AuthView: View {
                 .disabled(viewModel.isSubmitting)
                 .padding(.top, 29)
             }
-            .padding(.horizontal, 22)
+            .padding(.horizontal, horizontalPadding)
             .padding(.top, contentTopPadding)
             .padding(.bottom, bottomInset + 25)
             .frame(width: contentMaxWidth ?? nil, alignment: .top)

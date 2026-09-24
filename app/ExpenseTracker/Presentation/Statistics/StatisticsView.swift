@@ -1,54 +1,67 @@
 import SwiftUI
 
 struct StatisticsView: View {
+    private enum LayoutMode: Equatable {
+        case iPhonePortrait
+        case iPadPortrait
+        case iPadLandscape
+    }
+
     @State var viewModel: StatisticsViewModel
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                LazyVStack(spacing: AppSpacing.medium) {
-                    StatisticsPeriodSelector(
-                        period: viewModel.selectedPeriod,
-                        date: viewModel.selectedDate,
-                        previous: { Task { await viewModel.moveMonth(-1) } },
-                        next: { Task { await viewModel.moveMonth(1) } },
-                        selectPeriod: { period, date in
-                            Task { await viewModel.selectPeriod(period, date: date) }
-                        }
-                    )
-                    StatisticsSummaryView(
-                        summary: viewModel.summary,
-                        selectedType: viewModel.selectedType,
-                        onSelect: { type in
-                            Task { await viewModel.selectType(type) }
-                        }
-                    )
-                    if let errorMessage = viewModel.errorMessage {
-                        ErrorBanner(message: errorMessage)
-                    }
-                    statisticsContent
-                    if viewModel.selectedPeriod == .month {
-                        MonthlyCashFlowCalendar(
-                            month: viewModel.selectedDate,
-                            items: viewModel.dailyCashFlow
+        GeometryReader { proxy in
+            let mode = layoutMode(for: proxy.size)
+
+            NavigationStack {
+                ScrollView {
+                    LazyVStack(spacing: mode == .iPhonePortrait ? AppSpacing.medium : AppSpacing.large) {
+                        StatisticsPeriodSelector(
+                            period: viewModel.selectedPeriod,
+                            date: viewModel.selectedDate,
+                            previous: { Task { await viewModel.moveMonth(-1) } },
+                            next: { Task { await viewModel.moveMonth(1) } },
+                            selectPeriod: { period, date in
+                                Task { await viewModel.selectPeriod(period, date: date) }
+                            }
                         )
+                        StatisticsSummaryView(
+                            summary: viewModel.summary,
+                            selectedType: viewModel.selectedType,
+                            onSelect: { type in
+                                Task { await viewModel.selectType(type) }
+                            }
+                        )
+                        if let errorMessage = viewModel.errorMessage {
+                            ErrorBanner(message: errorMessage)
+                        }
+                        statisticsContent(for: mode)
+                        if viewModel.selectedPeriod == .month && mode == .iPhonePortrait {
+                            MonthlyCashFlowCalendar(
+                                month: viewModel.selectedDate,
+                                items: viewModel.dailyCashFlow
+                            )
+                        }
                     }
+                    .padding(.horizontal, mode == .iPhonePortrait ? AppSpacing.medium : AppSpacing.xLarge)
+                    .padding(.top, AppSpacing.xSmall)
+                    .padding(.bottom, AppSpacing.xxLarge)
+                    .frame(maxWidth: mode == .iPhonePortrait ? .infinity : 1240)
+                    .frame(maxWidth: .infinity)
                 }
-                .padding(.horizontal, AppSpacing.medium)
-                .padding(.top, AppSpacing.xSmall)
-                .padding(.bottom, AppSpacing.xxLarge)
+                .appScreenBackground()
+                .navigationTitle("Thống kê")
+                .navigationBarTitleDisplayMode(.inline)
+                .task { await viewModel.load() }
+                .refreshable { await viewModel.load() }
+                .appLoadingOverlay(viewModel.isLoading, message: "Đang tải thống kê…")
             }
-            .appScreenBackground()
-            .navigationTitle("Thống kê")
-            .navigationBarTitleDisplayMode(.inline)
-            .task { await viewModel.load() }
-            .refreshable { await viewModel.load() }
-            .appLoadingOverlay(viewModel.isLoading, message: "Đang tải thống kê…")
+            .appIPadTypography(isEnabled: mode != .iPhonePortrait)
         }
     }
 
     @ViewBuilder
-    private var statisticsContent: some View {
+    private func statisticsContent(for mode: LayoutMode) -> some View {
         if !viewModel.hasChartData {
             EmptyStateView(
                 icon: "chart.bar",
@@ -57,6 +70,42 @@ struct StatisticsView: View {
             )
             .frame(minHeight: 280)
             .appCard(padding: 0)
+        } else if mode == .iPadLandscape {
+            HStack(alignment: .top, spacing: AppSpacing.large) {
+                VStack(spacing: AppSpacing.large) {
+                    DailySpendingChart(
+                        items: viewModel.dailySpending,
+                        period: viewModel.selectedPeriod,
+                        transactionType: viewModel.selectedType
+                    )
+                    if viewModel.selectedPeriod == .month {
+                        MonthlyCashFlowCalendar(
+                            month: viewModel.selectedDate,
+                            items: viewModel.dailyCashFlow
+                        )
+                    }
+                }
+                CategorySpendingChart(
+                    items: viewModel.categorySpending,
+                    transactionType: viewModel.selectedType
+                )
+            }
+        } else if mode == .iPadPortrait {
+            DailySpendingChart(
+                items: viewModel.dailySpending,
+                period: viewModel.selectedPeriod,
+                transactionType: viewModel.selectedType
+            )
+            if viewModel.selectedPeriod == .month {
+                MonthlyCashFlowCalendar(
+                    month: viewModel.selectedDate,
+                    items: viewModel.dailyCashFlow
+                )
+            }
+            CategorySpendingChart(
+                items: viewModel.categorySpending,
+                transactionType: viewModel.selectedType
+            )
         } else {
             DailySpendingChart(
                 items: viewModel.dailySpending,
@@ -68,5 +117,15 @@ struct StatisticsView: View {
                 transactionType: viewModel.selectedType
             )
         }
+    }
+
+    private func layoutMode(for size: CGSize) -> LayoutMode {
+        if size.width >= 900 && size.width > size.height {
+            return .iPadLandscape
+        }
+        if size.width >= 600 {
+            return .iPadPortrait
+        }
+        return .iPhonePortrait
     }
 }

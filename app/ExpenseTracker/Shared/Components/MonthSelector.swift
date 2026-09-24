@@ -59,7 +59,11 @@ struct AppDatePickerField: View {
                     }
                 }
             }
-            .presentationDetents([.medium])
+            .presentationDetents(
+                UIDevice.current.userInterfaceIdiom == .pad
+                    ? [.large]
+                    : [.medium]
+            )
             .presentationBackground(AppTheme.elevatedSurface)
             .presentationDragIndicator(.visible)
         }
@@ -237,6 +241,7 @@ private struct MonthPickerSheet: View {
 struct StatisticsPeriodSelector: View {
     let period: StatisticsPeriod
     let date: Date
+    let usesLargeText: Bool
     let previous: () -> Void
     let next: () -> Void
     let selectPeriod: (StatisticsPeriod, Date) -> Void
@@ -248,12 +253,14 @@ struct StatisticsPeriodSelector: View {
     init(
         period: StatisticsPeriod,
         date: Date,
+        usesLargeText: Bool = false,
         previous: @escaping () -> Void,
         next: @escaping () -> Void,
         selectPeriod: @escaping (StatisticsPeriod, Date) -> Void
     ) {
         self.period = period
         self.date = date
+        self.usesLargeText = usesLargeText
         self.previous = previous
         self.next = next
         self.selectPeriod = selectPeriod
@@ -272,13 +279,15 @@ struct StatisticsPeriodSelector: View {
             } label: {
                 VStack(spacing: 2) {
                     Text("THỜI GIAN")
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .font(.system(size: usesLargeText ? 13 : 10, weight: .bold, design: .rounded))
                         .tracking(1.1)
                         .foregroundStyle(.secondary)
                     HStack(spacing: AppSpacing.xxSmall) {
                         Text(period.displayValue(for: date, calendar: AppFormatters.calendar))
                             .font(
-                                period == .week
+                                usesLargeText
+                                    ? .system(size: 20, weight: .semibold, design: .rounded)
+                                    : period == .week
                                     ? .system(size: 15, weight: .semibold, design: .rounded)
                                     : AppTypography.cardTitle
                             )
@@ -288,7 +297,7 @@ struct StatisticsPeriodSelector: View {
                             .minimumScaleFactor(period == .week ? 0.8 : 1)
                             .fixedSize(horizontal: false, vertical: period == .week)
                         Image(systemName: "chevron.down")
-                            .font(.caption.weight(.bold))
+                            .font(.system(size: usesLargeText ? 15 : 12, weight: .bold))
                             .foregroundStyle(AppTheme.primary)
                     }
                 }
@@ -320,9 +329,9 @@ struct StatisticsPeriodSelector: View {
     ) -> some View {
         Button(action: action) {
             Image(systemName: icon)
-                .font(.system(size: 13, weight: .bold))
+                .font(.system(size: usesLargeText ? 17 : 13, weight: .bold))
                 .foregroundStyle(AppTheme.primary)
-                .frame(width: 38, height: 38)
+                .frame(width: usesLargeText ? 46 : 38, height: usesLargeText ? 46 : 38)
                 .background(AppTheme.primary.opacity(0.09), in: Circle())
         }
         .accessibilityLabel(label)

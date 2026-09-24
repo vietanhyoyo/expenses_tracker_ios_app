@@ -199,6 +199,24 @@ struct TransactionFormView: View {
     }
 }
 
+private struct TransactionFormSheetPresentationModifier: ViewModifier {
+    func body(content: Content) -> some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            content
+                .presentationDetents([.height(700)])
+                .presentationDragIndicator(.visible)
+        } else {
+            content
+        }
+    }
+}
+
+extension View {
+    func transactionFormSheetPresentation() -> some View {
+        modifier(TransactionFormSheetPresentationModifier())
+    }
+}
+
 private struct TransactionTypePicker: View {
     @Binding var selection: TransactionType
 

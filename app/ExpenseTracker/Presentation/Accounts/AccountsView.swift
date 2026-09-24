@@ -3,8 +3,6 @@ import SwiftUI
 struct AccountsView: View {
     private let factory: any ViewModelFactory
     @State private var viewModel: AccountsViewModel
-    @State private var editingAccount: Account?
-    @State private var isShowingForm = false
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -14,7 +12,7 @@ struct AccountsView: View {
     var body: some View {
         List {
             if viewModel.accounts.isEmpty {
-                EmptyStateView(icon: "wallet.bifold", title: "Chưa có tài khoản", message: "Tạo ví hoặc tài khoản ngân hàng để bắt đầu.")
+                EmptyStateView(icon: "wallet.bifold", title: "Chưa có tài khoản", message: "Chưa có dữ liệu ví hoặc tài khoản ngân hàng để hiển thị.")
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -25,52 +23,32 @@ struct AccountsView: View {
         }
         .appFormStyle()
         .navigationTitle("Tài khoản")
-        .toolbar {
-            Button { isShowingForm = true } label: {
-                Image(systemName: "plus.circle.fill")
-            }
-            .accessibilityLabel("Thêm tài khoản")
-        }
         .task { await viewModel.load() }
-        .sheet(isPresented: $isShowingForm, onDismiss: reload) {
-            AccountFormView(viewModel: factory.makeAccountFormViewModel(account: nil))
-        }
-        .sheet(item: $editingAccount, onDismiss: reload) { account in
-            AccountFormView(viewModel: factory.makeAccountFormViewModel(account: account))
-        }
         .errorAlert(message: $viewModel.errorMessage)
         .appLoadingOverlay(viewModel.isLoading, message: "Đang tải tài khoản…")
     }
 
     private func accountRow(_ account: Account) -> some View {
-        Button { editingAccount = account } label: {
-            HStack(spacing: AppSpacing.small) {
-                AppIconBadge(icon: "wallet.bifold.fill", color: AppTheme.teal)
-                VStack(alignment: .leading, spacing: AppSpacing.xxxSmall) {
-                    Text(account.name)
-                        .font(AppTypography.bodyEmphasis)
-                        .foregroundStyle(.primary)
-                    Text("Số dư hiện tại")
-                        .font(AppTypography.caption)
-                        .foregroundStyle(.secondary)
-                }
-                Spacer()
-                Text(AppFormatters.money(viewModel.balance(for: account)))
-                    .font(AppTypography.cardTitle)
+        HStack(spacing: AppSpacing.small) {
+            AppIconBadge(icon: "wallet.bifold.fill", color: AppTheme.teal)
+            VStack(alignment: .leading, spacing: AppSpacing.xxxSmall) {
+                Text(account.name)
+                    .font(AppTypography.bodyEmphasis)
                     .foregroundStyle(.primary)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                Text("Số dư hiện tại")
+                    .font(AppTypography.caption)
+                    .foregroundStyle(.secondary)
             }
-            .padding(.vertical, AppSpacing.xxxSmall)
+            Spacer()
+            Text(AppFormatters.money(viewModel.balance(for: account)))
+                .font(AppTypography.cardTitle)
+                .foregroundStyle(.primary)
+                .lineLimit(1)
+                .minimumScaleFactor(0.7)
         }
-        .swipeActions {
-            Button("Xoá", role: .destructive) {
-                Task { await viewModel.delete(account) }
-            }
-        }
-    }
-
-    private func reload() {
-        Task { await viewModel.load() }
+        .padding(.vertical, AppSpacing.xxxSmall)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(account.name), số dư hiện tại")
+        .accessibilityValue(AppFormatters.money(viewModel.balance(for: account)))
     }
 }

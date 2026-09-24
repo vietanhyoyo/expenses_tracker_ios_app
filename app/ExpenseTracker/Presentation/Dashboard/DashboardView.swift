@@ -1,6 +1,12 @@
 import SwiftUI
 
 struct DashboardView: View {
+    private enum LayoutMode {
+        case iPhonePortrait
+        case iPadPortrait
+        case iPadLandscape
+    }
+
     private let factory: any ViewModelFactory
     private let userEmail: String?
     private let onShowTransactions: () -> Void
@@ -20,56 +26,45 @@ struct DashboardView: View {
     }
 
     var body: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            GeometryReader { proxy in
+                dashboardScreen(mode: layoutMode(for: proxy.size), size: proxy.size)
+            }
+        } else {
+            dashboardScreen(mode: .iPhonePortrait, size: .zero)
+        }
+    }
+
+    private func dashboardScreen(mode: LayoutMode, size: CGSize) -> some View {
         NavigationStack {
             ZStack(alignment: .top) {
                 AppTheme.elevatedSurface.ignoresSafeArea()
 
-                Image("HomeBackground")
-                    .resizable()
-                    .aspectRatio(497.0 / 794.0, contentMode: .fit)
-                    .frame(maxWidth: .infinity)
-                    .ignoresSafeArea(edges: .top)
+                if mode == .iPhonePortrait {
+                    Image("HomeBackground")
+                        .resizable()
+                        .aspectRatio(497.0 / 794.0, contentMode: .fit)
+                        .frame(maxWidth: .infinity)
+                        .ignoresSafeArea(edges: .top)
+                }
 
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        dashboardHeader
-                        VStack(spacing: AppSpacing.xLarge) {
-                            StatisticsPeriodSelector(
-                                period: viewModel.selectedPeriod,
-                                date: viewModel.selectedDate,
-                                previous: { Task { await viewModel.movePeriod(-1) } },
-                                next: { Task { await viewModel.movePeriod(1) } },
-                                selectPeriod: { period, date in
-                                    Task { await viewModel.selectPeriod(period, date: date) }
-                                }
-                            )
-                            DashboardPillDivider()
-                            if let errorMessage = viewModel.errorMessage {
-                                ErrorBanner(message: errorMessage)
-                            }
-                            DashboardSpendingCard(items: viewModel.categorySpending)
-                            if !viewModel.budgetProgress.isEmpty {
-                                DashboardBudgetCard(items: viewModel.budgetProgress)
-                            }
-                            DashboardPillDivider()
-                            DashboardRecentCard(
-                                transactions: viewModel.recentTransactions,
-                                categories: viewModel.categories,
-                                onShowAll: onShowTransactions
-                            )
+                VStack(spacing: 0) {
+                    if mode != .iPhonePortrait {
+                        HStack {
+                            Spacer()
+                            addTransactionButton(for: mode)
                         }
                         .padding(.horizontal, AppSpacing.xLarge)
-                        .padding(.top, AppSpacing.xLarge)
-                        .padding(.bottom, 96)
-                        .frame(maxWidth: .infinity)
-                        .background(
-                            AppTheme.elevatedSurface,
-                            in: UnevenRoundedRectangle(
-                                topLeadingRadius: 38,
-                                topTrailingRadius: 38,
-                                style: .continuous
-                            )
-                        )
+                        .frame(height: 76)
+                    }
+
+                    if mode == .iPadLandscape {
+                        dashboardContent(for: mode, size: size)
+                            .frame(maxHeight: .infinity, alignment: .top)
+                    } else {
+                        ScrollView {
+                            dashboardContent(for: mode, size: size)
+                        }
                     }
                 }
             }
@@ -77,10 +72,13 @@ struct DashboardView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbarBackground(.hidden, for: .navigationBar)
             .toolbar {
-                ToolbarItem(placement: .topBarTrailing) {
-                    addTransactionButton
+                if mode == .iPhonePortrait {
+                    ToolbarItem(placement: .topBarTrailing) {
+                        addTransactionButton(for: mode)
+                    }
                 }
             }
+            .toolbar(mode == .iPhonePortrait ? .visible : .hidden, for: .navigationBar)
             .refreshable { await viewModel.load() }
             .task { await viewModel.load() }
             .sheet(
@@ -91,9 +89,161 @@ struct DashboardView: View {
                     viewModel: factory.makeTransactionFormViewModel(transaction: nil),
                     onSuccess: { successMessage = $0 }
                 )
+                .transactionFormSheetPresentation()
             }
             .successToast(message: $successMessage)
             .appLoadingOverlay(viewModel.isLoading, message: "Đang tải tổng quan…")
+        }
+    }
+
+    @ViewBuilder
+    private func dashboardContent(for mode: LayoutMode, size: CGSize) -> some View {
+        switch mode {
+        case .iPhonePortrait:
+            LazyVStack(spacing: 0) {
+                dashboardHeader
+                VStack(spacing: AppSpacing.xLarge) {
+                    dashboardSections(for: mode)
+                }
+                    .padding(.horizontal, AppSpacing.xLarge)
+                    .padding(.top, AppSpacing.xLarge)
+                    .padding(.bottom, 96)
+                    .frame(maxWidth: .infinity)
+                    .background(
+                        AppTheme.elevatedSurface,
+                        in: UnevenRoundedRectangle(
+                            topLeadingRadius: 38,
+                            topTrailingRadius: 38,
+                            style: .continuous
+                        )
+                    )
+            }
+
+        case .iPadPortrait:
+            VStack(spacing: AppSpacing.xLarge) {
+                iPadHero(height: 318)
+                VStack(alignment: .leading, spacing: AppSpacing.large) {
+                    dashboardSections(for: mode)
+                }
+                    .padding(AppSpacing.xLarge)
+                    .background(
+                        AppTheme.elevatedSurface,
+                        in: RoundedRectangle(cornerRadius: 28, style: .continuous)
+                    )
+                    .shadow(color: AppTheme.navy.opacity(0.06), radius: 14, y: 6)
+            }
+            .padding(.horizontal, AppSpacing.xLarge)
+            .padding(.vertical, AppSpacing.large)
+            .frame(maxWidth: 840)
+            .frame(maxWidth: .infinity)
+            .padding(.bottom, 72)
+            .dynamicTypeSize(.xxxLarge)
+
+        case .iPadLandscape:
+            HStack(alignment: .top, spacing: AppSpacing.xLarge) {
+                iPadHero(height: 390)
+                    .frame(width: min(max(size.width * 0.34, 310), 420))
+
+                ScrollView {
+                    VStack(alignment: .leading, spacing: AppSpacing.medium) {
+                        dashboardSections(for: mode)
+                    }
+                        .padding(AppSpacing.large)
+                        .background(
+                            AppTheme.elevatedSurface,
+                            in: RoundedRectangle(cornerRadius: 28, style: .continuous)
+                        )
+                        .shadow(color: AppTheme.navy.opacity(0.06), radius: 14, y: 6)
+                        .frame(maxWidth: .infinity, alignment: .top)
+                        .padding(.bottom, 72)
+                }
+                .scrollIndicators(.hidden)
+            }
+            .padding(.horizontal, AppSpacing.xLarge)
+            .padding(.vertical, AppSpacing.medium)
+            .frame(maxWidth: 1280)
+            .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
+            .dynamicTypeSize(.xxxLarge)
+        }
+    }
+
+    private func iPadHero(height: CGFloat) -> some View {
+        ZStack {
+            Image("HomeBackground")
+                .resizable()
+                .scaledToFill()
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .clipped()
+
+            dashboardHeader
+                .padding(.horizontal, AppSpacing.small)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: height)
+        .clipShape(RoundedRectangle(cornerRadius: 28, style: .continuous))
+        .shadow(color: AppTheme.primary.opacity(0.18), radius: 18, y: 8)
+    }
+
+    @ViewBuilder
+    private func dashboardSections(for mode: LayoutMode) -> some View {
+        dashboardCard(
+            StatisticsPeriodSelector(
+                period: viewModel.selectedPeriod,
+                date: viewModel.selectedDate,
+                usesLargeText: mode != .iPhonePortrait,
+                previous: { Task { await viewModel.movePeriod(-1) } },
+                next: { Task { await viewModel.movePeriod(1) } },
+                selectPeriod: { period, date in
+                    Task { await viewModel.selectPeriod(period, date: date) }
+                }
+            ),
+            for: mode
+        )
+
+        DashboardPillDivider()
+
+        if let errorMessage = viewModel.errorMessage {
+            ErrorBanner(message: errorMessage)
+        }
+
+        dashboardCard(
+            DashboardSpendingCard(items: viewModel.categorySpending),
+            for: mode
+        )
+
+        if !viewModel.budgetProgress.isEmpty {
+            dashboardCard(
+                DashboardBudgetCard(items: viewModel.budgetProgress),
+                for: mode
+            )
+        }
+
+        DashboardPillDivider()
+
+        dashboardCard(
+            DashboardRecentCard(
+                transactions: viewModel.recentTransactions,
+                categories: viewModel.categories,
+                onShowAll: onShowTransactions
+            ),
+            for: mode
+        )
+    }
+
+    @ViewBuilder
+    private func dashboardCard<Content: View>(
+        _ content: Content,
+        for mode: LayoutMode
+    ) -> some View {
+        if mode == .iPhonePortrait {
+            content
+        } else {
+            content
+                .appCard(
+                    padding: mode == .iPadLandscape ? AppSpacing.medium : AppSpacing.large,
+                    cornerRadius: AppRadius.large,
+                    shadow: false
+                )
         }
     }
 
@@ -101,19 +251,31 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             HStack(spacing: AppSpacing.small) {
                 Text(userInitials)
-                    .font(.system(.body, design: .rounded).weight(.medium))
+                    .font(
+                        isPad
+                            ? .system(size: 18, weight: .medium, design: .rounded)
+                            : .system(.body, design: .rounded).weight(.medium)
+                    )
                     .foregroundStyle(.white)
-                    .frame(width: 40, height: 40)
+                    .frame(width: isPad ? 48 : 40, height: isPad ? 48 : 40)
                     .overlay {
                         Circle().stroke(.white.opacity(0.9), lineWidth: 1.2)
                     }
 
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Xin chào!")
-                        .font(AppTypography.captionEmphasis)
+                        .font(
+                            isPad
+                                ? .system(size: 18, weight: .semibold, design: .rounded)
+                                : AppTypography.captionEmphasis
+                        )
                         .foregroundStyle(.white)
                     Text(userEmail ?? "Tài khoản của bạn")
-                        .font(AppTypography.bodyEmphasis)
+                        .font(
+                            isPad
+                                ? .system(size: 20, weight: .semibold, design: .rounded)
+                                : AppTypography.bodyEmphasis
+                        )
                         .foregroundStyle(.white)
                         .lineLimit(1)
                 }
@@ -135,6 +297,7 @@ struct DashboardView: View {
         .padding(.horizontal, AppSpacing.xLarge)
         .padding(.top, AppSpacing.xSmall)
         .padding(.bottom, AppSpacing.xLarge)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private var userInitials: String {
@@ -142,16 +305,46 @@ struct DashboardView: View {
         return String(localPart.prefix(2)).uppercased()
     }
 
-    private var addTransactionButton: some View {
+    private var isPad: Bool {
+        UIDevice.current.userInterfaceIdiom == .pad
+    }
+
+    @ViewBuilder
+    private func addTransactionButton(for mode: LayoutMode) -> some View {
         Button { isShowingTransactionForm = true } label: {
-            Image(systemName: "plus.circle.fill")
-                .font(.title3)
+            if mode == .iPhonePortrait {
+                Image(systemName: "plus.circle.fill")
+                    .font(.title3)
+                    .foregroundStyle(AppTheme.primary)
+            } else {
+                Image(systemName: "plus.circle.fill")
+                    .font(.system(size: 29, weight: .semibold))
+                    .foregroundStyle(AppTheme.primary)
+                    .frame(width: 58, height: 58)
+                    .background(AppTheme.elevatedSurface, in: Circle())
+                    .overlay {
+                        Circle()
+                            .stroke(AppTheme.primary.opacity(0.18), lineWidth: 1)
+                    }
+                    .shadow(color: AppTheme.navy.opacity(0.1), radius: 10, y: 4)
+                    .contentShape(Rectangle())
+            }
         }
+        .buttonStyle(.plain)
         .accessibilityLabel("Thêm giao dịch")
+    }
+
+    private func layoutMode(for size: CGSize) -> LayoutMode {
+        if size.width >= 900 && size.width > size.height {
+            return .iPadLandscape
+        }
+        if size.width >= 600 {
+            return .iPadPortrait
+        }
+        return .iPhonePortrait
     }
 }
 
 #Preview {
-    // Previews compose the real dependency graph with an in-memory store.
     DashboardView(factory: try! AppContainer(inMemory: true))
 }

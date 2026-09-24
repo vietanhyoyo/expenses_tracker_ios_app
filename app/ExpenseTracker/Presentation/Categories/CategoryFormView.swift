@@ -34,7 +34,16 @@ struct CategoryFormView: View {
         "pawprint.fill", "leaf.fill", "person.2.fill", "square.grid.2x2.fill"
     ]
 
+    @ViewBuilder
     var body: some View {
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            iPadForm
+        } else {
+            iPhoneForm
+        }
+    }
+
+    private var iPhoneForm: some View {
         NavigationStack {
             Form {
                 detailsSection
@@ -53,6 +62,113 @@ struct CategoryFormView: View {
             .formToolbar(isSaveDisabled: !viewModel.canSave, onSave: save)
         }
         .errorToast(message: $failureMessage)
+    }
+
+    private var iPadForm: some View {
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: AppSpacing.large) {
+                    iPadDetailsCard
+                    iPadColorCard
+                    iPadIconCard
+
+                    if let errorMessage = viewModel.errorMessage {
+                        ErrorBanner(message: errorMessage)
+                    }
+                }
+                .padding(AppSpacing.xLarge)
+            }
+            .background(AppTheme.background)
+            .navigationTitle(viewModel.isEditing ? "Sửa danh mục" : "Danh mục mới")
+            .navigationBarTitleDisplayMode(.inline)
+            .formToolbar(isSaveDisabled: !viewModel.canSave, onSave: save)
+        }
+        .frame(width: 700, height: 700)
+        .modifier(CategoryFormIPadPresentationModifier())
+        .errorToast(message: $failureMessage)
+    }
+
+    private var iPadDetailsCard: some View {
+        @Bindable var viewModel = viewModel
+
+        return iPadSectionCard(title: "Thông tin") {
+            Picker("Loại", selection: $viewModel.type) {
+                ForEach(TransactionType.allCases, id: \.self) {
+                    Text($0.title).tag($0)
+                }
+            }
+            .pickerStyle(.segmented)
+            .disabled(viewModel.isEditing)
+            .onChange(of: viewModel.type) { _, _ in
+                viewModel.typeChanged()
+            }
+
+            Divider()
+
+            TextField("Tên danh mục", text: $viewModel.name)
+                .font(AppTypography.body)
+                .padding(.horizontal, AppSpacing.medium)
+                .frame(height: 50)
+                .background(
+                    AppTheme.surface,
+                    in: RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                )
+                .overlay {
+                    RoundedRectangle(cornerRadius: AppRadius.medium, style: .continuous)
+                        .stroke(AppTheme.separator, lineWidth: 0.5)
+                }
+        }
+    }
+
+    private var iPadColorCard: some View {
+        iPadSectionCard(title: "Màu sắc") {
+            ColorPicker(
+                "Màu danh mục",
+                selection: colorSelection,
+                supportsOpacity: false
+            )
+            .font(AppTypography.bodyEmphasis)
+            .frame(minHeight: 44)
+        }
+    }
+
+    private var iPadIconCard: some View {
+        @Bindable var viewModel = viewModel
+
+        return iPadSectionCard(title: "Biểu tượng") {
+            LazyVGrid(
+                columns: Array(repeating: GridItem(.flexible()), count: 7),
+                spacing: AppSpacing.xxSmall
+            ) {
+                ForEach(icons, id: \.self) { value in
+                    iconButton(value, viewModel: viewModel)
+                }
+            }
+        }
+    }
+
+    private func iPadSectionCard<Content: View>(
+        title: String,
+        @ViewBuilder content: () -> Content
+    ) -> some View {
+        VStack(alignment: .leading, spacing: AppSpacing.medium) {
+            Text(title)
+                .font(AppTypography.cardTitle)
+                .foregroundStyle(.primary)
+
+            content()
+        }
+        .padding(AppSpacing.large)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            AppTheme.elevatedSurface,
+            in: RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+        )
+        .overlay {
+            RoundedRectangle(cornerRadius: AppRadius.large, style: .continuous)
+                .stroke(AppTheme.separator, lineWidth: 0.5)
+        }
+        .shadow(color: AppTheme.navy.opacity(0.05), radius: 10, y: 4)
     }
 
     @ViewBuilder
@@ -147,6 +263,21 @@ struct CategoryFormView: View {
             } else if let errorMessage = viewModel.errorMessage {
                 failureMessage = errorMessage
             }
+        }
+    }
+}
+
+private struct CategoryFormIPadPresentationModifier: ViewModifier {
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if #available(iOS 18.0, *) {
+            content
+                .presentationSizing(.fitted)
+                .presentationDragIndicator(.visible)
+        } else {
+            content
+                .presentationDetents([.large])
+                .presentationDragIndicator(.visible)
         }
     }
 }

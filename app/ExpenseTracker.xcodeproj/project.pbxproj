@@ -184,6 +184,7 @@
 		6213CCDA495F0CDC53CEA952 /* DefaultDataSeeder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DefaultDataSeeder.swift; path = App/Bootstrap/DefaultDataSeeder.swift; sourceTree = "<group>"; };
 		63F811CEE7467EADDABF486C /* SettingsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsRow.swift; path = Presentation/Settings/SettingsRow.swift; sourceTree = "<group>"; };
 		67474EBA194786A473436AB8 /* AuthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthView.swift; path = Presentation/Auth/AuthView.swift; sourceTree = "<group>"; };
+		8F1BEE7B7DAA4D2AB2B9C1E3 /* ExpenseTracker.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = ExpenseTracker.entitlements; path = ExpenseTracker/ExpenseTracker.entitlements; sourceTree = "<group>"; };
 		6A57D585306596C23875F578 /* BudgetRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetRepositoryImpl.swift; path = Data/Repositories/BudgetRepositoryImpl.swift; sourceTree = "<group>"; };
 		6AC66055A3C6B9E798D052FF /* StatisticsUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatisticsUseCases.swift; path = Domain/UseCases/StatisticsUseCases.swift; sourceTree = "<group>"; };
 		6D8F404E3F1AA332C9ABE2B7 /* TransactionSort.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionSort.swift; path = Presentation/Transactions/Models/TransactionSort.swift; sourceTree = "<group>"; };
@@ -376,6 +377,7 @@
 				C1B98B7EA3BB7AF3C0FA9843 /* ExpenseTrackerApp.swift */,
 				9BCDF8AF3E943CE32102D875 /* Factories */,
 				A4C29D8DD283461DBADB2BFD /* RootView.swift */,
+				8F1BEE7B7DAA4D2AB2B9C1E3 /* ExpenseTracker.entitlements */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -968,6 +970,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
+				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				INFOPLIST_FILE = ExpenseTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1116,6 +1119,7 @@
 				CLANG_ENABLE_OBJC_WEAK = NO;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
+				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				INFOPLIST_FILE = ExpenseTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
