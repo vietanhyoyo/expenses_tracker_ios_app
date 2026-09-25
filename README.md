@@ -2,6 +2,12 @@
 
 Ứng dụng iOS quản lý thu chi cá nhân, kết nối REST API để đồng bộ tài khoản, giao dịch, danh mục, ngân sách và số liệu tổng quan.
 
+## Hình ảnh ứng dụng
+
+Mockup minh họa giao diện Sổ Thu Chi trên iPad và iPhone, bao gồm màn hình đăng nhập và màn hình tổng quan các khoản thu chi theo danh mục.
+
+![Mockup ứng dụng Sổ Thu Chi](assets/mockupapp.png)
+
 ## Công nghệ
 
 - **App:** Swift, SwiftUI, Clean Architecture, MVVM, URLSession, Keychain, Swift Charts.
@@ -34,3 +40,8 @@ docker compose down
 3. Chọn **Product → Run** hoặc nhấn `⌘R`.
 
 App mặc định kết nối tới `http://localhost:3000/api/v1`. Nếu dùng địa chỉ API khác, cập nhật khóa `API_BASE_URL` trong `app/ExpenseTracker/Info.plist`.
+
+## Tài khoản test
+
+- **Email:** `user@gmail.com`
+- **Mật khẩu:** `User123456@`
