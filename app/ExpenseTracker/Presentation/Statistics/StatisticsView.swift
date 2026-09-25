@@ -38,9 +38,9 @@ struct StatisticsView: View {
                         statisticsContent(for: mode)
                         if viewModel.selectedPeriod == .month && mode == .iPhonePortrait {
                             MonthlyCashFlowCalendar(
-                                month: viewModel.selectedDate,
-                                items: viewModel.dailyCashFlow
+                                data: viewModel.cashFlowCalendarData
                             )
+                            .equatable()
                         }
                     }
                     .padding(.horizontal, mode == .iPhonePortrait ? AppSpacing.medium : AppSpacing.xLarge)
@@ -79,9 +79,9 @@ struct StatisticsView: View {
                     )
                     if viewModel.selectedPeriod == .month {
                         MonthlyCashFlowCalendar(
-                            month: viewModel.selectedDate,
-                            items: viewModel.dailyCashFlow
+                            data: viewModel.cashFlowCalendarData
                         )
+                        .equatable()
                     }
                 }
                 CategorySpendingChart(
@@ -97,9 +97,9 @@ struct StatisticsView: View {
             )
             if viewModel.selectedPeriod == .month {
                 MonthlyCashFlowCalendar(
-                    month: viewModel.selectedDate,
-                    items: viewModel.dailyCashFlow
+                    data: viewModel.cashFlowCalendarData
                 )
+                .equatable()
             }
             CategorySpendingChart(
                 items: viewModel.categorySpending,

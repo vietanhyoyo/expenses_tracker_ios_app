@@ -55,6 +55,7 @@ final class StatisticsViewModel {
     var categorySpending: [CategorySpending] = []
     var dailySpending: [DailySpending] = []
     var dailyCashFlow: [DailyCashFlow] = []
+    var cashFlowCalendarData = CashFlowCalendarData.empty
     var errorMessage: String?
 
     private let statisticsUseCases: StatisticsUseCases
@@ -79,9 +80,16 @@ final class StatisticsViewModel {
             }
             summary = try await statisticsUseCases.summary(for: interval, calendar: calendar)
             if selectedPeriod == .month {
-                dailyCashFlow = try await statisticsUseCases.dailyCashFlow(for: interval, calendar: calendar)
+                let cashFlow = try await statisticsUseCases.dailyCashFlow(for: interval, calendar: calendar)
+                dailyCashFlow = cashFlow
+                cashFlowCalendarData = CashFlowCalendarData(
+                    month: selectedDate,
+                    items: cashFlow,
+                    calendar: calendar
+                )
             } else {
                 dailyCashFlow = []
+                cashFlowCalendarData = .empty
             }
             categorySpending = try await statisticsUseCases.spendingByCategory(
                 for: interval,

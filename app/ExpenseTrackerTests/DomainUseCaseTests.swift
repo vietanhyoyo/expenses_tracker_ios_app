@@ -57,6 +57,25 @@ final class DomainUseCaseTests: XCTestCase {
         )
     }
 
+    func testCashFlowCalendarPrecomputesCompleteMonthGrid() throws {
+        let calendar = AppFormatters.calendar
+        let month = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 9, day: 1)))
+        let dayWithCashFlow = try XCTUnwrap(calendar.date(from: DateComponents(year: 2026, month: 9, day: 24)))
+        let data = CashFlowCalendarData(
+            month: month,
+            items: [DailyCashFlow(date: dayWithCashFlow, income: 600_000, expense: 1_630_899)],
+            calendar: calendar
+        )
+
+        XCTAssertEqual(data.cells.count, 35)
+        XCTAssertEqual(data.cells.filter { !$0.isEmpty }.count, 30)
+
+        let dayCell = try XCTUnwrap(data.cells.first { $0.dayNumber == "24" })
+        XCTAssertEqual(dayCell.incomeText, "+600k")
+        XCTAssertEqual(dayCell.expenseText, "−1,6tr")
+        XCTAssertTrue(dayCell.hasCashFlow)
+    }
+
     func testBudgetThresholds() {
         XCTAssertEqual(BudgetUseCases.status(for: 0.79), .safe)
         XCTAssertEqual(BudgetUseCases.status(for: 0.8), .warning)
