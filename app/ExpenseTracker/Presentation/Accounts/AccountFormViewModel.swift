@@ -11,16 +11,16 @@ final class AccountFormViewModel {
     var errorMessage: String?
 
     private let id: UUID
-    private let useCases: AccountUseCases
+    private let accountUseCases: AccountUseCases
 
-    init(account: Account?, useCases: AccountUseCases) {
+    init(account: Account?, accountUseCases: AccountUseCases) {
         id = account?.id ?? UUID()
         isEditing = account != nil
         name = account?.name ?? ""
         initialBalanceText = account.map {
             AppFormatters.vietnameseMoneyInput(from: $0.initialBalance)
         } ?? ""
-        self.useCases = useCases
+        self.accountUseCases = accountUseCases
     }
 
     var canSave: Bool {
@@ -38,7 +38,7 @@ final class AccountFormViewModel {
             initialBalance: AppFormatters.decimal(from: initialBalanceText) ?? 0
         )
         do {
-            try await useCases.save(account, isEditing: isEditing)
+            try await accountUseCases.save(account, isEditing: isEditing)
             return true
         } catch {
             errorMessage = error.userMessage

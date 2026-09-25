@@ -12,7 +12,7 @@ struct AccountsView: View {
     var body: some View {
         List {
             if viewModel.accounts.isEmpty {
-                EmptyStateView(icon: "wallet.bifold", title: "Chưa có tài khoản", message: "Chưa có dữ liệu ví hoặc tài khoản ngân hàng để hiển thị.")
+                EmptyStateView(icon: AppSymbols.account, title: "Chưa có tài khoản", message: "Chưa có dữ liệu ví hoặc tài khoản ngân hàng để hiển thị.")
                     .listRowBackground(Color.clear)
                     .listRowSeparator(.hidden)
             }
@@ -30,7 +30,7 @@ struct AccountsView: View {
 
     private func accountRow(_ account: Account) -> some View {
         HStack(spacing: AppSpacing.small) {
-            AppIconBadge(icon: "wallet.bifold.fill", color: AppTheme.teal)
+            AppIconBadge(icon: AppSymbols.accountFilled, color: AppTheme.teal)
             VStack(alignment: .leading, spacing: AppSpacing.xxxSmall) {
                 Text(account.name)
                     .font(AppTypography.bodyEmphasis)

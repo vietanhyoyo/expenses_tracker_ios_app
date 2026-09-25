@@ -36,7 +36,7 @@ struct DashboardBalanceCard: View {
 
     private var balanceHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.xxSmall) {
-            Label(period.balanceTitle, systemImage: "wallet.bifold.fill")
+            Label(period.balanceTitle, systemImage: AppSymbols.accountFilled)
                 .font(
                     isPad
                         ? .system(size: 17, weight: .semibold, design: .rounded)

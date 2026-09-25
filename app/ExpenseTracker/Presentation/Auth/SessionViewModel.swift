@@ -19,10 +19,10 @@ final class SessionViewModel {
     var errorMessage: String?
     var didAttemptValidation = false
 
-    private let auth: AuthUseCases
+    private let authUseCases: AuthUseCases
 
-    init(auth: AuthUseCases) {
-        self.auth = auth
+    init(authUseCases: AuthUseCases) {
+        self.authUseCases = authUseCases
     }
 
     var isAuthenticated: Bool { user != nil }
@@ -76,7 +76,7 @@ final class SessionViewModel {
         defer { isRestoring = false }
 
         do {
-            user = try await auth.restoreSession()
+            user = try await authUseCases.restoreSession()
         } catch {
             user = nil
             errorMessage = error.userMessage
@@ -93,9 +93,9 @@ final class SessionViewModel {
         do {
             switch mode {
             case .login:
-                user = try await auth.login(email: email, password: password)
+                user = try await authUseCases.login(email: email, password: password)
             case .register:
-                user = try await auth.register(email: email, password: password)
+                user = try await authUseCases.register(email: email, password: password)
             }
             password = ""
             passwordConfirmation = ""
@@ -126,7 +126,7 @@ final class SessionViewModel {
             didAttemptValidation = false
         }
         do {
-            try await auth.logout()
+            try await authUseCases.logout()
             errorMessage = nil
         } catch {
             errorMessage = error.userMessage

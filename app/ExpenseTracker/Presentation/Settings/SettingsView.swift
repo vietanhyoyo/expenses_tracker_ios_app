@@ -78,7 +78,7 @@ struct SettingsView: View {
         NavigationLink {
             AccountsView(factory: factory)
         } label: {
-            SettingsRow(title: "Tài khoản", subtitle: "Ví và số dư", icon: "wallet.bifold.fill", color: AppTheme.teal)
+            SettingsRow(title: "Tài khoản", subtitle: "Ví và số dư", icon: AppSymbols.accountFilled, color: AppTheme.teal)
         }
         NavigationLink {
             CategoriesView(factory: factory)

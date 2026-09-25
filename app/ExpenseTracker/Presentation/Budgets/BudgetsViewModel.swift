@@ -9,17 +9,17 @@ final class BudgetsViewModel {
     var progress: [BudgetProgress] = []
     var errorMessage: String?
 
-    private let budgets: BudgetUseCases
+    private let budgetUseCases: BudgetUseCases
 
-    init(budgets: BudgetUseCases) {
-        self.budgets = budgets
+    init(budgetUseCases: BudgetUseCases) {
+        self.budgetUseCases = budgetUseCases
     }
 
     func load() async {
         isLoading = true
         defer { isLoading = false }
         do {
-            progress = try await budgets.progress(for: selectedMonth)
+            progress = try await budgetUseCases.progress(for: selectedMonth)
         } catch {
             errorMessage = error.userMessage
         }
@@ -37,7 +37,7 @@ final class BudgetsViewModel {
 
     func delete(_ progress: BudgetProgress) async {
         do {
-            try await budgets.delete(id: progress.budget.id)
+            try await budgetUseCases.delete(id: progress.budget.id)
             await load()
         } catch {
             errorMessage = error.userMessage

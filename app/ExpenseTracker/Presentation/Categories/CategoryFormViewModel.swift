@@ -13,16 +13,16 @@ final class CategoryFormViewModel {
     var errorMessage: String?
 
     private let id: UUID
-    private let useCases: CategoryUseCases
+    private let categoryUseCases: CategoryUseCases
 
-    init(category: ExpenseCategory?, useCases: CategoryUseCases) {
+    init(category: ExpenseCategory?, categoryUseCases: CategoryUseCases) {
         id = category?.id ?? UUID()
         isEditing = category != nil
         name = category?.name ?? ""
         icon = category?.icon ?? "star.fill"
         type = category?.type ?? .expense
         colorHex = category?.colorHex ?? ExpenseCategory.defaultColorHex(for: .expense)
-        self.useCases = useCases
+        self.categoryUseCases = categoryUseCases
     }
 
     var canSave: Bool {
@@ -49,7 +49,7 @@ final class CategoryFormViewModel {
             colorHex: colorHex
         )
         do {
-            try await useCases.save(category, isEditing: isEditing)
+            try await categoryUseCases.save(category, isEditing: isEditing)
             return true
         } catch {
             errorMessage = error.userMessage

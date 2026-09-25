@@ -262,6 +262,12 @@ struct DashboardView: View {
                     )
                     .foregroundStyle(.white)
                     .frame(width: isPad ? 48 : 40, height: isPad ? 48 : 40)
+                    .background(
+                        usesLegacyPhoneStyle
+                            ? Color.white.opacity(0.14)
+                            : Color.clear,
+                        in: Circle()
+                    )
                     .overlay {
                         Circle().stroke(.white.opacity(0.9), lineWidth: 1.2)
                     }
@@ -313,13 +319,38 @@ struct DashboardView: View {
         UIDevice.current.userInterfaceIdiom == .pad
     }
 
+    private var usesLegacyPhoneStyle: Bool {
+        guard !isPad else { return false }
+        if #available(iOS 26.0, *) {
+            return false
+        }
+        return true
+    }
+
     @ViewBuilder
     private func addTransactionButton(for mode: LayoutMode) -> some View {
         Button { isShowingTransactionForm = true } label: {
             if mode == .iPhonePortrait {
-                Image(systemName: "plus.circle.fill")
-                    .font(.title3)
-                    .foregroundStyle(AppTheme.primary)
+                if usesLegacyPhoneStyle {
+                    // iOS 17 needs a solid surface so the action remains
+                    // visible over the transparent navigation bar.
+                    Image(systemName: "plus")
+                        .font(.system(size: 19, weight: .semibold))
+                        .foregroundStyle(AppTheme.primary)
+                        .frame(width: 40, height: 40)
+                        .background(AppTheme.elevatedSurface, in: Circle())
+                        .overlay {
+                            Circle()
+                                .stroke(AppTheme.primary.opacity(0.18), lineWidth: 1)
+                        }
+                        .shadow(color: AppTheme.navy.opacity(0.1), radius: 8, y: 3)
+                        .contentShape(Circle())
+                } else {
+                    // Preserve the original iOS 26 appearance.
+                    Image(systemName: "plus.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(AppTheme.primary)
+                }
             } else {
                 Image(systemName: "plus.circle.fill")
                     .font(.system(size: 29, weight: .semibold))

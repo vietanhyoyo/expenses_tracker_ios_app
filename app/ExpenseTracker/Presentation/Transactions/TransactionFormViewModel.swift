@@ -17,15 +17,15 @@ final class TransactionFormViewModel {
     var isSaving = false
     var errorMessage: String?
 
-    private let transactions: TransactionUseCases
+    private let transactionUseCases: TransactionUseCases
     private let categoryUseCases: CategoryUseCases
     private let accountUseCases: AccountUseCases
 
     init(
         existing: ExpenseTransaction?,
-        transactions: TransactionUseCases,
-        categories: CategoryUseCases,
-        accounts: AccountUseCases
+        transactionUseCases: TransactionUseCases,
+        categoryUseCases: CategoryUseCases,
+        accountUseCases: AccountUseCases
     ) {
         id = existing?.id ?? UUID()
         isEditing = existing != nil
@@ -37,9 +37,9 @@ final class TransactionFormViewModel {
         if let amount = existing?.amount {
             amountText = AppFormatters.vietnameseMoneyInput(from: amount)
         }
-        self.transactions = transactions
-        categoryUseCases = categories
-        accountUseCases = accounts
+        self.transactionUseCases = transactionUseCases
+        self.categoryUseCases = categoryUseCases
+        self.accountUseCases = accountUseCases
     }
 
     var availableCategories: [ExpenseCategory] {
@@ -78,7 +78,7 @@ final class TransactionFormViewModel {
         defer { isSaving = false }
 
         do {
-            try await transactions.save(transaction, isEditing: isEditing)
+            try await transactionUseCases.save(transaction, isEditing: isEditing)
             return true
         } catch {
             errorMessage = error.userMessage
@@ -94,7 +94,7 @@ final class TransactionFormViewModel {
         defer { isSaving = false }
 
         do {
-            try await transactions.delete(id: id)
+            try await transactionUseCases.delete(id: id)
             return true
         } catch {
             errorMessage = error.userMessage

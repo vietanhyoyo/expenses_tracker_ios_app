@@ -26,6 +26,24 @@ enum AppTheme {
     )
 }
 
+enum AppSymbols {
+    /// `wallet.bifold` is not available on iOS 17, so use the older Wallet
+    /// symbol there while retaining the newer symbol on iOS 26 and later.
+    static var accountFilled: String {
+        if #available(iOS 26.0, *) {
+            return "wallet.bifold.fill"
+        }
+        return "wallet.pass.fill"
+    }
+
+    static var account: String {
+        if #available(iOS 26.0, *) {
+            return "wallet.bifold"
+        }
+        return "wallet.pass"
+    }
+}
+
 extension Color {
     init(hex: String) {
         let value = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)

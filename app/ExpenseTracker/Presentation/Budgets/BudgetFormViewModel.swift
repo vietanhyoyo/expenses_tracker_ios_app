@@ -13,15 +13,15 @@ final class BudgetFormViewModel {
 
     private let id: UUID
     private let month: Date
-    private let budgets: BudgetUseCases
-    private let categories: CategoryUseCases
+    private let budgetUseCases: BudgetUseCases
+    private let categoryUseCases: CategoryUseCases
 
     /// - Parameter month: Month of a new budget. An existing budget keeps its own month.
     init(
         budget: Budget?,
         month: Date,
-        budgets: BudgetUseCases,
-        categories: CategoryUseCases
+        budgetUseCases: BudgetUseCases,
+        categoryUseCases: CategoryUseCases
     ) {
         id = budget?.id ?? UUID()
         isEditing = budget != nil
@@ -30,8 +30,8 @@ final class BudgetFormViewModel {
         amountText = budget.map {
             AppFormatters.vietnameseMoneyInput(from: $0.amount)
         } ?? ""
-        self.budgets = budgets
-        self.categories = categories
+        self.budgetUseCases = budgetUseCases
+        self.categoryUseCases = categoryUseCases
     }
 
     var canSave: Bool {
@@ -40,7 +40,7 @@ final class BudgetFormViewModel {
 
     func load() async {
         do {
-            expenseCategories = try await categories.getAll().filter { $0.type == .expense }
+            expenseCategories = try await categoryUseCases.getAll().filter { $0.type == .expense }
             if !expenseCategories.contains(where: { $0.id == categoryID }) {
                 categoryID = expenseCategories.first?.id
             }
@@ -61,7 +61,7 @@ final class BudgetFormViewModel {
 
         let budget = Budget(id: id, categoryID: categoryID, amount: amount, month: month)
         do {
-            try await budgets.save(budget, isEditing: isEditing)
+            try await budgetUseCases.save(budget, isEditing: isEditing)
             return true
         } catch {
             errorMessage = error.userMessage

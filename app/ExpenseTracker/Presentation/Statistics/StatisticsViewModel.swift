@@ -57,10 +57,10 @@ final class StatisticsViewModel {
     var dailyCashFlow: [DailyCashFlow] = []
     var errorMessage: String?
 
-    private let statistics: StatisticsUseCases
+    private let statisticsUseCases: StatisticsUseCases
 
-    init(statistics: StatisticsUseCases) {
-        self.statistics = statistics
+    init(statisticsUseCases: StatisticsUseCases) {
+        self.statisticsUseCases = statisticsUseCases
     }
 
     var hasChartData: Bool {
@@ -77,18 +77,18 @@ final class StatisticsViewModel {
             guard let interval = selectedPeriod.interval(for: selectedDate, calendar: calendar) else {
                 throw DomainError.remoteError("Không xác định được khoảng thời gian.")
             }
-            summary = try await statistics.summary(for: interval, calendar: calendar)
+            summary = try await statisticsUseCases.summary(for: interval, calendar: calendar)
             if selectedPeriod == .month {
-                dailyCashFlow = try await statistics.dailyCashFlow(for: interval, calendar: calendar)
+                dailyCashFlow = try await statisticsUseCases.dailyCashFlow(for: interval, calendar: calendar)
             } else {
                 dailyCashFlow = []
             }
-            categorySpending = try await statistics.spendingByCategory(
+            categorySpending = try await statisticsUseCases.spendingByCategory(
                 for: interval,
                 type: selectedType,
                 calendar: calendar
             )
-            dailySpending = try await statistics.spendingTrend(
+            dailySpending = try await statisticsUseCases.spendingTrend(
                 period: selectedPeriod.rawValue,
                 type: selectedType,
                 for: selectedDate,

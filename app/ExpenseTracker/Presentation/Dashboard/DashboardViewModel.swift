@@ -15,21 +15,21 @@ final class DashboardViewModel {
     var selectedDate = Date()
     var selectedPeriod: StatisticsPeriod = .month
 
-    private let statistics: StatisticsUseCases
-    private let dashboard: DashboardUseCases
+    private let statisticsUseCases: StatisticsUseCases
+    private let dashboardUseCases: DashboardUseCases
     private let categoryUseCases: CategoryUseCases
-    private let budgets: BudgetUseCases
+    private let budgetUseCases: BudgetUseCases
 
     init(
-        dashboard: DashboardUseCases,
-        statistics: StatisticsUseCases,
-        categories: CategoryUseCases,
-        budgets: BudgetUseCases
+        dashboardUseCases: DashboardUseCases,
+        statisticsUseCases: StatisticsUseCases,
+        categoryUseCases: CategoryUseCases,
+        budgetUseCases: BudgetUseCases
     ) {
-        self.dashboard = dashboard
-        self.statistics = statistics
-        categoryUseCases = categories
-        self.budgets = budgets
+        self.dashboardUseCases = dashboardUseCases
+        self.statisticsUseCases = statisticsUseCases
+        self.categoryUseCases = categoryUseCases
+        self.budgetUseCases = budgetUseCases
     }
 
     func load() async {
@@ -46,7 +46,7 @@ final class DashboardViewModel {
                 throw DomainError.remoteError("Không xác định được khoảng thời gian.")
             }
 
-            let dashboardSummary = try await dashboard.summary(
+            let dashboardSummary = try await dashboardUseCases.summary(
                 for: selectedPeriod.rawValue,
                 date: selectedDate
             )
@@ -55,14 +55,14 @@ final class DashboardViewModel {
                 income: dashboardSummary.monthlyIncome,
                 expense: dashboardSummary.monthlyExpense
             )
-            categorySpending = try await statistics.expenseByCategory(
+            categorySpending = try await statisticsUseCases.expenseByCategory(
                 for: interval,
                 calendar: calendar
             )
             budgetProgress = selectedPeriod == .month
-                ? try await budgets.progress(for: selectedDate, calendar: calendar)
+                ? try await budgetUseCases.progress(for: selectedDate, calendar: calendar)
                 : []
-            recentTransactions = try await statistics.recent(
+            recentTransactions = try await statisticsUseCases.recent(
                 limit: 5,
                 in: interval,
                 calendar: calendar

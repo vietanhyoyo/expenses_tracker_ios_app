@@ -2,7 +2,7 @@ import Foundation
 
 extension AppContainer: ViewModelFactory {
     func makeSessionViewModel() -> SessionViewModel {
-        let viewModel = SessionViewModel(auth: authUseCases)
+        let viewModel = SessionViewModel(authUseCases: authUseCases)
         apiClient.onSessionInvalidated = { [weak viewModel] in
             viewModel?.sessionDidExpire()
         }
@@ -11,18 +11,18 @@ extension AppContainer: ViewModelFactory {
 
     func makeDashboardViewModel() -> DashboardViewModel {
         DashboardViewModel(
-            dashboard: dashboardUseCases,
-            statistics: statisticsUseCases,
-            categories: categoryUseCases,
-            budgets: budgetUseCases
+            dashboardUseCases: dashboardUseCases,
+            statisticsUseCases: statisticsUseCases,
+            categoryUseCases: categoryUseCases,
+            budgetUseCases: budgetUseCases
         )
     }
 
     func makeTransactionListViewModel() -> TransactionListViewModel {
         TransactionListViewModel(
-            transactions: transactionUseCases,
-            categories: categoryUseCases,
-            accounts: accountUseCases
+            transactionUseCases: transactionUseCases,
+            categoryUseCases: categoryUseCases,
+            accountUseCases: accountUseCases
         )
     }
 
@@ -31,42 +31,42 @@ extension AppContainer: ViewModelFactory {
     ) -> TransactionFormViewModel {
         TransactionFormViewModel(
             existing: transaction,
-            transactions: transactionUseCases,
-            categories: categoryUseCases,
-            accounts: accountUseCases
+            transactionUseCases: transactionUseCases,
+            categoryUseCases: categoryUseCases,
+            accountUseCases: accountUseCases
         )
     }
 
     func makeStatisticsViewModel() -> StatisticsViewModel {
-        StatisticsViewModel(statistics: statisticsUseCases)
+        StatisticsViewModel(statisticsUseCases: statisticsUseCases)
     }
 
     func makeAccountsViewModel() -> AccountsViewModel {
-        AccountsViewModel(useCases: accountUseCases)
+        AccountsViewModel(accountUseCases: accountUseCases)
     }
 
     func makeAccountFormViewModel(account: Account?) -> AccountFormViewModel {
-        AccountFormViewModel(account: account, useCases: accountUseCases)
+        AccountFormViewModel(account: account, accountUseCases: accountUseCases)
     }
 
     func makeBudgetsViewModel() -> BudgetsViewModel {
-        BudgetsViewModel(budgets: budgetUseCases)
+        BudgetsViewModel(budgetUseCases: budgetUseCases)
     }
 
     func makeBudgetFormViewModel(budget: Budget?, month: Date) -> BudgetFormViewModel {
         BudgetFormViewModel(
             budget: budget,
             month: month,
-            budgets: budgetUseCases,
-            categories: categoryUseCases
+            budgetUseCases: budgetUseCases,
+            categoryUseCases: categoryUseCases
         )
     }
 
     func makeCategoriesViewModel() -> CategoriesViewModel {
-        CategoriesViewModel(useCases: categoryUseCases)
+        CategoriesViewModel(categoryUseCases: categoryUseCases)
     }
 
     func makeCategoryFormViewModel(category: ExpenseCategory?) -> CategoryFormViewModel {
-        CategoryFormViewModel(category: category, useCases: categoryUseCases)
+        CategoryFormViewModel(category: category, categoryUseCases: categoryUseCases)
     }
 }

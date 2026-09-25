@@ -9,10 +9,10 @@ final class AccountsViewModel {
     var balances: [UUID: Decimal] = [:]
     var errorMessage: String?
 
-    private let useCases: AccountUseCases
+    private let accountUseCases: AccountUseCases
 
-    init(useCases: AccountUseCases) {
-        self.useCases = useCases
+    init(accountUseCases: AccountUseCases) {
+        self.accountUseCases = accountUseCases
     }
 
     func balance(for account: Account) -> Decimal {
@@ -23,8 +23,8 @@ final class AccountsViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            accounts = try await useCases.getAll()
-            balances = try await useCases.balances()
+            accounts = try await accountUseCases.getAll()
+            balances = try await accountUseCases.balances()
         } catch {
             errorMessage = error.userMessage
         }
@@ -32,7 +32,7 @@ final class AccountsViewModel {
 
     func delete(_ account: Account) async {
         do {
-            try await useCases.delete(id: account.id)
+            try await accountUseCases.delete(id: account.id)
             await load()
         } catch {
             errorMessage = error.userMessage

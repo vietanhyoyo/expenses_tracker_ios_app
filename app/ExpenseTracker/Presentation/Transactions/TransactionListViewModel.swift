@@ -18,18 +18,18 @@ final class TransactionListViewModel {
     var toDate: Date?
     var sort: TransactionSort = .newest
 
-    private let useCases: TransactionUseCases
+    private let transactionUseCases: TransactionUseCases
     private let categoryUseCases: CategoryUseCases
     private let accountUseCases: AccountUseCases
 
     init(
-        transactions: TransactionUseCases,
-        categories: CategoryUseCases,
-        accounts: AccountUseCases
+        transactionUseCases: TransactionUseCases,
+        categoryUseCases: CategoryUseCases,
+        accountUseCases: AccountUseCases
     ) {
-        useCases = transactions
-        categoryUseCases = categories
-        accountUseCases = accounts
+        self.transactionUseCases = transactionUseCases
+        self.categoryUseCases = categoryUseCases
+        self.accountUseCases = accountUseCases
     }
 
     var filtered: [ExpenseTransaction] {
@@ -98,7 +98,7 @@ final class TransactionListViewModel {
         defer { isLoading = false }
 
         do {
-            transactions = try await useCases.getAll(
+            transactions = try await transactionUseCases.getAll(
                 from: isDateRangeEnabled ? fromDate : nil,
                 to: isDateRangeEnabled ? toDate : nil,
                 type: selectedType,
@@ -115,7 +115,7 @@ final class TransactionListViewModel {
         isLoading = true
         defer { isLoading = false }
         do {
-            try await useCases.delete(id: transaction.id)
+            try await transactionUseCases.delete(id: transaction.id)
             await load()
             return true
         } catch {
