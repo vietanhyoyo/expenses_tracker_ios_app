@@ -8,6 +8,13 @@ Mockup minh họa giao diện Sổ Thu Chi trên iPad và iPhone, bao gồm màn
 
 ![Mockup ứng dụng Sổ Thu Chi](assets/mockupapp.png)
 
+## Video demo
+
+<video controls width="100%">
+  <source src="assets/demoappvideo.mp4" type="video/mp4">
+  Trình duyệt của bạn không hỗ trợ phát video. [Mở video demo](assets/demoappvideo.mp4).
+</video>
+
 ## Công nghệ
 
 - **App:** Swift, SwiftUI, Clean Architecture, MVVM, URLSession, Keychain, Swift Charts.
