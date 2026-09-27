@@ -12,7 +12,7 @@ Mockup minh họa giao diện Sổ Thu Chi trên iPad và iPhone, bao gồm màn
 
 [Xem video demo ứng dụng trên Google Drive](https://drive.google.com/file/d/1rfzWuS6rfyHwFmLPGaJYFs8ShpN6zF1C/view?usp=drive_link)
 
-[![Xem video demo ứng dụng trên YouTube](https://img.youtube.com/vi/gi3_wN0444A/hqdefault.jpg)](https://youtu.be/gi3_wN0444A)
+[Xem video demo ứng dụng trên YouTube](https://youtu.be/gi3_wN0444A)
 
 ## Công nghệ
 
