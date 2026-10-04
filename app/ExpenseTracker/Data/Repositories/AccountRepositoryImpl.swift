@@ -10,7 +10,7 @@ final class AccountRepositoryImpl: AccountRepository {
 
     func getAccounts() async throws -> [Account] {
         do {
-            let values: [AccountDTO] = try await api.get("/accounts")
+            let values: [AccountResponse] = try await api.get(APIEndpoints.Accounts.collection)
             return try values.map(map)
         } catch {
             throw ErrorMapper.map(error)
@@ -19,8 +19,8 @@ final class AccountRepositoryImpl: AccountRepository {
 
     func addAccount(_ account: Account) async throws {
         do {
-            let _: AccountDTO = try await api.post(
-                "/accounts",
+            let _: AccountResponse = try await api.post(
+                APIEndpoints.Accounts.collection,
                 body: CreateAccountRequest(
                     name: account.name,
                     type: "cash",
@@ -37,8 +37,8 @@ final class AccountRepositoryImpl: AccountRepository {
             throw DomainError.accountNotFound
         }
         do {
-            let _: AccountDTO = try await api.patch(
-                "/accounts/\(serverID)",
+            let _: AccountResponse = try await api.patch(
+                APIEndpoints.Accounts.detail(id: serverID),
                 body: UpdateAccountRequest(
                     name: account.name,
                     initialBalance: account.initialBalance
@@ -54,22 +54,22 @@ final class AccountRepositoryImpl: AccountRepository {
             throw DomainError.accountNotFound
         }
         do {
-            let _: APIEmpty? = try await api.delete("/accounts/\(serverID)")
+            let _: APIEmptyResponse? = try await api.delete(APIEndpoints.Accounts.detail(id: serverID))
         } catch {
             throw ErrorMapper.map(error)
         }
     }
 
-    private func map(_ dto: AccountDTO) throws -> Account {
+    private func map(_ response: AccountResponse) throws -> Account {
         guard let initialBalance = Decimal(
-            string: dto.initialBalance,
+            string: response.initialBalance,
             locale: Locale(identifier: "en_US_POSIX")
         ) else {
             throw DomainError.remoteError("Dữ liệu tài khoản từ máy chủ không hợp lệ.")
         }
         return Account(
-            id: ServerIDCodec.accountUUID(id: dto.id, userID: dto.userId),
-            name: dto.name,
+            id: ServerIDCodec.accountUUID(id: response.id, userID: response.userId),
+            name: response.name,
             initialBalance: initialBalance
         )
     }

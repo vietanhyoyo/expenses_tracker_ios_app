@@ -31,6 +31,8 @@ Dùng trước khi mở PR hoặc tự review. Giải thích chi tiết về ki�
 
 ## 3. Data
 
+- [ ] Đường dẫn REST API khai báo trong `Data/Remote/APIEndpoints.swift`; repository và `APIClient` dùng hằng số hoặc hàm `detail(id:)`, không viết path trực tiếp tại nơi gọi request.
+- [ ] Model gửi API đặt hậu tố `Request` và conform `Encodable`; model nhận từ API đặt hậu tố `Response` và conform `Decodable` (không dùng hậu tố `DTO`).
 - [ ] `@Model` chỉ xuất hiện trong `Data/` và `AppContainer`; View không dùng `.modelContainer`, `@Query` hay `@Environment(\.modelContext)`.
 - [ ] Model mới có `@Attribute(.unique) var id: UUID` và đã được thêm vào `Schema` trong `AppContainer`.
 - [ ] Thuộc tính mới trên model đã có sẵn dữ liệu cũ phải là optional hoặc có giá trị mặc định (tránh lỗi migration).

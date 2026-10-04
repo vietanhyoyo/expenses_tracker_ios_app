@@ -19,7 +19,7 @@ ExpenseTracker/
 │   └── Errors/                   # Lỗi nghiệp vụ
 ├── Data/
 │   ├── Local/                    # SwiftData model và data source
-│   ├── Remote/                   # API client, DTO, Keychain và xử lý token
+│   ├── Remote/                   # API client, Request/Response, Keychain và xử lý token
 │   ├── Mappers/                  # Chuyển đổi giữa các loại model
 │   └── Repositories/             # Hiện thực repository
 └── Shared/                       # Design system, component và tiện ích dùng chung

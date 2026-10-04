@@ -10,7 +10,7 @@ final class BudgetRepositoryImpl: BudgetRepository {
 
     func getBudgets() async throws -> [Budget] {
         do {
-            let values: [BudgetDTO] = try await api.get("/budgets")
+            let values: [BudgetResponse] = try await api.get(APIEndpoints.Budgets.collection)
             return try values.map(map)
         } catch {
             throw ErrorMapper.map(error)
@@ -22,8 +22,8 @@ final class BudgetRepositoryImpl: BudgetRepository {
             throw DomainError.categoryNotFound
         }
         do {
-            let _: BudgetDTO = try await api.post(
-                "/budgets",
+            let _: BudgetResponse = try await api.post(
+                APIEndpoints.Budgets.collection,
                 body: SaveBudgetRequest(
                     categoryId: categoryID,
                     amount: budget.amount,
@@ -43,8 +43,8 @@ final class BudgetRepositoryImpl: BudgetRepository {
             throw DomainError.categoryNotFound
         }
         do {
-            let _: BudgetDTO = try await api.patch(
-                "/budgets/\(budgetID)",
+            let _: BudgetResponse = try await api.patch(
+                APIEndpoints.Budgets.detail(id: budgetID),
                 body: SaveBudgetRequest(
                     categoryId: categoryID,
                     amount: budget.amount,
@@ -61,24 +61,24 @@ final class BudgetRepositoryImpl: BudgetRepository {
             throw DomainError.budgetNotFound
         }
         do {
-            let _: APIEmpty? = try await api.delete("/budgets/\(budgetID)")
+            let _: APIEmptyResponse? = try await api.delete(APIEndpoints.Budgets.detail(id: budgetID))
         } catch {
             throw ErrorMapper.map(error)
         }
     }
 
-    private func map(_ dto: BudgetDTO) throws -> Budget {
+    private func map(_ response: BudgetResponse) throws -> Budget {
         guard let amount = Decimal(
-            string: dto.amount,
+            string: response.amount,
             locale: Locale(identifier: "en_US_POSIX")
-        ), let month = DateParser.date(from: dto.month) else {
+        ), let month = DateParser.date(from: response.month) else {
             throw DomainError.remoteError("Dữ liệu ngân sách từ máy chủ không hợp lệ.")
         }
         return Budget(
-            id: ServerIDCodec.budgetUUID(id: dto.id, userID: dto.userId),
+            id: ServerIDCodec.budgetUUID(id: response.id, userID: response.userId),
             categoryID: ServerIDCodec.categoryUUID(
-                id: dto.categoryId,
-                userID: dto.category.isDefault ? nil : dto.category.userId
+                id: response.categoryId,
+                userID: response.category.isDefault ? nil : response.category.userId
             ),
             amount: amount,
             month: month

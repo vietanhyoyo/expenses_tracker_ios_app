@@ -1,37 +1,37 @@
 import Foundation
 
-struct APIEnvelope<Payload: Decodable>: Decodable {
+struct APIEnvelopeResponse<Payload: Decodable>: Decodable {
     let statusCode: Int
     let message: String
     let data: Payload
 }
 
-struct APIErrorPayload: Decodable {
+struct APIErrorResponse: Decodable {
     let statusCode: Int?
     let errorCode: String?
     let message: String?
 }
 
-struct AuthUserDTO: Decodable {
+struct AuthUserResponse: Decodable {
     let id: Int
     let email: String
     let createdAt: String
 }
 
-struct CurrentUserDTO: Decodable {
+struct CurrentUserResponse: Decodable {
     let id: Int
     let email: String
     let createdAt: String
     let updatedAt: String
 }
 
-struct TokenPairDTO: Decodable {
+struct TokenPairResponse: Decodable {
     let accessToken: String
     let refreshToken: String
 }
 
-struct AuthResultDTO: Decodable {
-    let user: AuthUserDTO
+struct AuthResultResponse: Decodable {
+    let user: AuthUserResponse
     let accessToken: String
     let refreshToken: String
 }
@@ -45,7 +45,7 @@ struct RefreshTokenRequest: Encodable {
     let refreshToken: String
 }
 
-struct CategoryDTO: Decodable {
+struct CategoryResponse: Decodable {
     let id: Int
     let name: String
     let colorHex: String?
@@ -67,14 +67,14 @@ struct UpdateCategoryRequest: Encodable {
     let colorHex: String
 }
 
-struct ExpenseCategoryDTO: Decodable {
+struct ExpenseCategoryResponse: Decodable {
     let id: Int
     let name: String
     let isDefault: Bool
     let type: String
 }
 
-struct ExpenseDTO: Decodable {
+struct ExpenseResponse: Decodable {
     let id: Int
     let userId: Int
     let categoryId: Int
@@ -86,10 +86,10 @@ struct ExpenseDTO: Decodable {
     let notes: String?
     let createdAt: String
     let updatedAt: String
-    let category: ExpenseCategoryDTO
+    let category: ExpenseCategoryResponse
 }
 
-struct ExpensePageDTO: Decodable {
+struct ExpensePageResponse: Decodable {
     struct Pagination: Decodable {
         let page: Int
         let limit: Int
@@ -97,22 +97,22 @@ struct ExpensePageDTO: Decodable {
         let totalPages: Int
     }
 
-    let items: [ExpenseDTO]
+    let items: [ExpenseResponse]
     let pagination: Pagination
 }
 
-struct ExpenseTrendItemDTO: Decodable {
+struct ExpenseTrendItemResponse: Decodable {
     let date: String
     let amount: String
 }
 
-struct ExpenseTrendDTO: Decodable {
+struct ExpenseTrendResponse: Decodable {
     let type: String
     let period: String
     let granularity: String
     let from: String
     let to: String
-    let items: [ExpenseTrendItemDTO]
+    let items: [ExpenseTrendItemResponse]
 }
 
 struct SaveExpenseRequest: Encodable {
@@ -125,7 +125,7 @@ struct SaveExpenseRequest: Encodable {
     let notes: String?
 }
 
-struct DashboardSummaryDTO: Decodable {
+struct DashboardSummaryResponse: Decodable {
     let month: String
     let totalBalance: String
     let monthlyIncome: String
@@ -133,7 +133,7 @@ struct DashboardSummaryDTO: Decodable {
     let monthlyBalance: String
 }
 
-struct AccountDTO: Decodable {
+struct AccountResponse: Decodable {
     let id: Int
     let userId: Int
     let name: String
@@ -155,7 +155,7 @@ struct UpdateAccountRequest: Encodable {
     let initialBalance: Decimal
 }
 
-struct BudgetDTO: Decodable {
+struct BudgetResponse: Decodable {
     struct Category: Decodable {
         let userId: Int?
         let isDefault: Bool
@@ -177,4 +177,4 @@ struct SaveBudgetRequest: Encodable {
     let month: String
 }
 
-struct APIEmpty: Decodable {}
+struct APIEmptyResponse: Decodable {}

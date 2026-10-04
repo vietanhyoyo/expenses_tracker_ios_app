@@ -28,7 +28,7 @@ final class TransactionRepositoryImpl: TransactionRepository {
     ) async throws -> [ExpenseTransaction] {
         do {
             var page = 1
-            var values: [ExpenseDTO] = []
+            var values: [ExpenseResponse] = []
             var totalPages = 1
 
             var queryItems = [
@@ -62,8 +62,8 @@ final class TransactionRepositoryImpl: TransactionRepository {
 
             repeat {
                 queryItems[0] = URLQueryItem(name: "page", value: String(page))
-                let result: ExpensePageDTO = try await api.get(
-                    "/transactions",
+                let result: ExpensePageResponse = try await api.get(
+                    APIEndpoints.Transactions.collection,
                     queryItems: queryItems
                 )
                 values.append(contentsOf: result.items)
@@ -85,8 +85,8 @@ final class TransactionRepositoryImpl: TransactionRepository {
         calendar: Calendar
     ) async throws -> [DailySpending] {
         do {
-            let result: ExpenseTrendDTO = try await api.get(
-                "/transactions/trend",
+            let result: ExpenseTrendResponse = try await api.get(
+                APIEndpoints.Transactions.trend,
                 queryItems: [
                     URLQueryItem(name: "period", value: period),
                     URLQueryItem(name: "type", value: type.rawValue),
@@ -113,7 +113,7 @@ final class TransactionRepositoryImpl: TransactionRepository {
     func getTransaction(id: UUID) async throws -> ExpenseTransaction? {
         guard let serverID = ServerIDCodec.expenseID(from: id) else { return nil }
         do {
-            let value: ExpenseDTO = try await api.get("/transactions/\(serverID)")
+            let value: ExpenseResponse = try await api.get(APIEndpoints.Transactions.detail(id: serverID))
             return try map(value, fallbackAccountID: try await defaultAccountID())
         } catch {
             let mapped = ErrorMapper.map(error)
@@ -124,8 +124,8 @@ final class TransactionRepositoryImpl: TransactionRepository {
 
     func addTransaction(_ transaction: ExpenseTransaction) async throws {
         do {
-            let created: ExpenseDTO = try await api.post(
-                "/transactions",
+            let created: ExpenseResponse = try await api.post(
+                APIEndpoints.Transactions.collection,
                 body: try request(from: transaction)
             )
             metadata.saveAccountID(
@@ -143,8 +143,8 @@ final class TransactionRepositoryImpl: TransactionRepository {
             throw DomainError.transactionNotFound
         }
         do {
-            let updated: ExpenseDTO = try await api.patch(
-                "/transactions/\(serverID)",
+            let updated: ExpenseResponse = try await api.patch(
+                APIEndpoints.Transactions.detail(id: serverID),
                 body: try request(from: transaction)
             )
             metadata.saveAccountID(
@@ -162,7 +162,7 @@ final class TransactionRepositoryImpl: TransactionRepository {
             throw DomainError.transactionNotFound
         }
         do {
-            let _: APIEmpty? = try await api.delete("/transactions/\(serverID)")
+            let _: APIEmptyResponse? = try await api.delete(APIEndpoints.Transactions.detail(id: serverID))
             metadata.removeAccountID(
                 userID: ServerIDCodec.userID(from: id),
                 expenseID: serverID
@@ -173,29 +173,29 @@ final class TransactionRepositoryImpl: TransactionRepository {
     }
 
     private func map(
-        _ dto: ExpenseDTO,
+        _ response: ExpenseResponse,
         fallbackAccountID: UUID
     ) throws -> ExpenseTransaction {
         guard let amount = Decimal(
-            string: dto.amount,
+            string: response.amount,
             locale: Locale(identifier: "en_US_POSIX")
-        ), let date = DateParser.date(from: dto.transactionDate),
-           let type = TransactionType(rawValue: dto.type),
-           dto.category.type == dto.type else {
+        ), let date = DateParser.date(from: response.transactionDate),
+           let type = TransactionType(rawValue: response.type),
+           response.category.type == response.type else {
             throw DomainError.remoteError("Dữ liệu giao dịch từ máy chủ không hợp lệ.")
         }
-        let categoryUserID = dto.category.isDefault ? nil : dto.userId
+        let categoryUserID = response.category.isDefault ? nil : response.userId
         return ExpenseTransaction(
-            id: ServerIDCodec.expenseUUID(id: dto.id, userID: dto.userId),
+            id: ServerIDCodec.expenseUUID(id: response.id, userID: response.userId),
             amount: amount,
             type: type,
             date: date,
-            note: dto.notes ?? dto.title,
+            note: response.notes ?? response.title,
             categoryID: ServerIDCodec.categoryUUID(
-                id: dto.categoryId,
+                id: response.categoryId,
                 userID: categoryUserID
             ),
-            accountID: metadata.accountID(userID: dto.userId, expenseID: dto.id)
+            accountID: metadata.accountID(userID: response.userId, expenseID: response.id)
                 ?? fallbackAccountID
         )
     }

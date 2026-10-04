@@ -12,7 +12,7 @@ final class CategoryRepositoryImpl: CategoryRepository {
 
     func getCategories() async throws -> [ExpenseCategory] {
         do {
-            let values: [CategoryDTO] = try await api.get("/categories")
+            let values: [CategoryResponse] = try await api.get(APIEndpoints.Categories.collection)
             return try values.map(map)
         } catch {
             throw ErrorMapper.map(error)
@@ -21,8 +21,8 @@ final class CategoryRepositoryImpl: CategoryRepository {
 
     func addCategory(_ category: ExpenseCategory) async throws {
         do {
-            let created: CategoryDTO = try await api.post(
-                "/categories",
+            let created: CategoryResponse = try await api.post(
+                APIEndpoints.Categories.collection,
                 body: CreateCategoryRequest(
                     name: category.name,
                     type: category.type.rawValue,
@@ -41,8 +41,8 @@ final class CategoryRepositoryImpl: CategoryRepository {
             throw DomainError.categoryNotFound
         }
         do {
-            let updated: CategoryDTO = try await api.patch(
-                "/categories/\(id)",
+            let updated: CategoryResponse = try await api.patch(
+                APIEndpoints.Categories.detail(id: id),
                 body: UpdateCategoryRequest(
                     name: category.name,
                     colorHex: category.colorHex
@@ -62,8 +62,8 @@ final class CategoryRepositoryImpl: CategoryRepository {
             throw DomainError.invalidCategoryReplacement
         }
         do {
-            let _: APIEmpty? = try await api.delete(
-                "/categories/\(serverID)",
+            let _: APIEmptyResponse? = try await api.delete(
+                APIEndpoints.Categories.detail(id: serverID),
                 queryItems: [
                     URLQueryItem(
                         name: "replacementCategoryId",
@@ -76,28 +76,28 @@ final class CategoryRepositoryImpl: CategoryRepository {
         }
     }
 
-    private func map(_ dto: CategoryDTO) throws -> ExpenseCategory {
-        guard let type = TransactionType(rawValue: dto.type) else {
+    private func map(_ response: CategoryResponse) throws -> ExpenseCategory {
+        guard let type = TransactionType(rawValue: response.type) else {
             throw DomainError.invalidTransactionType
         }
-        let appearance = metadata.appearance(userID: dto.userId, categoryID: dto.id)
+        let appearance = metadata.appearance(userID: response.userId, categoryID: response.id)
         return ExpenseCategory(
-            id: ServerIDCodec.categoryUUID(id: dto.id, userID: dto.userId),
-            name: dto.name,
-            icon: appearance?.icon ?? defaultIcon(for: dto.name),
+            id: ServerIDCodec.categoryUUID(id: response.id, userID: response.userId),
+            name: response.name,
+            icon: appearance?.icon ?? defaultIcon(for: response.name),
             type: type,
-            colorHex: dto.colorHex
+            colorHex: response.colorHex
                 ?? appearance?.colorHex
-                ?? defaultColor(for: dto.id, type: type),
-            isEditable: !dto.isDefault
+                ?? defaultColor(for: response.id, type: type),
+            isEditable: !response.isDefault
         )
     }
 
-    private func saveAppearance(of category: ExpenseCategory, for dto: CategoryDTO) {
+    private func saveAppearance(of category: ExpenseCategory, for response: CategoryResponse) {
         metadata.saveAppearance(
             .init(icon: category.icon, colorHex: category.colorHex),
-            userID: dto.userId,
-            categoryID: dto.id
+            userID: response.userId,
+            categoryID: response.id
         )
     }
 

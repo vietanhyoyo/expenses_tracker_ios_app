@@ -46,6 +46,7 @@
 		43E9EEF06616FD8EB05C384B /* ServerIDCodec.swift in Sources */ = {isa = PBXBuildFile; fileRef = 039338E67BCBCB149FB3FD72 /* ServerIDCodec.swift */; };
 		45A4CC2D6E2DF2F7D4B128D3 /* DateParser.swift in Sources */ = {isa = PBXBuildFile; fileRef = C348F1C41285B719AFF626CB /* DateParser.swift */; };
 		4957D695711A6E3E6858639D /* APIClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5581CA932EF95E578E14B0C4 /* APIClient.swift */; };
+		49A0B26EED8C459EB3A73A40 /* APIEndpoints.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21D562E75D384F068EE4B245 /* APIEndpoints.swift */; };
 		4AA4E1F67BAEADD436724135 /* Budget.swift in Sources */ = {isa = PBXBuildFile; fileRef = B366BCF2D99AD1C4592A5B12 /* Budget.swift */; };
 		4E687762CB046E3FD1980462 /* DashboardRepository.swift in Sources */ = {isa = PBXBuildFile; fileRef = D1A88494001BA43E8A8F1AF7 /* DashboardRepository.swift */; };
 		508214DED4737C360747543A /* StatisticsSummaryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 12CE7C3B2CA6730BB09D47FD /* StatisticsSummaryView.swift */; };
@@ -151,6 +152,7 @@
 		13B218FF81460867D67D9450 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		15D38D4A8E0967DED784CFAA /* AccountsView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountsView.swift; path = Presentation/Accounts/AccountsView.swift; sourceTree = "<group>"; };
 		1E50F795645F494B8E1DCFD0 /* DashboardSectionCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardSectionCard.swift; path = Presentation/Dashboard/Components/DashboardSectionCard.swift; sourceTree = "<group>"; };
+		21D562E75D384F068EE4B245 /* APIEndpoints.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = APIEndpoints.swift; path = Data/Remote/APIEndpoints.swift; sourceTree = "<group>"; };
 		22FB832EE0D1AEE63BCE099C /* DashboardBudgetCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardBudgetCard.swift; path = Presentation/Dashboard/Components/DashboardBudgetCard.swift; sourceTree = "<group>"; };
 		240F842B9C510A1FB1A5C2E8 /* DashboardSpendingCard.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardSpendingCard.swift; path = Presentation/Dashboard/Components/DashboardSpendingCard.swift; sourceTree = "<group>"; };
 		24DA8E96E5FC1E1E0C63BBAB /* BudgetUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetUseCases.swift; path = Domain/UseCases/BudgetUseCases.swift; sourceTree = "<group>"; };
@@ -360,6 +362,7 @@
 			isa = PBXGroup;
 			children = (
 				5581CA932EF95E578E14B0C4 /* APIClient.swift */,
+				21D562E75D384F068EE4B245 /* APIEndpoints.swift */,
 				484F9F4059A5B29309056EAD /* APIModels.swift */,
 				C348F1C41285B719AFF626CB /* DateParser.swift */,
 				E3AB2F76750A90C976A38714 /* ErrorMapper.swift */,
@@ -836,6 +839,7 @@
 				D438B297571EA7B85B038B7C /* AppContainer+ViewModelFactory.swift in Sources */,
 				C348E50D83CDC771A4886760 /* RootView.swift in Sources */,
 				4957D695711A6E3E6858639D /* APIClient.swift in Sources */,
+				49A0B26EED8C459EB3A73A40 /* APIEndpoints.swift in Sources */,
 				12496F1EE5CB8F15237DE0F1 /* APIModels.swift in Sources */,
 				45A4CC2D6E2DF2F7D4B128D3 /* DateParser.swift in Sources */,
 				93D1C836277DF527DAAFB1B6 /* ErrorMapper.swift in Sources */,

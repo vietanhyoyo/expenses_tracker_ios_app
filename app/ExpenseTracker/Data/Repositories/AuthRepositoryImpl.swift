@@ -13,7 +13,7 @@ final class AuthRepositoryImpl: AuthRepository {
     func restoreSession() async throws -> AuthUser? {
         do {
             guard try tokenStore.load() != nil else { return nil }
-            let user: CurrentUserDTO = try await api.get("/users/me")
+            let user: CurrentUserResponse = try await api.get(APIEndpoints.Users.me)
             return try map(user)
         } catch {
             throw ErrorMapper.map(error)
@@ -21,19 +21,19 @@ final class AuthRepositoryImpl: AuthRepository {
     }
 
     func login(email: String, password: String) async throws -> AuthUser {
-        try await authenticate(path: "/auth/login", email: email, password: password)
+        try await authenticate(path: APIEndpoints.Auth.login, email: email, password: password)
     }
 
     func register(email: String, password: String) async throws -> AuthUser {
-        try await authenticate(path: "/auth/register", email: email, password: password)
+        try await authenticate(path: APIEndpoints.Auth.register, email: email, password: password)
     }
 
     func logout() async throws {
         do {
             guard let tokens = try tokenStore.load() else { return }
             defer { try? tokenStore.clear() }
-            let _: APIEmpty? = try await api.post(
-                "/auth/logout",
+            let _: APIEmptyResponse? = try await api.post(
+                APIEndpoints.Auth.logout,
                 body: RefreshTokenRequest(refreshToken: tokens.refreshToken)
             )
         } catch {
@@ -48,7 +48,7 @@ final class AuthRepositoryImpl: AuthRepository {
         password: String
     ) async throws -> AuthUser {
         do {
-            let result: AuthResultDTO = try await api.post(
+            let result: AuthResultResponse = try await api.post(
                 path,
                 body: CredentialsRequest(email: email, password: password),
                 authorized: false
@@ -63,17 +63,17 @@ final class AuthRepositoryImpl: AuthRepository {
         }
     }
 
-    private func map(_ dto: AuthUserDTO) throws -> AuthUser {
-        guard let createdAt = DateParser.date(from: dto.createdAt) else {
+    private func map(_ response: AuthUserResponse) throws -> AuthUser {
+        guard let createdAt = DateParser.date(from: response.createdAt) else {
             throw DomainError.remoteError("Ngày tạo tài khoản không hợp lệ.")
         }
-        return AuthUser(id: dto.id, email: dto.email, createdAt: createdAt)
+        return AuthUser(id: response.id, email: response.email, createdAt: createdAt)
     }
 
-    private func map(_ dto: CurrentUserDTO) throws -> AuthUser {
-        guard let createdAt = DateParser.date(from: dto.createdAt) else {
+    private func map(_ response: CurrentUserResponse) throws -> AuthUser {
+        guard let createdAt = DateParser.date(from: response.createdAt) else {
             throw DomainError.remoteError("Ngày tạo tài khoản không hợp lệ.")
         }
-        return AuthUser(id: dto.id, email: dto.email, createdAt: createdAt)
+        return AuthUser(id: response.id, email: response.email, createdAt: createdAt)
     }
 }

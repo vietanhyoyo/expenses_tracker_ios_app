@@ -149,7 +149,7 @@ final class APIClient {
             throw APIClientError.invalidResponse
         }
         guard (200..<300).contains(http.statusCode) else {
-            let payload = try? decoder.decode(APIErrorPayload.self, from: data)
+            let payload = try? decoder.decode(APIErrorResponse.self, from: data)
             throw APIClientError.http(
                 status: http.statusCode,
                 code: payload?.errorCode,
@@ -158,7 +158,7 @@ final class APIClient {
         }
 
         do {
-            return try decoder.decode(APIEnvelope<Response>.self, from: data).data
+            return try decoder.decode(APIEnvelopeResponse<Response>.self, from: data).data
         } catch {
             throw APIClientError.invalidResponse
         }
@@ -169,8 +169,8 @@ final class APIClient {
             throw DomainError.authenticationRequired
         }
         let body = try encoder.encode(RefreshTokenRequest(refreshToken: current.refreshToken))
-        let pair: TokenPairDTO = try await send(
-            "/auth/refresh",
+        let pair: TokenPairResponse = try await send(
+            APIEndpoints.Auth.refresh,
             method: "POST",
             body: body,
             authorized: false,

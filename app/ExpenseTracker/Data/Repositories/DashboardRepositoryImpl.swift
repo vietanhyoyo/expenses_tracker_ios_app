@@ -10,8 +10,8 @@ final class DashboardRepositoryImpl: DashboardRepository {
 
     func getSummary(period: String, date: Date) async throws -> DashboardSummary {
         do {
-            let value: DashboardSummaryDTO = try await api.get(
-                "/dashboard/summary",
+            let value: DashboardSummaryResponse = try await api.get(
+                APIEndpoints.Dashboard.summary,
                 queryItems: [
                     URLQueryItem(name: "period", value: period),
                     URLQueryItem(

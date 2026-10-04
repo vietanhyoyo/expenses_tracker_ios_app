@@ -92,7 +92,7 @@ ExpenseTracker/
 ├── Data/
 │   ├── Local/Models/                      # @Model SwiftData
 │   ├── Local/DataSources/                 # SwiftDataLocalDataSource<Entity> + extension theo entity
-│   ├── Remote/                            # APIClient, DTO, Keychain, codec ID và metadata phụ trợ
+│   ├── Remote/                            # APIClient, APIEndpoints, Request/Response, Keychain, codec ID và metadata phụ trợ
 │   ├── Mappers/                           # Entity ↔ Domain
 │   └── Repositories/                      # Local và remote repository
 ├── Presentation/
@@ -207,6 +207,7 @@ extension SwiftDataLocalDataSource where Entity == AccountEntity {
 
 ### 5.5 Remote repository
 
+- `APIEndpoints.swift` tập trung các path REST theo nhóm Auth, Users, Accounts, Budgets, Categories, Dashboard và Transactions. Repository gọi endpoint qua hằng số hoặc `detail(id:)`; query và body vẫn được tạo tại lời gọi API tương ứng.
 - `APIClient` giải mã response envelope, gắn access token, refresh một lần khi nhận `ACCESS_TOKEN_EXPIRED`, rồi thử lại request. Refresh thất bại sẽ xoá phiên và đưa người dùng về màn đăng nhập.
 - `KeychainTokenStore` lưu access/refresh token. `MetadataStore` chỉ lưu icon/màu danh mục và tài khoản được chọn cho khoản chi vì transaction API chưa có các field metadata này.
 - `CategoryRepositoryImpl` dùng `/categories` cho cả danh mục thu và chi; danh mục mặc định có `isEditable = false`.
