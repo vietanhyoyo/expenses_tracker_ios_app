@@ -55,12 +55,18 @@ Dùng trước khi mở PR hoặc tự review. Giải thích chi tiết về ki�
 - [ ] Hàm `save` trả về `Bool` để View quyết định `dismiss()`.
 - [ ] Không để state chết (thuộc tính không View nào đọc).
 - [ ] Đặt tên thống nhất với feature khác: `selectedMonth`, `moveMonth(_ offset:)`, `load()`, `delete(_:)`.
+- [ ] Luồng nhiều bước của màn danh sách (chọn item, xác nhận xoá, thông báo kết quả) được điều phối trong ViewModel; View chỉ gọi action và bind state. Trạng thái trình bày gắn với luồng này có thể nằm trong ViewModel.
+- [ ] Khi một form phục vụ cả thêm và sửa, dùng một đích điều hướng có kiểu rõ ràng trong ViewModel; lưu các tham số cần thiết (ví dụ tháng được chọn) ngay lúc mở form.
+- [ ] Form đặt trạng thái xác nhận xoá và nội dung thông báo sau lưu/xoá trong ViewModel; View chỉ gọi action, chuyển thông báo thành công cho màn cha và `dismiss()` khi action thành công.
+- [ ] Giá trị dẫn xuất cho View (ví dụ icon bộ lọc, trạng thái empty) được expose qua computed property có tên rõ nghĩa; không lặp điều kiện ở các nhánh giao diện.
+- [ ] Dữ liệu trình bày dẫn xuất từ đầu vào màn hình (ví dụ tên/chữ viết tắt người dùng) và trạng thái tải ban đầu nằm trong ViewModel; View giữ logic bố cục, kích thước và khác biệt thiết bị.
 - [ ] Dùng `Date.addingMonths(_:)`, `Sequence.keyedByID()` thay vì viết lại.
 - [ ] Computed property nặng (lọc, sắp xếp, nhóm) không bị gọi nhiều lần trong một lần render; đọc một lần vào biến `let` trong `body`.
 
 ### View
 
 - [ ] View chỉ render state và gửi action; không tính nghiệp vụ, không gọi use case trực tiếp.
+- [ ] Closure của Button, sheet, alert và row chỉ gọi action của ViewModel; không tự phối hợp nhiều bước, giữ item chờ xoá hoặc quyết định thông báo thành công trong View.
 - [ ] View không tham chiếu `AppContainer` (trừ `#Preview`); cần tạo ViewModel con thì nhận `factory: any ViewModelFactory`.
 - [ ] View không `filter`/`sorted`, không parse tiền, trim chuỗi, validate hay tính giá trị mặc định; ViewModel expose sẵn (`categories(of:)`, `sortedAccounts`, `canSave`…).
 - [ ] Gọi hàm async bằng `.task {}`, `.refreshable {}` hoặc `Task { await … }` trong action.
@@ -98,6 +104,10 @@ Dùng trước khi mở PR hoặc tự review. Giải thích chi tiết về ki�
 ## 6. Clean code
 
 - [ ] Tên nói rõ ý định; tiếng Anh cho code, tiếng Việt cho chuỗi hiển thị.
+- [ ] Tên kiểu theo vai trò: `XxxView`, `XxxViewModel`, `XxxUseCases`, `XxxRepository`; tên file Swift khớp với kiểu chính trong file.
+- [ ] State Boolean dùng `is...`/`has...` (`isShowingAddForm`, `hasFilters`); item được chọn dùng `selected...` hoặc `editing...`; item chờ hành động dùng `...Pending...`.
+- [ ] Action dùng động từ thể hiện ý định và giai đoạn: `show...`, `edit(_:)`, `requestDeletion(of:)`, `cancelDeletion()`, `confirmDeletion()`; hàm async nói rõ công việc và không đặt tên theo thao tác UI mơ hồ.
+- [ ] Tên hàm và thuộc tính thống nhất giữa View và ViewModel; không dùng nhiều biến đồng nghĩa cho cùng một trạng thái (`showingAdd`/`isShowingAddForm`).
 - [ ] Không có code chết, `print`, code bị comment lại.
 - [ ] Không copy-paste khối logic/UI lần thứ hai: tách helper, extension hoặc component.
 - [ ] Comment giải thích **tại sao**, không mô tả lại code.

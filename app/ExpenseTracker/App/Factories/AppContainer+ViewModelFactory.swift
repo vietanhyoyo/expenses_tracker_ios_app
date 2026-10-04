@@ -9,8 +9,9 @@ extension AppContainer: ViewModelFactory {
         return viewModel
     }
 
-    func makeDashboardViewModel() -> DashboardViewModel {
+    func makeDashboardViewModel(userEmail: String?) -> DashboardViewModel {
         DashboardViewModel(
+            userEmail: userEmail,
             dashboardUseCases: dashboardUseCases,
             statisticsUseCases: statisticsUseCases,
             categoryUseCases: categoryUseCases,

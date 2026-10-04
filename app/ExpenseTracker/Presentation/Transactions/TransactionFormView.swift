@@ -3,7 +3,6 @@ import SwiftUI
 struct TransactionFormView: View {
     @State var viewModel: TransactionFormViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var isShowingDeleteConfirmation = false
     private let onSuccess: ((String) -> Void)?
 
     init(
@@ -85,7 +84,7 @@ struct TransactionFormView: View {
                 if viewModel.isEditing {
                     ToolbarItem(placement: .topBarTrailing) {
                         Button(role: .destructive) {
-                            isShowingDeleteConfirmation = true
+                            viewModel.requestDeletion()
                         } label: {
                             Image(systemName: "trash.fill")
                                 .font(.system(size: 15, weight: .semibold))
@@ -104,12 +103,12 @@ struct TransactionFormView: View {
                 }
             }
             .task { await viewModel.load() }
-            .alert("Xoá giao dịch?", isPresented: $isShowingDeleteConfirmation) {
-                Button("Huỷ", role: .cancel) {}
+            .alert("Xoá giao dịch?", isPresented: $viewModel.isShowingDeleteConfirmation) {
+                Button("Huỷ", role: .cancel) { viewModel.cancelDeletion() }
                 Button("Xoá", role: .destructive) {
                     Task {
-                        if await viewModel.delete() {
-                            onSuccess?("Đã xoá giao dịch thành công")
+                        if await viewModel.confirmDeletion() {
+                            onSuccess?(viewModel.successMessage)
                             dismiss()
                         }
                     }
@@ -124,15 +123,7 @@ struct TransactionFormView: View {
     private func save() {
         Task {
             if await viewModel.save() {
-                let message: String
-                if viewModel.isEditing {
-                    message = "Đã cập nhật giao dịch thành công"
-                } else {
-                    message = viewModel.type == .income
-                        ? "Đã thêm khoản thu thành công"
-                        : "Đã thêm khoản chi thành công"
-                }
-                onSuccess?(message)
+                onSuccess?(viewModel.successMessage)
                 dismiss()
             }
         }

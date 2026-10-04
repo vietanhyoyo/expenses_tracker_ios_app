@@ -8,6 +8,7 @@ final class BudgetsViewModel {
     var selectedMonth = Date()
     var progress: [BudgetProgress] = []
     var errorMessage: String?
+    var formDestination: BudgetFormDestination?
 
     private let budgetUseCases: BudgetUseCases
 
@@ -15,8 +16,17 @@ final class BudgetsViewModel {
         self.budgetUseCases = budgetUseCases
     }
 
+    func showAddForm() {
+        formDestination = .add(month: selectedMonth)
+    }
+
+    func edit(_ progress: BudgetProgress) {
+        formDestination = .edit(budget: progress.budget)
+    }
+
     func load() async {
         isLoading = true
+        errorMessage = nil
         defer { isLoading = false }
         do {
             progress = try await budgetUseCases.progress(for: selectedMonth)
@@ -41,6 +51,32 @@ final class BudgetsViewModel {
             await load()
         } catch {
             errorMessage = error.userMessage
+        }
+    }
+}
+
+enum BudgetFormDestination: Identifiable {
+    case add(month: Date)
+    case edit(budget: Budget)
+
+    var id: String {
+        switch self {
+        case .add: return "add"
+        case .edit(let budget): return budget.id.uuidString
+        }
+    }
+
+    var budget: Budget? {
+        switch self {
+        case .add: return nil
+        case .edit(let budget): return budget
+        }
+    }
+
+    var month: Date {
+        switch self {
+        case .add(let month): return month
+        case .edit(let budget): return budget.month
         }
     }
 }

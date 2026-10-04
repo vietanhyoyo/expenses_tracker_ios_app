@@ -11,6 +11,8 @@ final class CategoryFormViewModel {
     var colorHex: String
     var isSaving = false
     var errorMessage: String?
+    var failureToastMessage: String?
+    private(set) var successMessage = ""
 
     private let id: UUID
     private let categoryUseCases: CategoryUseCases
@@ -39,6 +41,7 @@ final class CategoryFormViewModel {
     func save() async -> Bool {
         isSaving = true
         errorMessage = nil
+        failureToastMessage = nil
         defer { isSaving = false }
 
         let category = ExpenseCategory(
@@ -50,9 +53,14 @@ final class CategoryFormViewModel {
         )
         do {
             try await categoryUseCases.save(category, isEditing: isEditing)
+            successMessage = isEditing
+                ? "Đã cập nhật danh mục thành công"
+                : "Đã thêm danh mục thành công"
             return true
         } catch {
-            errorMessage = error.userMessage
+            let message = error.userMessage
+            errorMessage = message
+            failureToastMessage = message
             return false
         }
     }

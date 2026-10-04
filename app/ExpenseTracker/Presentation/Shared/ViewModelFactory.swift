@@ -6,7 +6,7 @@ import Foundation
 @MainActor
 protocol ViewModelFactory {
     func makeSessionViewModel() -> SessionViewModel
-    func makeDashboardViewModel() -> DashboardViewModel
+    func makeDashboardViewModel(userEmail: String?) -> DashboardViewModel
     func makeTransactionListViewModel() -> TransactionListViewModel
     func makeTransactionFormViewModel(transaction: ExpenseTransaction?) -> TransactionFormViewModel
     func makeStatisticsViewModel() -> StatisticsViewModel

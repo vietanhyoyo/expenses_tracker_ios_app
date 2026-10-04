@@ -3,7 +3,6 @@ import SwiftUI
 struct CategoryFormView: View {
     @State var viewModel: CategoryFormViewModel
     @Environment(\.dismiss) private var dismiss
-    @State private var failureMessage: String?
 
     private let onSuccess: ((String) -> Void)?
 
@@ -61,7 +60,7 @@ struct CategoryFormView: View {
             .navigationBarTitleDisplayMode(.inline)
             .formToolbar(isSaveDisabled: !viewModel.canSave, onSave: save)
         }
-        .errorToast(message: $failureMessage)
+        .errorToast(message: $viewModel.failureToastMessage)
     }
 
     private var iPadForm: some View {
@@ -85,7 +84,7 @@ struct CategoryFormView: View {
         }
         .frame(width: 700, height: 700)
         .modifier(CategoryFormIPadPresentationModifier())
-        .errorToast(message: $failureMessage)
+        .errorToast(message: $viewModel.failureToastMessage)
     }
 
     private var iPadDetailsCard: some View {
@@ -254,14 +253,8 @@ struct CategoryFormView: View {
     private func save() {
         Task {
             if await viewModel.save() {
-                onSuccess?(
-                    viewModel.isEditing
-                        ? "Đã cập nhật danh mục thành công"
-                        : "Đã thêm danh mục thành công"
-                )
+                onSuccess?(viewModel.successMessage)
                 dismiss()
-            } else if let errorMessage = viewModel.errorMessage {
-                failureMessage = errorMessage
             }
         }
     }

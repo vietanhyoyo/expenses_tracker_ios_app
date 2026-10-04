@@ -15,7 +15,6 @@
 		0882CB801AE37D87594E26B7 /* CategoryFormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4D8E2ACDAADFDE0EA2849331 /* CategoryFormView.swift */; };
 		094A2AA52E474835175B1CED /* MonthlyCashFlowCalendar.swift in Sources */ = {isa = PBXBuildFile; fileRef = EDA65D5406B6698D005D62C5 /* MonthlyCashFlowCalendar.swift */; };
 		0AFDD73B18532337C2A46846 /* AppIconBadge.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2974BA81361FC3A40D429BCE /* AppIconBadge.swift */; };
-		DF2A7CCE7F45AE01B4356600 /* AppLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDBAE1BFBB370454EEA8050 /* AppLoadingView.swift */; };
 		0E061DDCC8E2A46ABFEC2C1B /* AppMetricCard.swift in Sources */ = {isa = PBXBuildFile; fileRef = F619EF0EEF32264E57664D9A /* AppMetricCard.swift */; };
 		0E47DF7C22A08279755E2EE0 /* BudgetProgress+Presentation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8DA43DC2CBAE53D83B4B0311 /* BudgetProgress+Presentation.swift */; };
 		12496F1EE5CB8F15237DE0F1 /* APIModels.swift in Sources */ = {isa = PBXBuildFile; fileRef = 484F9F4059A5B29309056EAD /* APIModels.swift */; };
@@ -112,6 +111,7 @@
 		D6010FE4B93032875C145D36 /* AuthUseCases.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBAC8F56C4B8CFDCB7A57168 /* AuthUseCases.swift */; };
 		DCF512C25C92560CE1026955 /* Error+UserMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7136873A6664AE3A2C2DC04F /* Error+UserMessage.swift */; };
 		DECD2B45ACF2ADDAA0218A0F /* AppTypography.swift in Sources */ = {isa = PBXBuildFile; fileRef = B01E2980BE68EFCE458E575C /* AppTypography.swift */; };
+		DF2A7CCE7F45AE01B4356600 /* AppLoadingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2CDBAE1BFBB370454EEA8050 /* AppLoadingView.swift */; };
 		E2FF45477DF4B93F109F74C1 /* MonthSelector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0D9702A7B243BCC9D67D196E /* MonthSelector.swift */; };
 		E3D8F41A3F12E0735736B4DB /* Decimal+Double.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5959E6D496526AC6D0B22C85 /* Decimal+Double.swift */; };
 		E96A50E378CE1BF273301FFB /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 13B218FF81460867D67D9450 /* Foundation.framework */; };
@@ -156,10 +156,10 @@
 		2786B4295FEE99EF745720BA /* View+FormToolbar.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "View+FormToolbar.swift"; path = "Shared/DesignSystem/View+FormToolbar.swift"; sourceTree = "<group>"; };
 		284169318BEA958C204D1DBC /* AppContainer+ViewModelFactory.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "AppContainer+ViewModelFactory.swift"; path = "App/Factories/AppContainer+ViewModelFactory.swift"; sourceTree = "<group>"; };
 		2974BA81361FC3A40D429BCE /* AppIconBadge.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppIconBadge.swift; path = Shared/Components/AppIconBadge.swift; sourceTree = "<group>"; };
-		2CDBAE1BFBB370454EEA8050 /* AppLoadingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppLoadingView.swift; path = Shared/Components/AppLoadingView.swift; sourceTree = "<group>"; };
 		29BA5A685E26AB3F7E7B5B18 /* AccountUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountUseCases.swift; path = Domain/UseCases/AccountUseCases.swift; sourceTree = "<group>"; };
 		2C71508B89A3D0D71096D37A /* TransactionRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionRepositoryImpl.swift; path = Data/Repositories/TransactionRepositoryImpl.swift; sourceTree = "<group>"; };
 		2CB19AFD9B07FC8E16F06877 /* AuthRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthRepository.swift; path = Domain/Repositories/AuthRepository.swift; sourceTree = "<group>"; };
+		2CDBAE1BFBB370454EEA8050 /* AppLoadingView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AppLoadingView.swift; path = Shared/Components/AppLoadingView.swift; sourceTree = "<group>"; };
 		305830F80FFD12BE347B719A /* DailySpendingChart.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DailySpendingChart.swift; path = Presentation/Statistics/Components/DailySpendingChart.swift; sourceTree = "<group>"; };
 		32F7FE7CA10D038A0521CC76 /* CategoryRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CategoryRepositoryImpl.swift; path = Data/Repositories/CategoryRepositoryImpl.swift; sourceTree = "<group>"; };
 		34D5732B9B744C6BE13AB7FB /* TransactionRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionRow.swift; path = Presentation/Shared/Components/TransactionRow.swift; sourceTree = "<group>"; };
@@ -184,7 +184,6 @@
 		6213CCDA495F0CDC53CEA952 /* DefaultDataSeeder.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DefaultDataSeeder.swift; path = App/Bootstrap/DefaultDataSeeder.swift; sourceTree = "<group>"; };
 		63F811CEE7467EADDABF486C /* SettingsRow.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SettingsRow.swift; path = Presentation/Settings/SettingsRow.swift; sourceTree = "<group>"; };
 		67474EBA194786A473436AB8 /* AuthView.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AuthView.swift; path = Presentation/Auth/AuthView.swift; sourceTree = "<group>"; };
-		8F1BEE7B7DAA4D2AB2B9C1E3 /* ExpenseTracker.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = ExpenseTracker.entitlements; path = ExpenseTracker/ExpenseTracker.entitlements; sourceTree = "<group>"; };
 		6A57D585306596C23875F578 /* BudgetRepositoryImpl.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetRepositoryImpl.swift; path = Data/Repositories/BudgetRepositoryImpl.swift; sourceTree = "<group>"; };
 		6AC66055A3C6B9E798D052FF /* StatisticsUseCases.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StatisticsUseCases.swift; path = Domain/UseCases/StatisticsUseCases.swift; sourceTree = "<group>"; };
 		6D8F404E3F1AA332C9ABE2B7 /* TransactionSort.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionSort.swift; path = Presentation/Transactions/Models/TransactionSort.swift; sourceTree = "<group>"; };
@@ -200,6 +199,7 @@
 		8DA43DC2CBAE53D83B4B0311 /* BudgetProgress+Presentation.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = "BudgetProgress+Presentation.swift"; path = "Presentation/Shared/Extensions/BudgetProgress+Presentation.swift"; sourceTree = "<group>"; };
 		8E0E70A016B124510499F648 /* DashboardViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DashboardViewModel.swift; path = Presentation/Dashboard/DashboardViewModel.swift; sourceTree = "<group>"; };
 		8E15928F83BDB43B95117D33 /* TransactionRepository.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = TransactionRepository.swift; path = Domain/Repositories/TransactionRepository.swift; sourceTree = "<group>"; };
+		8F1BEE7B7DAA4D2AB2B9C1E3 /* ExpenseTracker.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; name = ExpenseTracker.entitlements; path = ExpenseTracker/ExpenseTracker.entitlements; sourceTree = "<group>"; };
 		9205FB5A40CAC9872CDE574D /* BudgetsViewModel.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BudgetsViewModel.swift; path = Presentation/Budgets/BudgetsViewModel.swift; sourceTree = "<group>"; };
 		93E93E4E7CFBE761A523527F /* MonthlySummary.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = MonthlySummary.swift; path = Domain/Entities/Statistics/MonthlySummary.swift; sourceTree = "<group>"; };
 		968283A35DD5701A618C3DDF /* Assets.xcassets */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = folder.assetcatalog; name = Assets.xcassets; path = Resources/Assets.xcassets; sourceTree = "<group>"; };
@@ -322,7 +322,6 @@
 				9EFCB3958AC9717B03B51BC9 /* PersistenceTests.swift */,
 				0F128E9D7AB822FB78D805F1 /* ViewModelTests.swift */,
 			);
-			name = ExpenseTrackerTests;
 			path = ExpenseTrackerTests;
 			sourceTree = "<group>";
 		};
@@ -378,6 +377,7 @@
 				9BCDF8AF3E943CE32102D875 /* Factories */,
 				A4C29D8DD283461DBADB2BFD /* RootView.swift */,
 				8F1BEE7B7DAA4D2AB2B9C1E3 /* ExpenseTracker.entitlements */,
+				7E3B8FB938D2CFBDC4155795 /* Data */,
 			);
 			name = App;
 			sourceTree = "<group>";
@@ -606,13 +606,11 @@
 			isa = PBXGroup;
 			children = (
 				1A7A544ADE20DE9929E8C870 /* App */,
-				7E3B8FB938D2CFBDC4155795 /* Data */,
 				540801E886215B78AFBF978C /* Domain */,
 				15367F5C6B523AD051FA1295 /* Presentation */,
 				39C2BC11CE3526B95A0A6BA0 /* Resources */,
 				4EA3754DCD2E1D6FF194C251 /* Shared */,
 			);
-			name = ExpenseTracker;
 			path = ExpenseTracker;
 			sourceTree = "<group>";
 		};
@@ -968,9 +966,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				INFOPLIST_FILE = ExpenseTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
@@ -1105,8 +1103,7 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SWIFT_COMPILATION_MODE = wholemodule;
-				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -1117,9 +1114,9 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CLANG_ENABLE_OBJC_WEAK = NO;
+				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
-				CODE_SIGN_ENTITLEMENTS = ExpenseTracker/ExpenseTracker.entitlements;
 				INFOPLIST_FILE = ExpenseTracker/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";

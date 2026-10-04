@@ -4,13 +4,7 @@ struct CategoriesView: View {
     @Environment(\.dismiss) private var dismiss
     private let factory: any ViewModelFactory
     @State private var viewModel: CategoriesViewModel
-    @State private var editingCategory: ExpenseCategory?
-    @State private var categoryToDelete: ExpenseCategory?
-    @State private var pendingDeleteCategory: ExpenseCategory?
-    @State private var pendingReplacementID: UUID?
     @State private var categoriesListID = UUID()
-    @State private var isShowingForm = false
-    @State private var successMessage: String?
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -30,7 +24,7 @@ struct CategoriesView: View {
                 categoriesList
                     .navigationTitle("Danh mục")
                     .toolbar {
-                        Button { isShowingForm = true } label: {
+                        Button { viewModel.showAddForm() } label: {
                             Image(systemName: "plus.circle.fill")
                         }
                         .accessibilityLabel("Thêm danh mục")
@@ -38,31 +32,24 @@ struct CategoriesView: View {
             }
         }
         .task { await viewModel.load() }
-        .sheet(isPresented: $isShowingForm, onDismiss: reload) {
+        .sheet(item: $viewModel.formDestination, onDismiss: reload) { destination in
             CategoryFormView(
-                viewModel: factory.makeCategoryFormViewModel(category: nil),
-                onSuccess: { successMessage = $0 }
+                viewModel: factory.makeCategoryFormViewModel(category: destination.category),
+                onSuccess: viewModel.handleFormSuccess
             )
         }
-        .sheet(item: $editingCategory, onDismiss: reload) { category in
-            CategoryFormView(
-                viewModel: factory.makeCategoryFormViewModel(category: category),
-                onSuccess: { successMessage = $0 }
-            )
-        }
-        .sheet(item: $categoryToDelete, onDismiss: processPendingDelete) { category in
+        .sheet(item: $viewModel.categoryToDelete, onDismiss: processPendingDelete) { category in
             CategoryDeleteSheet(
                 category: category,
-                replacementCategories: viewModel.categories(of: category.type)
-                    .filter { $0.id != category.id },
+                replacementCategories: viewModel.replacementCategories(for: category),
+                defaultReplacementID: viewModel.defaultReplacementID(for: category),
                 onConfirm: { replacementID in
-                    pendingDeleteCategory = category
-                    pendingReplacementID = replacementID
+                    viewModel.queueDelete(category, replacementID: replacementID)
                 }
             )
         }
         .errorToast(message: $viewModel.errorMessage)
-        .successToast(message: $successMessage)
+        .successToast(message: $viewModel.successMessage)
         .appLoadingOverlay(viewModel.isLoading, message: "Đang tải danh mục…")
     }
 
@@ -104,7 +91,7 @@ struct CategoriesView: View {
 
                 Spacer()
 
-                Button { isShowingForm = true } label: {
+                Button { viewModel.showAddForm() } label: {
                     Image(systemName: "plus.circle.fill")
                         .font(.system(size: 29, weight: .semibold))
                         .foregroundStyle(AppTheme.primary)
@@ -132,12 +119,12 @@ struct CategoriesView: View {
     private func categoryRow(_ category: ExpenseCategory) -> some View {
         Group {
             if category.isEditable {
-                Button { editingCategory = category } label: {
+                Button { viewModel.edit(category) } label: {
                     categoryLabel(category)
                 }
                 .swipeActions {
                     Button("Xoá", role: .destructive) {
-                        categoryToDelete = category
+                        viewModel.requestDeletion(of: category)
                     }
                     .tint(AppTheme.coral)
                 }
@@ -168,19 +155,12 @@ struct CategoriesView: View {
     }
 
     private func processPendingDelete() {
-        guard let category = pendingDeleteCategory,
-              let replacementID = pendingReplacementID else {
-            return
-        }
-        pendingDeleteCategory = nil
-        pendingReplacementID = nil
         Task {
-            if await viewModel.delete(category, replacementID: replacementID) {
+            if await viewModel.processPendingDelete() {
                 // Recreate the List after the sheet and swipe interaction have
                 // completely finished so UICollectionView does not apply a
                 // stale section diff to the deleted row.
                 categoriesListID = UUID()
-                successMessage = "Đã xoá danh mục và chuyển giao dịch thành công"
             }
         }
     }
@@ -197,15 +177,13 @@ private struct CategoryDeleteSheet: View {
     init(
         category: ExpenseCategory,
         replacementCategories: [ExpenseCategory],
+        defaultReplacementID: UUID?,
         onConfirm: @escaping (UUID) -> Void
     ) {
         self.category = category
         self.replacementCategories = replacementCategories
         self.onConfirm = onConfirm
-        _replacementID = State(initialValue: Self.defaultReplacementID(
-            for: category,
-            in: replacementCategories
-        ))
+        _replacementID = State(initialValue: defaultReplacementID)
     }
 
     var body: some View {
@@ -253,16 +231,5 @@ private struct CategoryDeleteSheet: View {
         }
         .presentationDetents([.medium])
         .presentationDragIndicator(.visible)
-    }
-
-    private static func defaultReplacementID(
-        for category: ExpenseCategory,
-        in categories: [ExpenseCategory]
-    ) -> UUID? {
-        let preferredName = category.type == .income ? "Thu nhập khác" : "Khác"
-        if let preferred = categories.first(where: { $0.name == preferredName }) {
-            return preferred.id
-        }
-        return categories.first?.id
     }
 }

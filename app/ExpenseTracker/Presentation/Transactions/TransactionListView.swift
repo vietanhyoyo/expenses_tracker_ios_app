@@ -9,12 +9,6 @@ struct TransactionListView: View {
 
     private let factory: any ViewModelFactory
     @State private var viewModel: TransactionListViewModel
-    @State private var editingTransaction: ExpenseTransaction?
-    @State private var transactionToDelete: ExpenseTransaction?
-    @State private var showingAdd = false
-    @State private var showingFilters = false
-    @State private var isShowingDeleteConfirmation = false
-    @State private var successMessage: String?
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -54,11 +48,11 @@ struct TransactionListView: View {
                 .toolbar {
                     if mode == .iPhonePortrait {
                         ToolbarItemGroup(placement: .topBarTrailing) {
-                            Button { showingFilters = true } label: {
-                                Image(systemName: filterIcon)
+                            Button { viewModel.showFilters() } label: {
+                                Image(systemName: viewModel.filterIcon)
                             }
                             .accessibilityLabel("Bộ lọc")
-                            Button { showingAdd = true } label: {
+                            Button { viewModel.showAddForm() } label: {
                                 Image(systemName: "plus.circle.fill")
                                     .font(.title3)
                             }
@@ -69,44 +63,36 @@ struct TransactionListView: View {
                 .toolbar(mode == .iPhonePortrait ? .visible : .hidden, for: .navigationBar)
                 .task { await viewModel.load() }
                 .refreshable { await viewModel.load() }
-                .sheet(isPresented: $showingAdd, onDismiss: reload) {
+                .sheet(isPresented: $viewModel.isShowingAddForm, onDismiss: reload) {
                     TransactionFormView(
                         viewModel: factory.makeTransactionFormViewModel(transaction: nil),
-                        onSuccess: { successMessage = $0 }
+                        onSuccess: viewModel.handleFormSuccess
                     )
                     .transactionFormSheetPresentation()
                 }
-                .sheet(item: $editingTransaction, onDismiss: reload) { item in
+                .sheet(item: $viewModel.editingTransaction, onDismiss: reload) { item in
                     TransactionFormView(
                         viewModel: factory.makeTransactionFormViewModel(transaction: item),
-                        onSuccess: { successMessage = $0 }
+                        onSuccess: viewModel.handleFormSuccess
                     )
                     .transactionFormSheetPresentation()
                 }
-                .sheet(isPresented: $showingFilters) {
+                .sheet(isPresented: $viewModel.isShowingFilters) {
                     TransactionFilterView(viewModel: viewModel)
                 }
                 .alert(
                     "Xoá giao dịch?",
-                    isPresented: $isShowingDeleteConfirmation
+                    isPresented: $viewModel.isShowingDeleteConfirmation
                 ) {
-                    Button("Huỷ", role: .cancel) {
-                        transactionToDelete = nil
-                    }
+                    Button("Huỷ", role: .cancel) { viewModel.cancelDeletion() }
                     Button("Xoá", role: .destructive) {
-                        guard let transaction = transactionToDelete else { return }
-                        transactionToDelete = nil
-                        Task {
-                            if await viewModel.delete(transaction) {
-                                successMessage = "Đã xoá giao dịch thành công"
-                            }
-                        }
+                        Task { await viewModel.confirmDeletion() }
                     }
                 } message: {
                     Text("Giao dịch này sẽ bị xoá vĩnh viễn và không thể hoàn tác.")
                 }
                 .errorAlert(message: $viewModel.errorMessage)
-                .successToast(message: $successMessage)
+                .successToast(message: $viewModel.successMessage)
             }
             .appIPadTypography(isEnabled: mode != .iPhonePortrait)
         }
@@ -137,23 +123,14 @@ struct TransactionListView: View {
                     transactions: section.transactions,
                     categories: viewModel.categories,
                     accounts: viewModel.accounts,
-                    onEdit: { editingTransaction = $0 },
-                    onDelete: { transaction in
-                        transactionToDelete = transaction
-                        isShowingDeleteConfirmation = true
-                    }
+                    onEdit: viewModel.edit,
+                    onDelete: viewModel.requestDeletion
                 )
             }
         }
         .listStyle(.insetGrouped)
         .scrollContentBackground(.hidden)
         .background(AppTheme.background)
-    }
-
-    private var filterIcon: String {
-        viewModel.hasFilters
-            ? "line.3.horizontal.decrease.circle.fill"
-            : "line.3.horizontal.decrease.circle"
     }
 
     private func iPadNavigationHeader(mode: LayoutMode) -> some View {
@@ -182,8 +159,8 @@ struct TransactionListView: View {
 
     private var iPadToolbarControls: some View {
         HStack(spacing: AppSpacing.xxSmall) {
-            Button { showingFilters = true } label: {
-                Image(systemName: filterIcon)
+            Button { viewModel.showFilters() } label: {
+                Image(systemName: viewModel.filterIcon)
                     .font(.system(size: 23, weight: .semibold))
                     .foregroundStyle(AppTheme.primary)
                     .frame(width: 46, height: 46)
@@ -192,7 +169,7 @@ struct TransactionListView: View {
             .buttonStyle(.plain)
             .accessibilityLabel("Bộ lọc")
 
-            Button { showingAdd = true } label: {
+            Button { viewModel.showAddForm() } label: {
                 Image(systemName: "plus")
                     .font(.system(size: 22, weight: .bold))
                     .foregroundStyle(.white)

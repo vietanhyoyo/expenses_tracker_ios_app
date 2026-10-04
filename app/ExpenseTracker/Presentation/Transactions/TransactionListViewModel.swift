@@ -17,6 +17,13 @@ final class TransactionListViewModel {
     var fromDate: Date?
     var toDate: Date?
     var sort: TransactionSort = .newest
+    var isShowingAddForm = false
+    var isShowingFilters = false
+    var isShowingDeleteConfirmation = false
+    var editingTransaction: ExpenseTransaction?
+    var successMessage: String?
+
+    private var transactionPendingDeletion: ExpenseTransaction?
 
     private let transactionUseCases: TransactionUseCases
     private let categoryUseCases: CategoryUseCases
@@ -84,6 +91,12 @@ final class TransactionListViewModel {
         !query.isEmpty || hasFilters
     }
 
+    var filterIcon: String {
+        hasFilters
+            ? "line.3.horizontal.decrease.circle.fill"
+            : "line.3.horizontal.decrease.circle"
+    }
+
     var sortedCategories: [ExpenseCategory] {
         categories.values.sorted { $0.name < $1.name }
     }
@@ -111,7 +124,42 @@ final class TransactionListViewModel {
         }
     }
 
-    func delete(_ transaction: ExpenseTransaction) async -> Bool {
+    func showAddForm() {
+        isShowingAddForm = true
+    }
+
+    func showFilters() {
+        isShowingFilters = true
+    }
+
+    func edit(_ transaction: ExpenseTransaction) {
+        editingTransaction = transaction
+    }
+
+    func requestDeletion(of transaction: ExpenseTransaction) {
+        transactionPendingDeletion = transaction
+        isShowingDeleteConfirmation = true
+    }
+
+    func cancelDeletion() {
+        transactionPendingDeletion = nil
+        isShowingDeleteConfirmation = false
+    }
+
+    func confirmDeletion() async {
+        guard let transaction = transactionPendingDeletion else { return }
+        cancelDeletion()
+
+        if await delete(transaction) {
+            successMessage = "Đã xoá giao dịch thành công"
+        }
+    }
+
+    func handleFormSuccess(_ message: String) {
+        successMessage = message
+    }
+
+    private func delete(_ transaction: ExpenseTransaction) async -> Bool {
         isLoading = true
         defer { isLoading = false }
         do {

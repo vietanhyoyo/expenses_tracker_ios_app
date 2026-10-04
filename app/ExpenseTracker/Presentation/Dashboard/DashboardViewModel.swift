@@ -14,22 +14,50 @@ final class DashboardViewModel {
     var categories: [UUID: ExpenseCategory] = [:]
     var selectedDate = Date()
     var selectedPeriod: StatisticsPeriod = .month
+    var isShowingTransactionForm = false
+    var successMessage: String?
 
+    private(set) var hasLoaded = false
+
+    private let userEmail: String?
     private let statisticsUseCases: StatisticsUseCases
     private let dashboardUseCases: DashboardUseCases
     private let categoryUseCases: CategoryUseCases
     private let budgetUseCases: BudgetUseCases
 
     init(
+        userEmail: String?,
         dashboardUseCases: DashboardUseCases,
         statisticsUseCases: StatisticsUseCases,
         categoryUseCases: CategoryUseCases,
         budgetUseCases: BudgetUseCases
     ) {
+        self.userEmail = userEmail
         self.dashboardUseCases = dashboardUseCases
         self.statisticsUseCases = statisticsUseCases
         self.categoryUseCases = categoryUseCases
         self.budgetUseCases = budgetUseCases
+    }
+
+    var userInitials: String {
+        let localPart = userEmail?.split(separator: "@").first.map(String.init) ?? "TK"
+        return String(localPart.prefix(2)).uppercased()
+    }
+
+    var userDisplayName: String {
+        userEmail ?? "Tài khoản của bạn"
+    }
+
+    var isInitialLoading: Bool {
+        isLoading && !hasLoaded
+    }
+
+    func showTransactionForm() {
+        isShowingTransactionForm = true
+    }
+
+    func handleFormSuccess(_ message: String) {
+        successMessage = message
     }
 
     func load() async {
@@ -68,6 +96,7 @@ final class DashboardViewModel {
                 calendar: calendar
             )
             categories = try await categoryUseCases.getAll().keyedByID()
+            hasLoaded = true
         } catch {
             errorMessage = error.userMessage
         }

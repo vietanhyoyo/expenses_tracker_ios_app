@@ -3,8 +3,6 @@ import SwiftUI
 struct BudgetsView: View {
     private let factory: any ViewModelFactory
     @State private var viewModel: BudgetsViewModel
-    @State private var isShowingForm = false
-    @State private var editingProgress: BudgetProgress?
 
     init(factory: any ViewModelFactory) {
         self.factory = factory
@@ -37,20 +35,18 @@ struct BudgetsView: View {
         .appScreenBackground()
         .navigationTitle("Ngân sách")
         .toolbar {
-            Button { isShowingForm = true } label: {
+            Button { viewModel.showAddForm() } label: {
                 Image(systemName: "plus.circle.fill")
             }
             .accessibilityLabel("Thêm ngân sách")
         }
         .task { await viewModel.load() }
-        .sheet(isPresented: $isShowingForm, onDismiss: reload) {
+        .sheet(item: $viewModel.formDestination, onDismiss: reload) { destination in
             BudgetFormView(
-                viewModel: factory.makeBudgetFormViewModel(budget: nil, month: viewModel.selectedMonth)
-            )
-        }
-        .sheet(item: $editingProgress, onDismiss: reload) { progress in
-            BudgetFormView(
-                viewModel: factory.makeBudgetFormViewModel(budget: progress.budget, month: viewModel.selectedMonth)
+                viewModel: factory.makeBudgetFormViewModel(
+                    budget: destination.budget,
+                    month: destination.month
+                )
             )
         }
         .errorAlert(message: $viewModel.errorMessage)
@@ -60,7 +56,7 @@ struct BudgetsView: View {
     private var budgetList: some View {
         List {
             ForEach(viewModel.progress) { progress in
-                Button { editingProgress = progress } label: {
+                Button { viewModel.edit(progress) } label: {
                     BudgetRow(progress: progress)
                 }
                 .buttonStyle(.plain)

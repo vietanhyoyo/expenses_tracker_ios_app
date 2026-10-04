@@ -15,7 +15,11 @@ final class TransactionFormViewModel {
     var categories: [ExpenseCategory] = []
     var accounts: [Account] = []
     var isSaving = false
+    var isShowingDeleteConfirmation = false
     var errorMessage: String?
+    private(set) var successMessage = ""
+
+    private var hasPendingDeletion = false
 
     private let transactionUseCases: TransactionUseCases
     private let categoryUseCases: CategoryUseCases
@@ -67,6 +71,23 @@ final class TransactionFormViewModel {
         categoryID = availableCategories.first?.id
     }
 
+    func requestDeletion() {
+        guard isEditing, !isSaving else { return }
+        hasPendingDeletion = true
+        isShowingDeleteConfirmation = true
+    }
+
+    func cancelDeletion() {
+        hasPendingDeletion = false
+        isShowingDeleteConfirmation = false
+    }
+
+    func confirmDeletion() async -> Bool {
+        guard hasPendingDeletion else { return false }
+        cancelDeletion()
+        return await delete()
+    }
+
     func save() async -> Bool {
         guard let transaction = makeTransaction() else {
             errorMessage = DomainError.invalidAmount.userMessage
@@ -79,6 +100,13 @@ final class TransactionFormViewModel {
 
         do {
             try await transactionUseCases.save(transaction, isEditing: isEditing)
+            if isEditing {
+                successMessage = "Đã cập nhật giao dịch thành công"
+            } else {
+                successMessage = type == .income
+                    ? "Đã thêm khoản thu thành công"
+                    : "Đã thêm khoản chi thành công"
+            }
             return true
         } catch {
             errorMessage = error.userMessage
@@ -86,7 +114,7 @@ final class TransactionFormViewModel {
         }
     }
 
-    func delete() async -> Bool {
+    private func delete() async -> Bool {
         guard isEditing else { return false }
 
         isSaving = true
@@ -95,6 +123,7 @@ final class TransactionFormViewModel {
 
         do {
             try await transactionUseCases.delete(id: id)
+            successMessage = "Đã xoá giao dịch thành công"
             return true
         } catch {
             errorMessage = error.userMessage

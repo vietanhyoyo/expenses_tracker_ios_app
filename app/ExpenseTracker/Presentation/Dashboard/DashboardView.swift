@@ -8,11 +8,8 @@ struct DashboardView: View {
     }
 
     private let factory: any ViewModelFactory
-    private let userEmail: String?
     private let onShowTransactions: () -> Void
     @State private var viewModel: DashboardViewModel
-    @State private var isShowingTransactionForm = false
-    @State private var successMessage: String?
 
     init(
         factory: any ViewModelFactory,
@@ -20,9 +17,8 @@ struct DashboardView: View {
         onShowTransactions: @escaping () -> Void = {}
     ) {
         self.factory = factory
-        self.userEmail = userEmail
         self.onShowTransactions = onShowTransactions
-        _viewModel = State(initialValue: factory.makeDashboardViewModel())
+        _viewModel = State(initialValue: factory.makeDashboardViewModel(userEmail: userEmail))
     }
 
     var body: some View {
@@ -82,16 +78,17 @@ struct DashboardView: View {
             .refreshable { await viewModel.load() }
             .task { await viewModel.load() }
             .sheet(
-                isPresented: $isShowingTransactionForm,
+                isPresented: $viewModel.isShowingTransactionForm,
                 onDismiss: { Task { await viewModel.load() } }
             ) {
                 TransactionFormView(
                     viewModel: factory.makeTransactionFormViewModel(transaction: nil),
-                    onSuccess: { successMessage = $0 }
+                    onSuccess: viewModel.handleFormSuccess
                 )
                 .transactionFormSheetPresentation()
             }
-            .successToast(message: $successMessage)
+            .successToast(message: $viewModel.successMessage)
+            .appLoadingOverlay(viewModel.isInitialLoading, message: "Đang tải tổng quan…")
         }
     }
 
@@ -254,7 +251,7 @@ struct DashboardView: View {
     private var dashboardHeader: some View {
         VStack(alignment: .leading, spacing: AppSpacing.large) {
             HStack(spacing: AppSpacing.small) {
-                Text(userInitials)
+                Text(viewModel.userInitials)
                     .font(
                         isPad
                             ? .system(size: 18, weight: .medium, design: .rounded)
@@ -280,7 +277,7 @@ struct DashboardView: View {
                                 : AppTypography.captionEmphasis
                         )
                         .foregroundStyle(.white)
-                    Text(userEmail ?? "Tài khoản của bạn")
+                    Text(viewModel.userDisplayName)
                         .font(
                             isPad
                                 ? .system(size: 20, weight: .semibold, design: .rounded)
@@ -310,11 +307,6 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private var userInitials: String {
-        let localPart = userEmail?.split(separator: "@").first.map(String.init) ?? "TK"
-        return String(localPart.prefix(2)).uppercased()
-    }
-
     private var isPad: Bool {
         UIDevice.current.userInterfaceIdiom == .pad
     }
@@ -329,7 +321,7 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func addTransactionButton(for mode: LayoutMode) -> some View {
-        Button { isShowingTransactionForm = true } label: {
+        Button { viewModel.showTransactionForm() } label: {
             if mode == .iPhonePortrait {
                 if usesLegacyPhoneStyle {
                     // iOS 17 needs a solid surface so the action remains
