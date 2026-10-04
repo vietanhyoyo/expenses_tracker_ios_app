@@ -102,6 +102,7 @@ ExpenseTracker/
 │   │   ├── Components/                    # View con chỉ dùng trong feature
 │   │   └── Models/                        # Kiểu chỉ dành cho UI (sort, nhóm theo ngày…)
 │   └── Shared/
+│       ├── AppRouter.swift               # Tab và path điều hướng có kiểu rõ ràng
 │       ├── ViewModelFactory.swift         # Protocol tạo ViewModel, App hiện thực
 │       ├── Components/                    # View dùng giữa các feature và biết Domain (TransactionRow)
 │       └── Extensions/                    # Mở rộng Domain cho hiển thị (title, color, userMessage)
@@ -233,14 +234,16 @@ View ──(action)──▶ ViewModel ──▶ UseCase
 
 Protocol `ViewModelFactory` (Presentation/Shared) có một hàm `makeXxxViewModel(...)` cho mỗi ViewModel; `AppContainer` hiện thực nó.
 
-- `RootView` (App) tạo một `SessionViewModel`, truyền `container` vào `DashboardView(factory:)`, `TransactionListView(factory:)`, `SettingsView(factory:session:)`; `StatisticsView` nhận ViewModel tạo sẵn.
-- View cần mở màn khác (Settings → Accounts/Categories/Budgets, danh sách → form) giữ `factory: any ViewModelFactory` và tạo ViewModel con từ đó.
+- `RootView` (App) tạo `SessionViewModel` và `AppRouter`, truyền `container` vào `DashboardView(factory:)`, `TransactionListView(factory:)`, `SettingsView(factory:session:router:)`; `StatisticsView` nhận ViewModel tạo sẵn.
+- View cần mở màn khác (Settings → Accounts/Categories, danh sách → form) giữ `factory: any ViewModelFactory` và tạo ViewModel con từ đó.
 - View tự tạo ViewModel của mình trong `init` bằng `State(initialValue: factory.makeXxxViewModel())`.
 - Không View hay ViewModel nào khởi tạo use case, repository hay tham chiếu `AppContainer` (ngoại lệ duy nhất: `#Preview`).
 
 ### 6.3 Điều hướng
 
-`RootView` khôi phục phiên từ Keychain và `/users/me`. Khi chưa có phiên, app hiển thị màn đăng nhập/đăng ký. Sau khi xác thực và `container.bootstrap()` xong, `TabView` gồm 4 tab: Tổng quan, Giao dịch, Thống kê, Cài đặt. Mỗi tab có `NavigationStack` riêng. Tài khoản, Danh mục, Ngân sách được mở từ Cài đặt bằng `NavigationLink`. Thêm/sửa dùng `.sheet`; màn danh sách tải lại trong `onDismiss`.
+`RootView` khôi phục phiên từ Keychain và `/users/me`. Khi chưa có phiên, app hiển thị màn đăng nhập/đăng ký. Sau khi xác thực và `container.bootstrap()` xong, `AppRouter` giữ `selectedTab: AppTab` cho 4 tab: Tổng quan, Giao dịch, Thống kê, Cài đặt. iPhone bind state này vào `TabView`; iPad dùng cùng state cho thanh tab riêng. `DashboardView` gọi callback tới `router.showTransactions()` khi người dùng chọn xem tất cả giao dịch.
+
+Mỗi tab có `NavigationStack` riêng. Cài đặt bind `NavigationStack(path:)` với `router.settingsPath: [SettingsRoute]`; `NavigationLink(value:)` và `navigationDestination(for:)` mở Tài khoản, Danh mục và trang chính sách. Router xoá tab/path cũ khi trạng thái đăng nhập thay đổi. Form thêm/sửa và bộ lọc vẫn là `.sheet` theo state của ViewModel từng feature; màn danh sách tải lại trong `onDismiss`.
 
 ### 6.4 Trạng thái màn hình
 

@@ -66,6 +66,7 @@ Dùng trước khi mở PR hoặc tự review. Giải thích chi tiết về ki�
 ### View
 
 - [ ] View chỉ render state và gửi action; không tính nghiệp vụ, không gọi use case trực tiếp.
+- [ ] Chuyển tab và đẩy màn trong `NavigationStack` qua `AppRouter`, dùng `AppTab`/`SettingsRoute` thay cho chỉ số tab hoặc tạo `NavigationLink(destination:)` rải rác. Sheet gắn với thao tác của feature tiếp tục bind state ViewModel.
 - [ ] Closure của Button, sheet, alert và row chỉ gọi action của ViewModel; không tự phối hợp nhiều bước, giữ item chờ xoá hoặc quyết định thông báo thành công trong View.
 - [ ] View không tham chiếu `AppContainer` (trừ `#Preview`); cần tạo ViewModel con thì nhận `factory: any ViewModelFactory`.
 - [ ] View không `filter`/`sorted`, không parse tiền, trim chuỗi, validate hay tính giá trị mặc định; ViewModel expose sẵn (`categories(of:)`, `sortedAccounts`, `canSave`…).

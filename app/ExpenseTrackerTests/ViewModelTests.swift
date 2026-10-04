@@ -3,6 +3,23 @@ import XCTest
 
 @MainActor
 final class ViewModelTests: XCTestCase {
+    func testAppRouterSelectsTabAndResetsNavigation() {
+        let router = AppRouter()
+
+        router.selectTab(.settings)
+        router.settingsPath.append(.categories)
+        XCTAssertEqual(router.selectedTab, .settings)
+        XCTAssertEqual(router.settingsPath, [.categories])
+
+        router.showTransactions()
+        XCTAssertEqual(router.selectedTab, .transactions)
+        XCTAssertEqual(router.settingsPath, [.categories])
+
+        router.reset()
+        XCTAssertEqual(router.selectedTab, .dashboard)
+        XCTAssertTrue(router.settingsPath.isEmpty)
+    }
+
     func testAccountFormSavesTrimmedNameAndParsedBalance() async throws {
         let container = try AppContainer(inMemory: true)
         let form = container.makeAccountFormViewModel(account: nil)

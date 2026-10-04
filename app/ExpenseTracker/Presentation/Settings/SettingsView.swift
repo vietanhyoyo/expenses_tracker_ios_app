@@ -9,12 +9,13 @@ struct SettingsView: View {
 
     let factory: any ViewModelFactory
     @Bindable var session: SessionViewModel
+    @Bindable var router: AppRouter
 
     var body: some View {
         GeometryReader { proxy in
             let mode = layoutMode(for: proxy.size)
 
-            NavigationStack {
+            NavigationStack(path: $router.settingsPath) {
                 Group {
                     if mode == .iPhonePortrait {
                         List {
@@ -30,6 +31,7 @@ struct SettingsView: View {
                 .appFormStyle()
                 .navigationTitle("Cài đặt")
                 .navigationBarTitleDisplayMode(.inline)
+                .navigationDestination(for: SettingsRoute.self, destination: destination)
             }
             .appLoadingOverlay(session.isSubmitting, message: "Đang xử lý…")
             .appIPadTypography(isEnabled: mode != .iPhonePortrait)
@@ -75,14 +77,10 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var managementRows: some View {
-        NavigationLink {
-            AccountsView(factory: factory)
-        } label: {
+        NavigationLink(value: SettingsRoute.accounts) {
             SettingsRow(title: "Tài khoản", subtitle: "Ví và số dư", icon: AppSymbols.accountFilled, color: AppTheme.teal)
         }
-        NavigationLink {
-            CategoriesView(factory: factory)
-        } label: {
+        NavigationLink(value: SettingsRoute.categories) {
             SettingsRow(title: "Danh mục", subtitle: "Nhóm khoản thu chi", icon: "square.grid.2x2.fill", color: AppTheme.violet)
         }
     }
@@ -104,9 +102,7 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var privacyRows: some View {
-        NavigationLink {
-            SettingsLegalDocumentView(document: .privacyPolicy)
-        } label: {
+        NavigationLink(value: SettingsRoute.privacyPolicy) {
             SettingsRow(
                 title: "Chính sách bảo mật",
                 subtitle: "Cách dữ liệu của bạn được bảo vệ",
@@ -115,15 +111,27 @@ struct SettingsView: View {
             )
         }
 
-        NavigationLink {
-            SettingsLegalDocumentView(document: .privacyRights)
-        } label: {
+        NavigationLink(value: SettingsRoute.privacyRights) {
             SettingsRow(
                 title: "Quyền riêng tư",
                 subtitle: "Quản lý và kiểm soát dữ liệu cá nhân",
                 icon: "hand.raised.fill",
                 color: AppTheme.violet
             )
+        }
+    }
+
+    @ViewBuilder
+    private func destination(for route: SettingsRoute) -> some View {
+        switch route {
+        case .accounts:
+            AccountsView(factory: factory)
+        case .categories:
+            CategoriesView(factory: factory)
+        case .privacyPolicy:
+            SettingsLegalDocumentView(document: .privacyPolicy)
+        case .privacyRights:
+            SettingsLegalDocumentView(document: .privacyRights)
         }
     }
 

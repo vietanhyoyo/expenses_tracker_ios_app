@@ -4,8 +4,8 @@ import UIKit
 struct RootView: View {
     let container: AppContainer
     @State private var session: SessionViewModel
+    @State private var router = AppRouter()
     @State private var isReady = false
-    @State private var selectedTab = 0
 
     init(container: AppContainer) {
         self.container = container
@@ -37,12 +37,11 @@ struct RootView: View {
         }
         .onAppear(perform: updateStatusBarStyle)
         .onChange(of: session.isAuthenticated) { _, isAuthenticated in
-            if isAuthenticated {
-                selectedTab = 0
-            }
+            router.reset()
+            if !isAuthenticated { isReady = false }
             updateStatusBarStyle()
         }
-        .onChange(of: selectedTab) { _, _ in
+        .onChange(of: router.selectedTab) { _, _ in
             updateStatusBarStyle()
         }
         .preferredColorScheme(session.isAuthenticated ? .light : .dark)
@@ -51,23 +50,23 @@ struct RootView: View {
     }
 
     private var mainTabView: some View {
-        TabView(selection: $selectedTab) {
+        TabView(selection: $router.selectedTab) {
             DashboardView(
                 factory: container,
                 userEmail: session.user?.email,
-                onShowTransactions: { selectedTab = 1 }
+                onShowTransactions: router.showTransactions
             )
-                .tabItem { Label("Tổng quan", systemImage: "square.grid.2x2.fill") }
-                .tag(0)
+                .tabItem { Label(AppTab.dashboard.title, systemImage: AppTab.dashboard.symbol) }
+                .tag(AppTab.dashboard)
             TransactionListView(factory: container)
-                .tabItem { Label("Giao dịch", systemImage: "arrow.left.arrow.right") }
-                .tag(1)
+                .tabItem { Label(AppTab.transactions.title, systemImage: AppTab.transactions.symbol) }
+                .tag(AppTab.transactions)
             StatisticsView(viewModel: container.makeStatisticsViewModel())
-                .tabItem { Label("Thống kê", systemImage: "chart.bar.xaxis") }
-                .tag(2)
-            SettingsView(factory: container, session: session)
-                .tabItem { Label("Cài đặt", systemImage: "gearshape.fill") }
-                .tag(3)
+                .tabItem { Label(AppTab.statistics.title, systemImage: AppTab.statistics.symbol) }
+                .tag(AppTab.statistics)
+            SettingsView(factory: container, session: session, router: router)
+                .tabItem { Label(AppTab.settings.title, systemImage: AppTab.settings.symbol) }
+                .tag(AppTab.settings)
         }
         .tint(AppTheme.teal)
         .toolbarBackground(AppTheme.elevatedSurface, for: .tabBar)
@@ -81,51 +80,51 @@ struct RootView: View {
             iPadBottomNavigation
         }
         .background(
-            (selectedTab == 0 ? AppTheme.elevatedSurface : AppTheme.background)
+            (router.selectedTab == .dashboard ? AppTheme.elevatedSurface : AppTheme.background)
                 .ignoresSafeArea()
         )
     }
 
     @ViewBuilder
     private var selectedTabContent: some View {
-        switch selectedTab {
-        case 0:
+        switch router.selectedTab {
+        case .dashboard:
             DashboardView(
                 factory: container,
                 userEmail: session.user?.email,
-                onShowTransactions: { selectedTab = 1 }
+                onShowTransactions: router.showTransactions
             )
-        case 1:
+        case .transactions:
             TransactionListView(factory: container)
-        case 2:
+        case .statistics:
             StatisticsView(viewModel: container.makeStatisticsViewModel())
-        default:
-            SettingsView(factory: container, session: session)
+        case .settings:
+            SettingsView(factory: container, session: session, router: router)
         }
     }
 
     private var iPadBottomNavigation: some View {
         HStack(spacing: AppSpacing.xxxSmall) {
-            ForEach(Array(zip(tabTitles.indices, tabTitles)), id: \.0) { index, title in
+            ForEach(AppTab.allCases, id: \.self) { tab in
                 Button {
-                    selectedTab = index
+                    router.selectTab(tab)
                 } label: {
-                    Text(title)
+                    Text(tab.title)
                         .font(.system(size: 17, weight: .semibold, design: .rounded))
                         .lineLimit(1)
                         .padding(.horizontal, 18)
                         .padding(.vertical, 9)
-                        .foregroundStyle(index == selectedTab ? AppTheme.primary : .secondary)
+                        .foregroundStyle(tab == router.selectedTab ? AppTheme.primary : .secondary)
                         .background(
-                            index == selectedTab
+                            tab == router.selectedTab
                                 ? AppTheme.primary.opacity(0.1)
                                 : .clear,
                             in: Capsule(style: .continuous)
                         )
                 }
                 .buttonStyle(.plain)
-                .accessibilityLabel(title)
-                .accessibilityAddTraits(index == selectedTab ? .isSelected : [])
+                .accessibilityLabel(tab.title)
+                .accessibilityAddTraits(tab == router.selectedTab ? .isSelected : [])
             }
         }
         .padding(AppSpacing.xxSmall)
@@ -142,12 +141,10 @@ struct RootView: View {
         .padding(.bottom, AppSpacing.medium)
     }
 
-    private let tabTitles = ["Tổng quan", "Giao dịch", "Thống kê", "Cài đặt"]
-
     @MainActor
     private func updateStatusBarStyle() {
         let isIPhoneDashboard =
-            UIDevice.current.userInterfaceIdiom == .phone && selectedTab == 0
+            UIDevice.current.userInterfaceIdiom == .phone && router.selectedTab == .dashboard
 
         UIApplication.shared.statusBarStyle =
             !session.isAuthenticated || isIPhoneDashboard ? .lightContent : .darkContent
